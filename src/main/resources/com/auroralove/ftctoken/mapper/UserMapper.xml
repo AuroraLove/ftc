@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.auroralove.ftctoken.mapper.UserMapper">
+    <sql id="TABLE_NAME" >ftc_user</sql>
+
+    <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
+      SELECT id,password FROM ftc_user
+      where
+      phone=#{phone}
+    </select>
+
+    <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
+        SELECT id,phone,teamid,amdin_status FROM ftc_user
+      where
+      id=#{id}
+    </select>
+
+    <insert id="newUser" parameterType="com.auroralove.ftctoken.model.UserModel"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        INSERT INTO
+        <include refid="TABLE_NAME" />
+        (
+        id,
+        parent_id,
+        phone,
+        password,
+        teamid,
+        regist_time
+        )
+        VALUES
+        (
+        #{id},
+        #{parentId},
+        #{phone},
+        #{passWord},
+        #{teamId},
+        NOW()
+        )
+    </insert>
+</mapper>
