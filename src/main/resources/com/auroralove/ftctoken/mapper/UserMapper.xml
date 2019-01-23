@@ -10,7 +10,7 @@
     </select>
 
     <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
-        SELECT id,phone,teamid,amdin_status FROM ftc_user
+        SELECT id,phone,password,teamid,admin_status FROM ftc_user
       where
       id=#{id}
     </select>
