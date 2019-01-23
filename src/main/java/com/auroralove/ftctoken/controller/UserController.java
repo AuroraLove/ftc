@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 用户中心REST访问接口
  * @author zyu
  * @date 2019-1-22  20:45
  */
@@ -66,6 +67,9 @@ public class UserController {
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
 
+    /**
+     *  @UserLoginToken 注解直接添加token验证，从header中获取，不需要的接口则无需增加
+     */
     @UserLoginToken
     @GetMapping("/getMessage")
     public String getMessage(){

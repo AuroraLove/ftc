@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 实体业务模型，用于返回值
  * @author zyu
  * @date 2019-1-22  20:43
  */

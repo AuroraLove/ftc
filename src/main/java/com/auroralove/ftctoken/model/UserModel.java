@@ -3,7 +3,7 @@ package com.auroralove.ftctoken.model;
 import java.sql.Date;
 
 /**
- * 用户实体模型
+ * 用户实体模型，与数据库字段相对应
  *
  * @author zyu
  * @date 2019/1/22
