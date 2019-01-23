@@ -120,7 +120,12 @@ public enum ResponseMessage {
 	/**
 	 * 有未通过的版本
 	 */
-	UNPASS_VERSION(516, "有未通过的版本!");
+	UNPASS_VERSION(516, "有未通过的版本!"),
+
+	/**
+	 * 注册手机号已存在
+	 */
+	PHONE_EXITS(517,"注册手机号已存在");
 
 	private final int status;
 	

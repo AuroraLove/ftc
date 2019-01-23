@@ -35,10 +35,10 @@ public class UserController {
     public ResponseResult login(Ufilter ufilter){
         UserModel userForBase = userService.findByUserphone(ufilter.getPhone());
         if(userForBase ==null){
-            return new ResponseResult(ResponseMessage.DATA_NOT_FOUND);
+            return new ResponseResult(ResponseMessage.DATA_NOT_FOUND,false);
         }else {
             if (!userForBase.getPassWord().equals(ufilter.getPassWord())){
-                return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR);
+                return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR,false);
             }else {
                 String token = tokenService.getToken(userForBase);
                 UserModel userModel = userService.findUserById(userForBase.getId());
@@ -57,13 +57,13 @@ public class UserController {
     @PostMapping("/regist")
     public ResponseResult regist(UserModel userModel){
         if(userService.findByUserphone(userModel.getPhone()) != null){
-            return new ResponseResult(ResponseMessage.DATA_NOT_FOUND,"注册手机号已存在");
+            return new ResponseResult(ResponseMessage.PHONE_EXITS,false);
         }
         Boolean flag = userService.registUser(userModel);
         if(flag != null && flag){
-            return new ResponseResult(ResponseMessage.OK,"注册成功");
+            return new ResponseResult(ResponseMessage.OK,true);
         }
-        return new ResponseResult(ResponseMessage.FAIL);
+        return new ResponseResult(ResponseMessage.FAIL,false);
     }
 
     @UserLoginToken
