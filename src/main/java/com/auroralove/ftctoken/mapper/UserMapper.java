@@ -1,5 +1,7 @@
 package com.auroralove.ftctoken.mapper;
 
+import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,4 +34,21 @@ public interface UserMapper {
      * @return Result<int>
      */
     int newUser(UserModel userModel);
+
+    /**
+     * 账户充值
+     *
+     * @param dealModel
+     * @return Result<int>
+     */
+    int recharge(DealModel dealModel);
+
+    /**
+     * 增加充值标识
+     *
+     * @param uid
+     * @param flag
+     * @return Result<int>
+     */
+    int rechargeFlag(@Param("id") Long uid,@Param("flag")Integer flag);
 }

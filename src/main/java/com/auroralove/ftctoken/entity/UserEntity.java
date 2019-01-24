@@ -91,6 +91,19 @@ public class UserEntity {
      */
     private Map<String, List<Map<String,Double>>> EOSPrice;
 
+    /**
+     * 用户级别
+     */
+    private Integer level;
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
     public UserEntity() {
 
     }

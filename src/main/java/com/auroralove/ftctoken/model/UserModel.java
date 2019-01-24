@@ -50,6 +50,11 @@ public class UserModel {
      */
     private Long teamId;
 
+    /**
+     * 用户是否已充值
+     */
+    private Integer flag;
+
     public Long getId() {
         return id;
     }
@@ -112,5 +117,13 @@ public class UserModel {
 
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
+    }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
     }
 }

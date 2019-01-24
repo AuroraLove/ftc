@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.auroralove.ftctoken.mapper.UserMapper">
-    <sql id="TABLE_NAME" >ftc_user</sql>
+    <sql id="USER" >ftc_user</sql>
+    <sql id="DEAL" >ftc_deal</sql>
 
     <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
       SELECT id,password FROM ftc_user
@@ -19,7 +20,7 @@
             useGeneratedKeys="true"
             keyProperty="id">
         INSERT INTO
-        <include refid="TABLE_NAME" />
+        <include refid="USER" />
         (
         id,
         parent_id,
@@ -38,4 +39,33 @@
         NOW()
         )
     </insert>
+
+    <insert id="recharge" parameterType="com.auroralove.ftctoken.model.DealModel"
+            useGeneratedKeys="true"
+            keyProperty="tid">
+        INSERT INTO
+        <include refid="DEAL" />
+        (
+        tid,
+        uid,
+        deal_amount,
+        deal_date,
+        type
+        )
+        VALUES
+        (
+        #{dealId},
+        #{userId},
+        #{amount},
+        NOW(),
+        #{type}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE <include refid="USER" />
+        SET flag = #{flag}
+        WHERE id = #{id}
+    </update>
+
 </mapper>

@@ -11,6 +11,8 @@ import com.auroralove.ftctoken.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 用户中心REST访问接口
  * @author zyu
@@ -66,6 +68,40 @@ public class UserController {
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
+
+    /**
+     * 账户充值
+     * @param ufilter
+     * @return
+     */
+    @PostMapping("/home/recharge")
+    public ResponseResult recharge(Ufilter ufilter){
+        if (ufilter.getId() != null && ufilter.getAmount() != null){
+            int result = userService.recharge(ufilter);
+            if (result > 0){
+                return new ResponseResult(ResponseMessage.OK,"充值成功");
+            }
+            return new ResponseResult(ResponseMessage.FAIL,"充值失败");
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+    }
+
+    /**
+     * 查看我的团队
+     * @param
+     * @return
+     */
+    @PostMapping("/home/team")
+    public ResponseResult team(Ufilter ufilter){
+        if (ufilter.getTeamId() != null){
+            List<UserEntity> userEntities = userService.getMyTeam(ufilter);
+            return new ResponseResult(ResponseMessage.OK,userEntities);
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+    }
+
+
+
 
     /**
      *  @UserLoginToken 注解直接添加token验证，从header中获取，不需要的接口则无需增加
