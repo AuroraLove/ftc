@@ -1,0 +1,7 @@
+{
+  "name": "Futurecion",
+  "version": "0.1.0",
+  "description": "Futurecion apiDoc,参数token放入header中，没有标明的参数即默认表单提交",
+  "title": "Futurecion apiDoc",
+  "url" : "https://localhost:8086/v1"
+}
