@@ -3,7 +3,7 @@ package com.auroralove.ftctoken.model;
 import java.sql.Date;
 
 /**
- * 用户实体模型
+ * 用户实体模型，与数据库字段相对应
  *
  * @author zyu
  * @date 2019/1/22
@@ -49,6 +49,16 @@ public class UserModel {
      *  我的团队id
      */
     private Long teamId;
+
+    /**
+     * 用户是否已充值
+     */
+    private Integer flag;
+    
+    /**
+     * 支付密码
+     */
+    private String pay_pwd;
 
     public Long getId() {
         return id;
@@ -113,4 +123,20 @@ public class UserModel {
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
     }
+
+    public Integer getFlag() {
+        return flag;
+    }
+
+    public void setFlag(Integer flag) {
+        this.flag = flag;
+    }
+    
+	public String getPay_pwd() {
+		return pay_pwd;
+	}
+
+	public void setPay_pwd(String pay_pwd) {
+		this.pay_pwd = pay_pwd;
+	}
 }

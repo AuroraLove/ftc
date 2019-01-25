@@ -1,4 +1,4 @@
-/*
+﻿/*
 Navicat MySQL Data Transfer
 
 Source Server         : ftc
@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80011
 File Encoding         : 65001
 
-Date: 2019-01-22 18:59:40
+Date: 2019-01-24 18:04:22
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -20,12 +20,13 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `ftc_deal`;
 CREATE TABLE `ftc_deal` (
+  `tid` bigint(20) NOT NULL,
   `uid` bigint(20) NOT NULL COMMENT '可交易资产',
   `deal_amount` double DEFAULT NULL,
   `deal_date` datetime DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
   `type` int(11) DEFAULT NULL,
-  PRIMARY KEY (`uid`)
+  PRIMARY KEY (`tid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
@@ -37,17 +38,22 @@ CREATE TABLE `ftc_deal` (
 -- ----------------------------
 DROP TABLE IF EXISTS `ftc_dict`;
 CREATE TABLE `ftc_dict` (
-  `did` bigint(20) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `value1` varchar(255) DEFAULT NULL,
-  `value2` varchar(255) DEFAULT NULL,
-  `value3` varchar(255) DEFAULT NULL,
+  `did` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name1` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `name2` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `value1` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `value2` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   PRIMARY KEY (`did`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of ftc_dict
 -- ----------------------------
+INSERT INTO `ftc_dict` VALUES ('1', 'EOS-FTC', 'EOS', '200', null);
+INSERT INTO `ftc_dict` VALUES ('2', 'EOS-FTC', 'FTC', '5000', null);
+INSERT INTO `ftc_dict` VALUES ('3', 'FTCPrice-Num', 'univalent', '1', null);
+INSERT INTO `ftc_dict` VALUES ('4', 'FTCPrice-Num', 'quantity', '500', null);
+INSERT INTO `ftc_dict` VALUES ('5', 'User-level', 'level', '6', null);
 
 -- ----------------------------
 -- Table structure for ftc_flow_oneside
@@ -158,13 +164,16 @@ CREATE TABLE `ftc_user` (
   `admin_status` int(11) DEFAULT NULL,
   `level` int(11) DEFAULT NULL,
   `regist_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `flag` int(11) DEFAULT NULL,
+  `pay_pwd` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Records of ftc_user
 -- ----------------------------
-INSERT INTO `ftc_user` VALUES ('7681578573824', null, null, '123456', null, '7681578573825', null, null, '2019-01-22 17:06:45');
+INSERT INTO `ftc_user` VALUES ('7681578573824', null, null, '123456', '123456', '7681578573825', null, null, '2019-01-23 15:56:36', null);
+INSERT INTO `ftc_user` VALUES ('7993796067328', null, null, '1234567', '123456', '7993796067329', null, null, '2019-01-23 10:21:08', null);
 
 -- ----------------------------
 -- Table structure for ftc_user_payinfo

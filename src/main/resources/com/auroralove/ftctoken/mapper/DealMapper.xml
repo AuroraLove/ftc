@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.auroralove.ftctoken.mapper.DealMapper">
+    <sql id="USER" >ftc_user</sql>
+    <sql id="DEAL" >ftc_deal</sql>
+    <insert id="newDealRecord" parameterType="com.auroralove.ftctoken.model.DealModel"
+            useGeneratedKeys="true"
+            keyProperty="tid">
+        INSERT INTO
+        <include refid="DEAL" />
+        (
+        tid,
+        uid,
+        univalent,
+        quantity,
+        deal_amount,
+        deal_date,
+        type,
+        status
+        )
+        VALUES
+        (
+        #{dealId},
+        #{userId},
+        #{univalent},
+        #{quantity},
+        #{amount},
+        NOW(),
+        #{type},
+        #{status}
+        )
+    </insert>
+
+
+</mapper>

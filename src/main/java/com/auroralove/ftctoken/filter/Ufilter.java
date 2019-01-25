@@ -1,11 +1,14 @@
 package com.auroralove.ftctoken.filter;
 
+import lombok.Data;
+
 /**
  * 用户访问过滤器
  *
  * @author zyu
  * @date 2019/1/22
  */
+@Data
 public class Ufilter {
 
     /**
@@ -42,60 +45,85 @@ public class Ufilter {
      *  我的团队id
      */
     private Long teamId;
+    
+    /**
+     * 支付密码
+     */
+    private String pay_pwd;
 
-    public Long getTeamId() {
-        return teamId;
-    }
+    private Double amount;
 
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Integer getPhone() {
+		return phone;
+	}
 
-    public Integer getPhone() {
-        return phone;
-    }
+	public void setPhone(Integer phone) {
+		this.phone = phone;
+	}
 
-    public void setPhone(Integer phone) {
-        this.phone = phone;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getPassWord() {
+		return passWord;
+	}
 
-    public String getPassWord() {
-        return passWord;
-    }
+	public void setPassWord(String passWord) {
+		this.passWord = passWord;
+	}
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
+	public String getToken() {
+		return token;
+	}
 
-    public String getToken() {
-        return token;
-    }
+	public void setToken(String token) {
+		this.token = token;
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+	public Integer getCode() {
+		return code;
+	}
 
-    public Integer getCode() {
-        return code;
-    }
+	public void setCode(Integer code) {
+		this.code = code;
+	}
 
-    public void setCode(Integer code) {
-        this.code = code;
-    }
+	public Long getTeamId() {
+		return teamId;
+	}
+
+	public void setTeamId(Long teamId) {
+		this.teamId = teamId;
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+    
+	public String getPay_pwd() {
+		return pay_pwd;
+	}
+
+	public void setPay_pwd(String pay_pwd) {
+		this.pay_pwd = pay_pwd;
+	}
+    
+
 }

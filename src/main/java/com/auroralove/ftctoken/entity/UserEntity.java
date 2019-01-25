@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 实体业务模型，用于返回值
  * @author zyu
  * @date 2019-1-22  20:43
  */
@@ -89,6 +90,19 @@ public class UserEntity {
      * EOS-FTC价格比
      */
     private Map<String, List<Map<String,Double>>> EOSPrice;
+
+    /**
+     * 用户级别
+     */
+    private Integer level;
+
+    public Integer getLevel() {
+        return level;
+    }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 
     public UserEntity() {
 
