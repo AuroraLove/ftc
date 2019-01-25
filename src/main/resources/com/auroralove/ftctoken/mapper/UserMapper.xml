@@ -3,6 +3,7 @@
 <mapper namespace="com.auroralove.ftctoken.mapper.UserMapper">
     <sql id="USER" >ftc_user</sql>
     <sql id="DEAL" >ftc_deal</sql>
+    <sql id="PAYINFO" >ftc_user_payinfo</sql>
 
     <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
       SELECT id,password FROM ftc_user
@@ -62,9 +63,21 @@
         )
     </insert>
 
-    <update id="update">
+    <update id="rechargeFlag">
         UPDATE <include refid="USER" />
         SET flag = #{flag}
+        WHERE id = #{id}
+    </update>
+    
+     <update id="changeLoginPwd">
+        UPDATE <include refid="USER" />
+        SET password = #{password}
+        WHERE id = #{id}
+    </update>
+    
+     <update id="changePayPwd">
+        UPDATE <include refid="USER" />
+        SET PAY_PWD = #{pay_pwd}
         WHERE id = #{id}
     </update>
 

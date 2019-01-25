@@ -96,8 +96,40 @@ public class UserController {
         return null;
     }
 
+    /**
+     * 修改登陆密码
+     * @param
+     * @return
+     */
+    @PostMapping("/home/changeLoginPwd")
+    public ResponseResult changeLoginPwd(Ufilter ufilter){
+    	if (ufilter.getId() != null && ufilter.getPassWord() != null){
+    		int result = userService.changeLoginPwd(ufilter);
+    		 if (result > 0){
+                 return new ResponseResult(ResponseMessage.OK,true);
+             }
+             return new ResponseResult(ResponseMessage.FAIL,false);
+    	}
+    	 return new ResponseResult(ResponseMessage.FAIL,false);
+    }
 
+    /**
+     * 修改支付密码
+     * @param
+     * @return
+     */
+    @PostMapping("/home/changePayPwd")
+    public ResponseResult changePayPwd(Ufilter ufilter){
+    	if (ufilter.getId() != null && ufilter.getPay_pwd() != null){
+    		int result = userService.changePayPwd(ufilter);
+    		 if (result > 0){
+                return new ResponseResult(ResponseMessage.OK,true);
+            }
+            return new ResponseResult(ResponseMessage.FAIL,false);
+    	}
+    	 return new ResponseResult(ResponseMessage.FAIL,false);
 
+    }
 
     /**
      *  @UserLoginToken 注解直接添加token验证，从header中获取，不需要的接口则无需增加

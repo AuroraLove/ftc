@@ -1,4 +1,4 @@
-/*
+﻿/*
 Navicat MySQL Data Transfer
 
 Source Server         : ftc
@@ -165,6 +165,7 @@ CREATE TABLE `ftc_user` (
   `level` int(11) DEFAULT NULL,
   `regist_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   `flag` int(11) DEFAULT NULL,
+  `pay_pwd` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
