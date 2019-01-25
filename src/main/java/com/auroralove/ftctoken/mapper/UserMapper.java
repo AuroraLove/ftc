@@ -1,6 +1,5 @@
 package com.auroralove.ftctoken.mapper;
 
-import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
 import org.apache.ibatis.annotations.Param;

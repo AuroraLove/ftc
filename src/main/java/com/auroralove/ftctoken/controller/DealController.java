@@ -43,9 +43,11 @@ public class DealController {
      */
     @PostMapping("/home/purchase")
     public ResponseResult purchase(Dfilter dfilter){
-        if (ufilter.getTeamId() != null){
-            List<UserEntity> userEntities = dealService.subReward(ufilter);
-            return new ResponseResult(ResponseMessage.OK,userEntities);
+        if (dfilter.getId() != null){
+            int result = dealService.deal(dfilter);
+            if (result > 0){
+                return new ResponseResult(ResponseMessage.OK,"下单成功正在匹配！");
+            }
         }
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }
