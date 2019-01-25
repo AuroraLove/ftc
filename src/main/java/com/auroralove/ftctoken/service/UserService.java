@@ -87,4 +87,24 @@ public class UserService {
         }
         return reslut;
     }
+    /**
+     *  修改登陆密码
+     * @param ufilter
+     * @return
+     */
+    public int changeLoginPwd(Ufilter ufilter) {
+    	int reslut = userMapper.changeLoginPwd(ufilter.getId(),ufilter.getPassWord());
+        return reslut;
+    }
+    
+    /**
+     *  修改支付密码
+     * @param ufilter
+     * @return
+     */
+    public int changePayPwd(Ufilter ufilter) {
+    	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPay_pwd());
+        return reslut;
+    }
+    
 }

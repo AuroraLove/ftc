@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken.model;
 
+import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import lombok.Data;
 
@@ -23,6 +24,16 @@ public class DealModel {
      * 用户id
      */
     private Long userId;
+
+    /**
+     * 单价
+     */
+    private Double univalent;
+
+    /**
+     * 数量
+     */
+    private Double quantity;
 
     /**
      * 金额
@@ -50,5 +61,12 @@ public class DealModel {
     }
 
     public DealModel() {
+    }
+
+    public DealModel(Dfilter dfilter) {
+        this.userId = dfilter.getId();
+        this.type = dfilter.getTrctFlag();
+        this.univalent = dfilter.getUnivalent();
+        this.quantity = dfilter.getQuantity();
     }
 }

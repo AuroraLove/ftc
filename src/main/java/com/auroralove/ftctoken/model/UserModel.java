@@ -54,6 +54,11 @@ public class UserModel {
      * 用户是否已充值
      */
     private Integer flag;
+    
+    /**
+     * 支付密码
+     */
+    private String pay_pwd;
 
     public Long getId() {
         return id;
@@ -126,4 +131,12 @@ public class UserModel {
     public void setFlag(Integer flag) {
         this.flag = flag;
     }
+    
+	public String getPay_pwd() {
+		return pay_pwd;
+	}
+
+	public void setPay_pwd(String pay_pwd) {
+		this.pay_pwd = pay_pwd;
+	}
 }

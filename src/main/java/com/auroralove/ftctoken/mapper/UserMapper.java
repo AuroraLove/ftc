@@ -46,9 +46,27 @@ public interface UserMapper {
     /**
      * 增加充值标识
      *
-     * @param uid
+     * @param id
      * @param flag
      * @return Result<int>
      */
-    int rechargeFlag(@Param("id") Long uid,@Param("flag")Integer flag);
+    int rechargeFlag(@Param("id") Long id,@Param("flag")Integer flag);
+    
+    /**
+     * 修改登陆密码
+     *
+     * @param id
+     * @param password
+     * @return Result<int>
+     */
+    int changeLoginPwd(@Param("id") Long id,@Param("password")String password);
+    /**
+     * 修改支付密码
+     *
+     * @param id
+     * @param password
+     * @return Result<int>
+     */
+    int changePayPwd(@Param("id") Long id,@Param("pay_pwd")String pay_pwd);
+    
 }
