@@ -16,7 +16,7 @@ public interface UserMapper {
      * @param phone phone
      * @return Result<UserModel>
      */
-    UserModel findByUserphone(@Param("phone") Integer phone);
+    UserModel findByUserphone(@Param("phone") String phone);
 
     /**
      * 通过手机号查找用户

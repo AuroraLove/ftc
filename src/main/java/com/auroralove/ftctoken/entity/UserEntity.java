@@ -1,11 +1,7 @@
 package com.auroralove.ftctoken.entity;
 
 import com.auroralove.ftctoken.model.UserModel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +20,7 @@ public class UserEntity {
     /**
      * 用户手机号
      */
-    private Integer phone;
+    private String phone;
 
     /**
      * 用户密码
@@ -123,11 +119,11 @@ public class UserEntity {
         this.id = id;
     }
 
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Integer phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

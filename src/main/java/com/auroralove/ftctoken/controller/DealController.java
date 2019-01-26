@@ -8,6 +8,8 @@ import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.DealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ import java.util.List;
  * @author zyu
  * @date 2019/1/24
  */
+@RestController
+@RequestMapping("/v1/rest")
 public class DealController {
 
     @Autowired
@@ -37,12 +41,12 @@ public class DealController {
     }
 
     /**
-     * 买单交易
+     * 交易
      * @param
      * @return
      */
-    @PostMapping("/home/purchase")
-    public ResponseResult purchase(Dfilter dfilter){
+    @PostMapping("/home/deal")
+    public ResponseResult deal(Dfilter dfilter){
         if (dfilter.getId() != null){
             int result = dealService.deal(dfilter);
             if (result > 0){

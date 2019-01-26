@@ -10,8 +10,6 @@ import com.auroralove.ftctoken.utils.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-
 /**
  * @author zyu
  * @date 2019-1-22 20:52
@@ -30,7 +28,7 @@ public class UserService {
      * @param phone
      * @return
      */
-    public UserModel findByUserphone(Integer phone){
+    public UserModel findByUserphone(String phone){
         return userMapper.findByUserphone(phone);
     }
 
