@@ -27,6 +27,8 @@ public enum DealEnum {
      */
     RELEASE_FLAG(7),
 
+
+
     /**
      * 交易状态STATUS，匹配中
      */

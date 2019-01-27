@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.auroralove.ftctoken.mapper.DealMapper">
-    <sql id="USER" >ftc_user</sql>
-    <sql id="DEAL" >ftc_deal</sql>
-    <insert id="newDealRecord" parameterType="com.auroralove.ftctoken.model.DealModel"
-            useGeneratedKeys="true"
-            keyProperty="tid">
+    <sql id="USER">ftc_user</sql>
+    <sql id="DEAL">ftc_deal</sql>
+    <insert id="newDealRecord" parameterType="com.auroralove.ftctoken.model.DealModel">
         INSERT INTO
-        <include refid="DEAL" />
+        <include refid="DEAL"/>
         (
         tid,
         uid,
@@ -31,5 +29,72 @@
         )
     </insert>
 
+    <select id="getPurchaseDeals" resultType="com.auroralove.ftctoken.model.DealModel">
+     SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where uid in
+(select t1.uid from
+(select uid,sum(deal_amount) as buy_release_amount from ftc_deal  where type in(0,7) and status=6 GROUP BY uid) as t1 LEFT  JOIN
+ (select uid,sum(deal_amount) as sell_amount from ftc_deal  where type=1 and status=6 GROUP BY uid)  as t2 ON t1.uid = t2.uid order by
+ (t1.buy_release_amount- t2.sell_amount) desc) and type = 0 and status = 3
+    </select>
+
+    <select id="getSellDeals" resultType="com.auroralove.ftctoken.model.DealModel">
+    SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
+    </select>
+
+    <insert id="newOrders" parameterType="java.util.List" >
+        INSERT INTO ftc_order
+        (
+        oid,
+        deal_buy_id,
+        deal_sell_id,
+        seller_id,
+        buyer_id,
+        seller_phone,
+        buyer_phone,
+        oder_date,
+        status,
+        univalent,
+        quantity,
+        deal_amount
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.oid},
+            #{item.deal_buy_id},
+            #{item.deal_sell_id},
+            #{item.seller_id},
+            #{item.buyer_id},
+            #{item.seller_phone},
+            #{item.buyer_phone},
+            NOW(),
+            #{item.status},
+            #{item.univalent},
+            #{item.quantity},
+            #{item.deal_amount}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
+    SELECT (
+            oid,
+        deal_buy_id,
+        deal_sell_id,
+        seller_id,
+        buyer_id,
+        seller_phone,
+        buyer_phone,
+        oder_date,
+        status,
+        univalent,
+        quantity,
+        deal_amount,
+        pay_way,
+        affirm_date,
+        order_date,
+        finnish_date
+    ) from ftc_order where oid = #{oid}
+    </select>
 
 </mapper>

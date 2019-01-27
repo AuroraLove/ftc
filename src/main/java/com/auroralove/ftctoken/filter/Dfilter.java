@@ -30,4 +30,8 @@ public class Dfilter{
      */
     private Integer trctFlag;
 
+    /**
+     * 订单id
+     */
+    private Long oid;
 }

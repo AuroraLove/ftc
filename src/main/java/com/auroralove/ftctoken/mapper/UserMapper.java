@@ -2,7 +2,10 @@ package com.auroralove.ftctoken.mapper;
 
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
+import com.auroralove.ftctoken.model.UserPayModel;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author zyu
@@ -67,5 +70,11 @@ public interface UserMapper {
      * @return Result<int>
      */
     int changePayPwd(@Param("id") Long id,@Param("pay_pwd")String pay_pwd);
-    
+
+    /**
+     * 获取支付信息
+     * @param buyer_id
+     * @return
+     */
+    List<UserPayModel> getPayInfo(Long buyer_id);
 }

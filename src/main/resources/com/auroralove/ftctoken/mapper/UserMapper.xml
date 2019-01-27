@@ -17,9 +17,7 @@
       id=#{id}
     </select>
 
-    <insert id="newUser" parameterType="com.auroralove.ftctoken.model.UserModel"
-            useGeneratedKeys="true"
-            keyProperty="id">
+    <insert id="newUser" parameterType="com.auroralove.ftctoken.model.UserModel">
         INSERT INTO
         <include refid="USER" />
         (
@@ -41,9 +39,7 @@
         )
     </insert>
 
-    <insert id="recharge" parameterType="com.auroralove.ftctoken.model.DealModel"
-            useGeneratedKeys="true"
-            keyProperty="tid">
+    <insert id="recharge" parameterType="com.auroralove.ftctoken.model.DealModel">
         INSERT INTO
         <include refid="DEAL" />
         (
@@ -81,4 +77,8 @@
         WHERE id = #{id}
     </update>
 
+    <select id="getPayInfo" resultType="com.auroralove.ftctoken.model.UserPayModel">
+        SELECT pid,uid,name,card_id,bank_name,ali_pay,ali_url,wechat_pay,wechat_url,bank_address
+        WHERE uid = #{id}
+    </select>
 </mapper>

@@ -76,7 +76,7 @@ public class UserService {
     public int recharge(Ufilter ufilter) {
         DealModel dealModel = new DealModel(ufilter);
         dealModel.setType(DealEnum.DEALTYPE_RECHARGE.getValue());
-        dealModel.setDealId(idWorker.nextId());
+        dealModel.setTid(idWorker.nextId());
         //增加用户充值记录
         int reslut = userMapper.recharge(dealModel);
         if (reslut > 0){

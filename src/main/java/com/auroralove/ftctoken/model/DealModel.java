@@ -18,12 +18,12 @@ public class DealModel {
     /**
      * 交易记录id
      */
-    private Long dealId;
+    private Long tid;
 
     /**
      * 用户id
      */
-    private Long userId;
+    private Long uid;
 
     /**
      * 单价
@@ -38,12 +38,12 @@ public class DealModel {
     /**
      * 金额
      */
-    private Double amount;
+    private Double deal_amount;
 
     /**
      * 交易日期
      */
-    private Date dealDate;
+    private Date deal_date;
 
     /**
      * 交易状态
@@ -51,20 +51,25 @@ public class DealModel {
     private Integer status;
 
     /**
+     * 用户手机号
+     */
+    private String phone;
+
+    /**
      * 交易类型，0，买，1，卖，2，充值
      */
     private Integer type;
 
     public DealModel(Ufilter ufilter) {
-        this.userId = ufilter.getId();
-        this.amount = ufilter.getAmount();
+        this.uid = ufilter.getId();
+        this.deal_amount = ufilter.getAmount();
     }
 
     public DealModel() {
     }
 
     public DealModel(Dfilter dfilter) {
-        this.userId = dfilter.getId();
+        this.uid = dfilter.getId();
         this.type = dfilter.getTrctFlag();
         this.univalent = dfilter.getUnivalent();
         this.quantity = dfilter.getQuantity();
