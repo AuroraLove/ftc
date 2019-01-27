@@ -23,6 +23,11 @@ public enum DealEnum {
     SELL_FLAG(1),
 
     /**
+     * 交易类型TYPE,释放
+     */
+    RELEASE_FLAG(7),
+
+    /**
      * 交易状态STATUS，匹配中
      */
     MATCHING_STATUS(3),

@@ -9,6 +9,7 @@ import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.OrderModel;
 import com.auroralove.ftctoken.utils.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author zyu
  * @date 2019/1/24
  */
+@Service
 public class DealService {
 
      @Autowired

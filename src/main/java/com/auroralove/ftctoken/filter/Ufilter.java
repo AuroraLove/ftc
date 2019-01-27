@@ -19,7 +19,7 @@ public class Ufilter {
     /**
      * 用户手机号
      */
-    private Integer phone;
+    private String phone;
 
     /**
      * 用户名称
@@ -61,11 +61,11 @@ public class Ufilter {
 		this.id = id;
 	}
 
-	public Integer getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(Integer phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 

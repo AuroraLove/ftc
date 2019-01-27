@@ -11,8 +11,6 @@ import com.auroralove.ftctoken.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * 用户中心REST访问接口
  * @author zyu

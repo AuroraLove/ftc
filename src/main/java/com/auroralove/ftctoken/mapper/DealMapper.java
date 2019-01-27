@@ -17,6 +17,9 @@ public interface DealMapper {
      */
     int newDealRecord(DealModel dealModel);
 
+    /**
+     * @return
+     */
     List<DealModel> getPurchaseDeals();
 
     List<DealModel> getSellDeals();
