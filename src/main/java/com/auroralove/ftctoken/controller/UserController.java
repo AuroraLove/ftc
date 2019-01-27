@@ -1,13 +1,16 @@
 package com.auroralove.ftctoken.controller;
 
 import com.auroralove.ftctoken.annotation.UserLoginToken;
+import com.auroralove.ftctoken.entity.MessageEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +46,7 @@ public class UserController {
             }else {
                 String token = tokenService.getToken(userForBase);
                 UserModel userModel = userService.findUserById(userForBase.getId());
-                UserEntity userResult = userService.getUserInfo(userModel);
+                UserEntity userResult = userService.getUserInfo(userModel); 
                 userResult.setToken(token);
                 return new ResponseResult(ResponseMessage.OK, userResult);
             }
@@ -129,6 +132,62 @@ public class UserController {
 
     }
 
+    /**
+     * 上传留言
+     * @param
+     * @return
+     */
+    @PostMapping("/home/uploadMsg")
+    public ResponseResult uploadMsg(Ufilter ufilter){
+    	if (ufilter.getId() != null && ufilter.getmType() != null&& ufilter.getMessage() != null){
+    		int res=0;
+    		if(ufilter.getPicture()!=null){
+    			//存凭证
+    			String url=null;
+    			
+    			
+    			
+    			
+    			//type=11，类型为上传留言
+    			if(ufilter.getmType()==11){
+    				res=userService.uploadMsg(ufilter, url);
+    			}else{
+    				res=userService.replayMsg(ufilter, url);
+    			}
+    			
+    		}else{
+    			//直接存数据库
+    			if(ufilter.getmType()==11){
+    				res=userService.uploadMsg(ufilter, null);
+    			}else{
+    				res=userService.replayMsg(ufilter, null);
+    			}
+    		}
+    		 if (res > 0){
+                 return new ResponseResult(ResponseMessage.OK,true);
+             }
+             return new ResponseResult(ResponseMessage.FAIL,false);
+    	
+    	}
+         return new ResponseResult(ResponseMessage.FAIL,false);
+
+    }
+    /**
+     * 查询留言簿
+     * @param
+     * @return
+     */
+    @PostMapping("/home/messageInfo")
+    public ResponseResult messageInfo(Ufilter ufilter){
+    	if (ufilter.getId() != null){
+    		MessageModel messageInfo=userService.messageInfo(ufilter.getId());
+    		MessageEntity messageEntity=new MessageEntity(messageInfo);
+    		return new ResponseResult(ResponseMessage.OK,messageEntity);
+    	}
+    	 return new ResponseResult(ResponseMessage.FAIL,false);
+
+    }
+    
     /**
      *  @UserLoginToken 注解直接添加token验证，从header中获取，不需要的接口则无需增加
      */

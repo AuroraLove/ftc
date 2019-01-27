@@ -92,6 +92,7 @@ public class UserEntity {
      */
     private Integer level;
 
+
     public Integer getLevel() {
         return level;
     }
@@ -230,4 +231,7 @@ public class UserEntity {
     public void setEOSPrice(Map<String, List<Map<String, Double>>> EOSPrice) {
         this.EOSPrice = EOSPrice;
     }
+
+
+    
 }

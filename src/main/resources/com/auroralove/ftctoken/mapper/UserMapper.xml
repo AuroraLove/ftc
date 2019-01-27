@@ -4,6 +4,7 @@
     <sql id="USER" >ftc_user</sql>
     <sql id="DEAL" >ftc_deal</sql>
     <sql id="PAYINFO" >ftc_user_payinfo</sql>
+    <sql id="MESSAGE" >ftc_message</sql>
 
     <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
       SELECT id,password FROM ftc_user
@@ -81,4 +82,37 @@
         WHERE id = #{id}
     </update>
 
+
+    <insert id="uploadMsg" >
+        INSERT INTO
+        <include refid="MESSAGE" />
+        (id,uid,leaving_date,  msg, pic_url) 
+        VALUES
+        (
+        #{id},
+        #{uid},
+        NOW(),
+        #{message},
+        #{url}
+        )
+    </insert>
+    
+        <insert id="replayMsg" >
+        UPDATE
+        <include refid="MESSAGE" />
+        (replay_date,  r_msg, pic_url) 
+        VALUES
+        (
+        NOW(),
+        #{message},
+        #{url}
+        )
+        WHERE id=#{mesId}
+    </insert>
+    
+    <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
+        SELECT msg,r_msg,leaving_date,replay_date FROM ftc_message
+      where
+      uid=#{uid}
+    </select>
 </mapper>

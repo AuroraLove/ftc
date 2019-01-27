@@ -1,8 +1,11 @@
 package com.auroralove.ftctoken.mapper;
 
 import com.auroralove.ftctoken.model.DealModel;
+import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
+
 import org.apache.ibatis.annotations.Param;
+import org.w3c.dom.Text;
 
 /**
  * @author zyu
@@ -67,5 +70,28 @@ public interface UserMapper {
      * @return Result<int>
      */
     int changePayPwd(@Param("id") Long id,@Param("pay_pwd")String pay_pwd);
-    
+    /**
+     * 上传留言
+     *
+     * @param id
+     * @param message
+     * @return Result<int>
+     */
+    int uploadMsg(Long id,@Param("uid") Long uid,@Param("message")String message,String url);
+    /**
+     * 回复留言
+     *
+     * @param id
+     * @param message
+     * @return Result<int>
+     */
+    int replayMsg(Long mesId,String message,String url);
+    /**
+     * 查询留言
+     *
+     * @param id
+     * @param message
+     * @return Result<UserModel>
+     */
+    MessageModel messageInfo(Long uid);
 }
