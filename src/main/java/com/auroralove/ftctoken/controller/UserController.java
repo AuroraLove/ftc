@@ -1,5 +1,10 @@
 package com.auroralove.ftctoken.controller;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.entity.MessageEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
@@ -138,23 +143,35 @@ public class UserController {
      * @return
      */
     @PostMapping("/home/uploadMsg")
-    public ResponseResult uploadMsg(Ufilter ufilter){
+    public ResponseResult uploadMsg(Ufilter ufilter,HttpServletRequest request){
     	if (ufilter.getId() != null && ufilter.getmType() != null&& ufilter.getMessage() != null){
     		int res=0;
     		if(ufilter.getPicture()!=null){
-    			//存凭证
-    			String url=null;
-    			
-    			
-    			
-    			
-    			//type=11，类型为上传留言
-    			if(ufilter.getmType()==11){
-    				res=userService.uploadMsg(ufilter, url);
-    			}else{
-    				res=userService.replayMsg(ufilter, url);
-    			}
-    			
+    			try {
+	    			String fileName=ufilter.getPicture().getOriginalFilename();
+	    			//存凭证
+	    			String url=null;
+	    			// 项目在容器中实际发布运行的根路径
+	    			String realPath=request.getSession().getServletContext().getRealPath("/");
+	    			// 设置存放图片文件的路径
+	    			url=realPath+"pictures/";
+	    			File file=new File(url);
+	    			if (!file.exists()) {
+	    				file.mkdirs();
+	    			}
+	    			 // 转存文件到指定的路径
+					ufilter.getPicture().transferTo(file);
+	    			//type=11，类型为上传留言
+	    			if(ufilter.getmType()==11){
+	    				res=userService.uploadMsg(ufilter, url+"/"+fileName);
+	    			}else{
+	    				res=userService.replayMsg(ufilter, url+"/"+fileName);
+	    			}
+				} catch (IllegalStateException e) {
+					return new ResponseResult(ResponseMessage.FAIL,false);
+				} catch (IOException e) {
+					return new ResponseResult(ResponseMessage.FAIL,false);
+				}
     		}else{
     			//直接存数据库
     			if(ufilter.getmType()==11){
