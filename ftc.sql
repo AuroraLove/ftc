@@ -79,7 +79,7 @@ CREATE TABLE `ftc_flow_oneside` (
 DROP TABLE IF EXISTS `ftc_message`;
 CREATE TABLE `ftc_message` (
   `uid` bigint(20) NOT NULL,
-  `phone` int(11) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
   `leaving_date` datetime DEFAULT NULL,
   `replay_date` datetime DEFAULT NULL,
   `msg` text,
@@ -101,8 +101,8 @@ CREATE TABLE `ftc_order` (
   `seller_id` bigint(20) DEFAULT NULL,
   `buyer_id` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL,
-  `seller_phone` int(11) DEFAULT NULL,
-  `buyer_phone` int(11) DEFAULT NULL,
+  `seller_phone` varchar(255) DEFAULT NULL,
+  `buyer_phone` varchar(255) DEFAULT NULL,
   `pay_date` datetime DEFAULT NULL,
   `get_date` datetime DEFAULT NULL,
   `oder_date` datetime DEFAULT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE `ftc_user` (
   `id` bigint(20) NOT NULL,
   `parent_id` bigint(20) DEFAULT NULL,
   `name` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
-  `phone` int(11) DEFAULT NULL COMMENT '用户表',
+  `phone` varchar(255) DEFAULT NULL COMMENT '用户表',
   `password` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `teamid` bigint(255) DEFAULT NULL,
   `admin_status` int(11) DEFAULT NULL,
@@ -203,7 +203,7 @@ CREATE TABLE `ftc_user_payinfo` (
 DROP TABLE IF EXISTS `ftc_veritify`;
 CREATE TABLE `ftc_veritify` (
   `vid` bigint(20) NOT NULL,
-  `phone` int(11) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
   `code` int(11) DEFAULT NULL,
   `new_time` datetime DEFAULT NULL,
   `loss_time` datetime DEFAULT NULL,

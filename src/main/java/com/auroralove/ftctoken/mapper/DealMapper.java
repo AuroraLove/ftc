@@ -1,7 +1,7 @@
 package com.auroralove.ftctoken.mapper;
 
 import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.model.OrderEntity;
+import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.model.OrderModel;
 
 import java.util.List;

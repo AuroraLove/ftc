@@ -3,8 +3,7 @@ package com.auroralove.ftctoken.controller;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
-import com.auroralove.ftctoken.model.OrderEntity;
-import com.auroralove.ftctoken.model.OrderModel;
+import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.DealService;
@@ -68,6 +67,20 @@ public class DealController {
         if (dfilter.getDid() != null){
             OrderEntity result = dealService.orderInfo(dfilter);
                 return new ResponseResult(ResponseMessage.OK,result);
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+    }
+
+    /**
+     * 订单状态修改
+     * @param
+     * @return
+     */
+    @PostMapping("/myDeal/orderStatus")
+    public ResponseResult orderStatus(Dfilter dfilter){
+        if (dfilter.getOid() != null){
+            OrderEntity result = dealService.orderInfo(dfilter);
+            return new ResponseResult(ResponseMessage.OK,result);
         }
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }

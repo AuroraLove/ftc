@@ -77,9 +77,9 @@
         </foreach>
     </insert>
 
-    <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
+    <select id="getOrder" resultMap="OrderModel" >
     SELECT (
-            oid,
+        oid,
         deal_buy_id,
         deal_sell_id,
         seller_id,
@@ -97,6 +97,22 @@
         finnish_date
     ) from ftc_order where oid = #{oid}
     </select>
-
+    <resultMap type="com.auroralove.ftctoken.model.OrderModel" id="OrderModel">
+        <result column="oid" property="orderId"/>
+        <result column="deal_buy_id" property="dealBuyId"/>
+        <result column="deal_sell_id" property="dealSellId"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="buyer_id" property="buyerId"/>
+        <result column="seller_phone" property="sellerPhone"/>
+        <result column="buyer_phone" property="buyerPhone"/>
+        <result column="oder_date" property="orderTime"/>
+        <result column="status" property="orderStatus"/>
+        <result column="univalent" property="univalent"/>
+        <result column="quantity" property="quantity"/>
+        <result column="deal_amount" property="amount"/>
+        <result column="affirm_date" property="affirmDate"/>
+        <result column="put_money_date" property="putMoneyDate"/>
+        <result column="finnish_date" property="finnishDate"/>
+    </resultMap>
 
 </mapper>

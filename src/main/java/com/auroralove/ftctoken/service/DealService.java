@@ -7,7 +7,7 @@ import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.DealMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.model.OrderEntity;
+import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.model.OrderModel;
 import com.auroralove.ftctoken.model.UserPayModel;
 import com.auroralove.ftctoken.utils.IdWorker;

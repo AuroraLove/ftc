@@ -97,15 +97,15 @@ public class OrderModel {
     }
 
     public OrderModel(DealModel purchase, DealModel sell) {
-        this.seller_id = sell.getUid() == null?null:sell.getUid();
-        this.buyer_id = purchase.getUid()== null?null:purchase.getUid();
-        this.seller_phone = sell.getPhone()== null?null:sell.getPhone();
-        this.buyer_phone = purchase.getPhone()== null?null:purchase.getPhone();
-        this.status = DealEnum.UNPAID.getValue()== null?null:DealEnum.UNPAID.getValue();
-        this.quantity = purchase.getQuantity()== null?null:purchase.getQuantity();
-        this.univalent = purchase.getUnivalent()== null?null: purchase.getUnivalent();
-        this.deal_amount = purchase.getDeal_amount()== null?null:purchase.getDeal_amount();
-        this.deal_buy_id = purchase.getTid()== null?null:purchase.getTid();
-        this.deal_sell_id = sell.getTid()== null?null:sell.getTid();
+        this.seller_id = sell.getUid() ;
+        this.buyer_id = purchase.getUid();
+        this.seller_phone = sell.getPhone();
+        this.buyer_phone = purchase.getPhone();
+        this.status = DealEnum.UNPAID.getValue();
+        this.quantity = purchase.getQuantity();
+        this.univalent = purchase.getUnivalent();
+        this.deal_amount = purchase.getDeal_amount();
+        this.deal_buy_id = purchase.getTid();
+        this.deal_sell_id = sell.getTid();
     }
 }
