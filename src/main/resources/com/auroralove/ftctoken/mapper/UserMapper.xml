@@ -4,6 +4,7 @@
     <sql id="USER" >ftc_user</sql>
     <sql id="DEAL" >ftc_deal</sql>
     <sql id="PAYINFO" >ftc_user_payinfo</sql>
+    <sql id="MESSAGE" >ftc_message</sql>
 
     <resultMap type="com.auroralove.ftctoken.model.AccountModel" id="DealAccountInfo">
         <result column="tradeableAcct" property="tradeableAcct"/>
@@ -103,4 +104,37 @@ where t1.uid= #{uid}
 where uid= #{id} GROUP BY uid
     </select>
 
+
+    <insert id="uploadMsg" >
+        INSERT INTO
+        <include refid="MESSAGE" />
+        (id,uid,leaving_date,  msg, pic_url) 
+        VALUES
+        (
+        #{id},
+        #{uid},
+        NOW(),
+        #{message},
+        #{url}
+        )
+    </insert>
+    
+        <insert id="replayMsg" >
+        UPDATE
+        <include refid="MESSAGE" />
+        (replay_date,  r_msg, pic_url) 
+        VALUES
+        (
+        NOW(),
+        #{message},
+        #{url}
+        )
+        WHERE id=#{mesId}
+    </insert>
+    
+    <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
+        SELECT msg,r_msg,leaving_date,replay_date FROM ftc_message
+      where
+      uid=#{uid}
+    </select>
 </mapper>

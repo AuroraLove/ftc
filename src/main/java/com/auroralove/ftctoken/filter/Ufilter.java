@@ -1,5 +1,9 @@
 package com.auroralove.ftctoken.filter;
 
+
+import org.springframework.web.multipart.MultipartFile;
+import org.w3c.dom.Text;
+
 import lombok.Data;
 
 /**
@@ -50,6 +54,25 @@ public class Ufilter {
      * 支付密码
      */
     private String pay_pwd;
+    
+    /**
+     * 留言id
+     */
+    private Long mesId; 
+    /**
+     * 留言信息
+     */
+    private String message;	
+    
+    /**
+     * 留言凭证
+     */
+    private MultipartFile picture;
+    
+    /**
+     * 留言类型
+     */
+    private Integer mType;
 
     private Double amount;
 
@@ -124,6 +147,39 @@ public class Ufilter {
 	public void setPay_pwd(String pay_pwd) {
 		this.pay_pwd = pay_pwd;
 	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public MultipartFile getPicture() {
+		return picture;
+	}
+
+	public void setPicture(MultipartFile picture) {
+		this.picture = picture;
+	}
+
+	public Integer getmType() {
+		return mType;
+	}
+
+	public void setmType(Integer mType) {
+		this.mType = mType;
+	}
+
+	public Long getMesId() {
+		return mesId;
+	}
+
+	public void setMesId(Long mesId) {
+		this.mesId = mesId;
+	}
     
+	
 
 }

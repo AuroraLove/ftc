@@ -1,13 +1,21 @@
 package com.auroralove.ftctoken.controller;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
 import com.auroralove.ftctoken.annotation.UserLoginToken;
+import com.auroralove.ftctoken.entity.MessageEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -129,6 +137,74 @@ public class UserController {
     }
 
     /**
+     * 上传留言
+     * @param
+     * @return
+     */
+    @PostMapping("/home/uploadMsg")
+    public ResponseResult uploadMsg(Ufilter ufilter,HttpServletRequest request){
+    	if (ufilter.getId() != null && ufilter.getmType() != null&& ufilter.getMessage() != null){
+    		int res=0;
+    		if(ufilter.getPicture()!=null){
+    			try {
+	    			String fileName=ufilter.getPicture().getOriginalFilename();
+	    			//存凭证
+	    			String url=null;
+	    			// 项目在容器中实际发布运行的根路径
+	    			String realPath=request.getSession().getServletContext().getRealPath("/");
+	    			// 设置存放图片文件的路径
+	    			url=realPath+"pictures/";
+	    			File file=new File(url);
+	    			if (!file.exists()) {
+	    				file.mkdirs();
+	    			}
+	    			 // 转存文件到指定的路径
+					ufilter.getPicture().transferTo(file);
+	    			//type=11，类型为上传留言
+	    			if(ufilter.getmType()==11){
+	    				res=userService.uploadMsg(ufilter, url+"/"+fileName);
+	    			}else{
+	    				res=userService.replayMsg(ufilter, url+"/"+fileName);
+	    			}
+				} catch (IllegalStateException e) {
+					return new ResponseResult(ResponseMessage.FAIL,false);
+				} catch (IOException e) {
+					return new ResponseResult(ResponseMessage.FAIL,false);
+				}
+    		}else{
+    			//直接存数据库
+    			if(ufilter.getmType()==11){
+    				res=userService.uploadMsg(ufilter, null);
+    			}else{
+    				res=userService.replayMsg(ufilter, null);
+    			}
+    		}
+    		 if (res > 0){
+                 return new ResponseResult(ResponseMessage.OK,true);
+             }
+             return new ResponseResult(ResponseMessage.FAIL,false);
+
+    	}
+         return new ResponseResult(ResponseMessage.FAIL,false);
+
+    }
+    /**
+     * 查询留言簿
+     * @param
+     * @return
+     */
+    @PostMapping("/home/messageInfo")
+    public ResponseResult messageInfo(Ufilter ufilter){
+    	if (ufilter.getId() != null){
+    		MessageModel messageInfo=userService.messageInfo(ufilter.getId());
+    		MessageEntity messageEntity=new MessageEntity(messageInfo);
+    		return new ResponseResult(ResponseMessage.OK,messageEntity);
+    	}
+    	 return new ResponseResult(ResponseMessage.FAIL,false);
+
+    }
+
+    /**
      * 获取系统参数
      * @param
      * @return
@@ -137,6 +213,7 @@ public class UserController {
     public ResponseResult getSystem(){
         return new ResponseResult(ResponseMessage.OK,userService.getSystem());
     }
+
 
     /**
      *  @UserLoginToken 注解直接添加token验证，从header中获取，不需要的接口则无需增加

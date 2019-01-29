@@ -8,8 +8,10 @@ import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.AccountModel;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.SystemModel;
+import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.utils.IdWorker;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -128,4 +130,33 @@ public class UserService {
         SystemModel reslut = systemMapper.getSystemInfo();
         return reslut;
     }
+
+    /**
+     *  上传留言
+     * @param ufilter
+     * @return
+     */
+    public int uploadMsg(Ufilter ufilter,String url) {
+    	int reslut = userMapper.uploadMsg(idWorker.nextId(),ufilter.getId(),ufilter.getMessage(),url);
+        return reslut;
+    }
+    /**
+     *  回复留言
+     * @param ufilter
+     * @return
+     */
+    public int replayMsg(Ufilter ufilter,String url) {
+    	int reslut = userMapper.replayMsg(ufilter.getMesId(),ufilter.getMessage(),url);
+        return reslut;
+    }
+    /**
+     *  查留言簿
+     * @param ufilter
+     * @return
+     */
+    public MessageModel messageInfo(Long uid) {
+    	MessageModel reslut = userMapper.messageInfo(uid);
+        return reslut;
+    }
+
 }
