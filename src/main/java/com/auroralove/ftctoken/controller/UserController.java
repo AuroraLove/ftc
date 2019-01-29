@@ -42,8 +42,7 @@ public class UserController {
                 return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR,false);
             }else {
                 String token = tokenService.getToken(userForBase);
-                UserModel userModel = userService.findUserById(userForBase.getId());
-                UserEntity userResult = userService.getUserInfo(userModel);
+                UserEntity userResult = userService.getUserInfo(userForBase);
                 userResult.setToken(token);
                 return new ResponseResult(ResponseMessage.OK, userResult);
             }
@@ -127,6 +126,16 @@ public class UserController {
     	}
     	 return new ResponseResult(ResponseMessage.FAIL,false);
 
+    }
+
+    /**
+     * 获取系统参数
+     * @param
+     * @return
+     */
+    @PostMapping("/system")
+    public ResponseResult getSystem(){
+        return new ResponseResult(ResponseMessage.OK,userService.getSystem());
     }
 
     /**

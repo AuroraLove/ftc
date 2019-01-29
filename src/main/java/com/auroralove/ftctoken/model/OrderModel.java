@@ -3,7 +3,7 @@ package com.auroralove.ftctoken.model;
 import com.auroralove.ftctoken.dict.DealEnum;
 import lombok.Data;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 /**
  * 订单表模型
@@ -76,36 +76,36 @@ public class OrderModel {
     /**
      * 确认支付日期
      */
-    private Date affirm_date;
+    private Timestamp affirm_date;
 
     /**
      * 支付日期
      */
-    private Date pay_date;
+    private Timestamp pay_date;
 
     /**
      * 下单日期
      */
-    private Date order_date;
+    private Timestamp order_date;
 
     /**
      * 完成订单日期
      */
-    private Date finish_date;
+    private Timestamp finish_date;
 
     public OrderModel() {
     }
 
     public OrderModel(DealModel purchase, DealModel sell) {
-        this.seller_id = sell.getUid();
-        this.buyer_id = purchase.getUid();
-        this.seller_phone = sell.getPhone();
-        this.buyer_phone = purchase.getPhone();
-        this.status = DealEnum.UNPAID.getValue();
-        this.quantity = purchase.getQuantity();
-        this.univalent = purchase.getUnivalent();
-        this.deal_amount = purchase.getDeal_amount();
-        this.deal_buy_id = purchase.getTid();
-        this.deal_sell_id = sell.getTid();
+        this.seller_id = sell.getUid() == null?null:sell.getUid();
+        this.buyer_id = purchase.getUid()== null?null:purchase.getUid();
+        this.seller_phone = sell.getPhone()== null?null:sell.getPhone();
+        this.buyer_phone = purchase.getPhone()== null?null:purchase.getPhone();
+        this.status = DealEnum.UNPAID.getValue()== null?null:DealEnum.UNPAID.getValue();
+        this.quantity = purchase.getQuantity()== null?null:purchase.getQuantity();
+        this.univalent = purchase.getUnivalent()== null?null: purchase.getUnivalent();
+        this.deal_amount = purchase.getDeal_amount()== null?null:purchase.getDeal_amount();
+        this.deal_buy_id = purchase.getTid()== null?null:purchase.getTid();
+        this.deal_sell_id = sell.getTid()== null?null:sell.getTid();
     }
 }

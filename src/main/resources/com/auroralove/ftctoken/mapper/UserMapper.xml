@@ -5,8 +5,16 @@
     <sql id="DEAL" >ftc_deal</sql>
     <sql id="PAYINFO" >ftc_user_payinfo</sql>
 
+    <resultMap type="com.auroralove.ftctoken.model.AccountModel" id="DealAccountInfo">
+        <result column="tradeableAcct" property="tradeableAcct"/>
+        <result column="FTCLockedAcct" property="FTCLockedAcct"/>
+    </resultMap>
+    <resultMap type="com.auroralove.ftctoken.model.AccountModel" id="RewardAccount">
+        <result column="FTCRewardAcct" property="FTCRewardAcct"/>
+    </resultMap>
     <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
-      SELECT id,password FROM ftc_user
+      SELECT id,phone,name,password,admin_status as amdinStatus,parent_id as parentId,regist_flag as registFlag,regist_time as registTime,teamid
+       FROM ftc_user
       where
       phone=#{phone}
     </select>
@@ -81,4 +89,18 @@
         SELECT pid,uid,name,card_id,bank_name,ali_pay,ali_url,wechat_pay,wechat_url,bank_address
         WHERE uid = #{id}
     </select>
+
+    <select id="getDealAccountInfo" resultMap="DealAccountInfo" >
+select (buy_release_amount- sell_amount) as tradeableAcct,FTCLockedAcct from
+(select uid,sum(deal_amount) as FTCLockedAcct from ftc_deal  where type=2 GROUP BY uid)as t1 LEFT  JOIN
+ (select uid,sum(deal_amount) as buy_release_amount from ftc_deal  where type in(0,7) and status=6 GROUP BY uid)  as t2 ON t1.uid = t2.uid LEFT  JOIN
+   (select uid,sum(deal_amount) as sell_amount from ftc_deal  where type=1 and status=6 GROUP BY uid)   as t3 ON t3.uid = t2.uid
+where t1.uid= #{uid}
+    </select>
+
+    <select id="getRewardAccount"  resultMap="RewardAccount" >
+ select sum(amount) as FTCRewardAcct from ftc_reward
+where uid= #{id} GROUP BY uid
+    </select>
+
 </mapper>

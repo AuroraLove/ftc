@@ -1,6 +1,6 @@
 package com.auroralove.ftctoken.model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * 用户实体模型，与数据库字段相对应
@@ -43,7 +43,7 @@ public class UserModel {
     /**
      * 注册时间
      */
-    private Date registTime;
+    private Timestamp registTime;
 
     /**
      *  我的团队id
@@ -108,11 +108,11 @@ public class UserModel {
         this.parentId = parentId;
     }
 
-    public Date getRegistTime() {
+    public Timestamp getRegistTime() {
         return registTime;
     }
 
-    public void setRegistTime(Date registTime) {
+    public void setRegistTime(Timestamp registTime) {
         this.registTime = registTime;
     }
 

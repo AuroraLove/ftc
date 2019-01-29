@@ -65,7 +65,7 @@ public class DealController {
      */
     @PostMapping("/myDeal/orderInfo")
     public ResponseResult orderInfo(Dfilter dfilter){
-        if (dfilter.getOid() != null){
+        if (dfilter.getDid() != null){
             OrderEntity result = dealService.orderInfo(dfilter);
                 return new ResponseResult(ResponseMessage.OK,result);
         }

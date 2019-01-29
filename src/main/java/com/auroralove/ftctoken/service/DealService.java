@@ -86,7 +86,7 @@ public class DealService {
      * @return
      */
     public OrderEntity orderInfo(Dfilter dfilter) {
-        List<OrderEntity> orderEntities = dealMapper.getOrder(dfilter.getOid());
+        List<OrderEntity> orderEntities = dealMapper.getOrder(dfilter.getDid());
         OrderEntity orderEntity = (OrderEntity) Collections.singletonList(orderEntities);
         //获取买单用户支付信息
         List<UserPayModel> payModel = userMapper.getPayInfo(orderEntity.getBuyer_id());

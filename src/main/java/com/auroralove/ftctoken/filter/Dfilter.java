@@ -34,4 +34,10 @@ public class Dfilter{
      * 订单id
      */
     private Long oid;
+
+    /**
+     * 交易单号id
+     */
+    private Long did;
+
 }

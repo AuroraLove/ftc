@@ -4,7 +4,7 @@ import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import lombok.Data;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * 交易记录模型
@@ -43,7 +43,7 @@ public class DealModel {
     /**
      * 交易日期
      */
-    private Date deal_date;
+    private Timestamp deal_date;
 
     /**
      * 交易状态
@@ -69,9 +69,9 @@ public class DealModel {
     }
 
     public DealModel(Dfilter dfilter) {
-        this.uid = dfilter.getId();
-        this.type = dfilter.getTrctFlag();
-        this.univalent = dfilter.getUnivalent();
-        this.quantity = dfilter.getQuantity();
+        this.uid = dfilter.getId() == null?null:dfilter.getId();
+        this.type = dfilter.getTrctFlag()== null?null:dfilter.getTrctFlag();
+        this.univalent = dfilter.getUnivalent()== null?null:dfilter.getUnivalent();
+        this.quantity = dfilter.getQuantity()== null?null:dfilter.getQuantity();
     }
 }

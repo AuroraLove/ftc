@@ -1,5 +1,7 @@
 package com.auroralove.ftctoken.mapper;
 
+import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.model.AccountModel;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.model.UserPayModel;
@@ -66,7 +68,7 @@ public interface UserMapper {
      * 修改支付密码
      *
      * @param id
-     * @param password
+     * @param pay_pwd
      * @return Result<int>
      */
     int changePayPwd(@Param("id") Long id,@Param("pay_pwd")String pay_pwd);
@@ -77,4 +79,18 @@ public interface UserMapper {
      * @return
      */
     List<UserPayModel> getPayInfo(Long buyer_id);
+
+    /**
+     * 返回用户账户信息详情
+     * @param uid
+     * @return
+     */
+    AccountModel getDealAccountInfo(Long uid);
+
+    /**
+     * 返回用户账户奖励金额信息详情
+     * @param id
+     * @return
+     */
+    AccountModel getRewardAccount(Long id);
 }

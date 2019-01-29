@@ -3,8 +3,11 @@ package com.auroralove.ftctoken.service;
 import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
+import com.auroralove.ftctoken.model.AccountModel;
 import com.auroralove.ftctoken.model.DealModel;
+import com.auroralove.ftctoken.model.SystemModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.utils.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private SystemMapper systemMapper;
 
     @Autowired
     private IdWorker idWorker;
@@ -63,8 +69,17 @@ public class UserService {
      * @return
      */
     public UserEntity getUserInfo(UserModel userModel) {
-        UserEntity userEntity = new UserEntity(userModel);
-
+        //取交易金额
+        AccountModel dealAccount = userMapper.getDealAccountInfo(userModel.getId());
+        if (dealAccount == null){
+            dealAccount = new AccountModel();
+        }
+        //取奖励金额
+        AccountModel rewardAccount = userMapper.getRewardAccount(userModel.getId());
+        if (rewardAccount == null){
+            rewardAccount = new AccountModel();
+        }
+        UserEntity userEntity = new UserEntity(userModel,dealAccount,rewardAccount);
         return userEntity;
     }
 
@@ -104,5 +119,13 @@ public class UserService {
     	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPay_pwd());
         return reslut;
     }
-    
+
+    /**
+     *  获取系统信息
+     * @return
+     */
+    public SystemModel getSystem() {
+        SystemModel reslut = systemMapper.getSystemInfo();
+        return reslut;
+    }
 }
