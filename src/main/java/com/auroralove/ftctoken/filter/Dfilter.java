@@ -28,7 +28,7 @@ public class Dfilter{
     /**
      * 交易标识，0为买，1为卖，2注册充值
      */
-    private Integer trctFlag;
+    private Integer dealType;
 
     /**
      * 订单id
@@ -41,22 +41,12 @@ public class Dfilter{
     private Long did;
 
     /**
-     * 订单状态，非空，工作流推进对应工作状态，1，待支付，2，已支付未确认收款，3，确认收款，4，订单完成
+     * 用户手机号
      */
-    private Integer orderStatus;
+    private String phone;
 
     /**
      * 用户实名
      */
     private String userName;
-
-    /**
-     * 用户id
-     */
-    private Long uid;
-
-    /**
-     * 用户手机号
-     */
-    private String userPhone;
 }

@@ -103,7 +103,7 @@ public interface UserMapper {
      * @param message
      * @return Result<int>
      */
-    int uploadMsg(Long id,@Param("uid") Long uid,@Param("message")String message,String url);
+    int uploadMsg(@Param("id")Long id,@Param("uid") Long uid,@Param("message")String message,@Param("url")String url);
     /**
      * 回复留言
      *
@@ -111,7 +111,8 @@ public interface UserMapper {
      * @param message
      * @return Result<int>
      */
-    int replayMsg(Long mesId,String message,String url);
+    int replayMsg(@Param("mesId") Long mesId,@Param("message") String message);
+
     /**
      * 查询留言
      *
@@ -120,4 +121,12 @@ public interface UserMapper {
      * @return Result<UserModel>
      */
     MessageModel messageInfo(Long uid);
+
+    /**
+     * 存储用户支付信息
+     *
+     * @param payModel
+     * @return Result<UserModel>
+     */
+    int savePayInfo(UserPayModel payModel);
 }

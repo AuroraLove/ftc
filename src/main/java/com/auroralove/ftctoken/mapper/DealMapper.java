@@ -1,8 +1,10 @@
 package com.auroralove.ftctoken.mapper;
 
+import com.auroralove.ftctoken.entity.AssetEntity;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.model.OrderModel;
+import com.github.pagehelper.Page;
 
 import java.util.List;
 
@@ -35,11 +37,17 @@ public interface DealMapper {
      * 新增订单
      * @return
      */
-    int newOrders(List<OrderModel> orders);
+    int newOrder(OrderModel order);
 
     /**
      * 查询订单
      * @return
      */
     List<OrderEntity> getOrder(Long oid);
+
+    /**
+     * 获取奖励记录
+     * @return
+     */
+    Page<AssetEntity> getRewardList(Long id);
 }

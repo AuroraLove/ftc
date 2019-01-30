@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.entity.AssetEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
@@ -11,6 +12,9 @@ import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.model.OrderModel;
 import com.auroralove.ftctoken.model.UserPayModel;
 import com.auroralove.ftctoken.utils.IdWorker;
+import com.auroralove.ftctoken.utils.PageInfo;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -72,10 +76,10 @@ public class DealService {
             //匹配生成订单
             OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
             orderModel.setOid(idWorker.nextId());
-            orders.add(orderModel);
-        }
-        if (orders.size() > 0){
-            int n = dealMapper.newOrders(orders);
+            int n = dealMapper.newOrder(orderModel);
+            if (n > 0){
+                orders.add(orderModel);
+            }
         }
         System.out.println("===========匹配任务"+ System.currentTimeMillis()+"================");
     }
@@ -92,5 +96,12 @@ public class DealService {
         List<UserPayModel> payModel = userMapper.getPayInfo(orderEntity.getBuyer_id());
         orderEntity.setPayInfo(payModel);
         return orderEntity;
+    }
+
+    public PageInfo<AssetEntity> commutableAssets(Dfilter dfilter, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        //取奖励金额
+        Page<AssetEntity> rewards = dealMapper.getRewardList(dfilter.getId());
+        return new PageInfo<>(rewards);
     }
 }

@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.entity.MessageEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.filter.MsgFilter;
+import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
@@ -159,12 +161,10 @@ public class UserController {
 	    				file.mkdirs();
 	    			}
 	    			 // 转存文件到指定的路径
-					ufilter.getPicture().transferTo(file);
+					ufilter.getPicture().transferTo(new File(url + fileName));
 	    			//type=11，类型为上传留言
 	    			if(ufilter.getmType()==11){
 	    				res=userService.uploadMsg(ufilter, url+"/"+fileName);
-	    			}else{
-	    				res=userService.replayMsg(ufilter, url+"/"+fileName);
 	    			}
 				} catch (IllegalStateException e) {
 					return new ResponseResult(ResponseMessage.FAIL,false);
@@ -175,8 +175,6 @@ public class UserController {
     			//直接存数据库
     			if(ufilter.getmType()==11){
     				res=userService.uploadMsg(ufilter, null);
-    			}else{
-    				res=userService.replayMsg(ufilter, null);
     			}
     		}
     		 if (res > 0){
@@ -187,6 +185,27 @@ public class UserController {
     	}
          return new ResponseResult(ResponseMessage.FAIL,false);
 
+    }
+    /**
+     * 上传留言
+     * @param
+     * @return
+     */
+    @PostMapping("/home/relayMsg")
+    public ResponseResult relayMsg(MsgFilter msgFilter){
+        if (msgFilter.getMessage() != null && msgFilter.getMessage() != null){
+            int res=0;
+                //直接存数据库
+                if(msgFilter.getMType()==12){
+                    res=userService.replayMsg(msgFilter);
+                }
+            if (res > 0){
+                return new ResponseResult(ResponseMessage.OK,true);
+            }
+            return new ResponseResult(ResponseMessage.FAIL,false);
+
+        }
+        return new ResponseResult(ResponseMessage.FAIL,false);
     }
     /**
      * 查询留言簿
@@ -201,7 +220,22 @@ public class UserController {
     		return new ResponseResult(ResponseMessage.OK,messageEntity);
     	}
     	 return new ResponseResult(ResponseMessage.FAIL,false);
+    }
 
+    /**
+     * 用户交易资料
+     * @param
+     * @return
+     */
+    @PostMapping("/home/userData")
+    public ResponseResult userData(PayFilter payFilter,HttpServletRequest request) throws Exception{
+        if (payFilter.getId() != null){
+            int result = userService.saveUserData(payFilter,request);
+            if (result > 0){
+                return new ResponseResult(ResponseMessage.OK,true);
+            }
+        }
+        return new ResponseResult(ResponseMessage.FAIL,false);
     }
 
     /**

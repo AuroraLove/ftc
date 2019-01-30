@@ -2,18 +2,20 @@ package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.filter.MsgFilter;
+import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
-import com.auroralove.ftctoken.model.AccountModel;
-import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.model.SystemModel;
-import com.auroralove.ftctoken.model.MessageModel;
-import com.auroralove.ftctoken.model.UserModel;
+import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.utils.IdWorker;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 
 /**
  * @author zyu
@@ -140,18 +142,20 @@ public class UserService {
     	int reslut = userMapper.uploadMsg(idWorker.nextId(),ufilter.getId(),ufilter.getMessage(),url);
         return reslut;
     }
+
     /**
      *  回复留言
-     * @param ufilter
+     * @param msgFilter
      * @return
      */
-    public int replayMsg(Ufilter ufilter,String url) {
-    	int reslut = userMapper.replayMsg(ufilter.getMesId(),ufilter.getMessage(),url);
+    public int replayMsg(MsgFilter msgFilter) {
+    	int reslut = userMapper.replayMsg(msgFilter.getMid(),msgFilter.getMessage());
         return reslut;
     }
+
     /**
      *  查留言簿
-     * @param ufilter
+     * @param uid
      * @return
      */
     public MessageModel messageInfo(Long uid) {
@@ -159,4 +163,38 @@ public class UserService {
         return reslut;
     }
 
+    /**
+     *  保存/修改用户交易资料
+     * @param payFilter
+     * @return
+     */
+    public int saveUserData(PayFilter payFilter,HttpServletRequest request) throws Exception{
+        UserPayModel payModel = new UserPayModel(payFilter);
+        payModel.setPid(idWorker.nextId());
+        if(payFilter.getAliPayCode() != null){
+            payModel.setAli_url(savePicture(payFilter.getAliPayCode(),request));
+        }
+        if (payFilter.getWehatPayCode() != null){
+            payModel.setWechat_url(savePicture(payFilter.getWehatPayCode(),request));
+        }
+        int result =userMapper.savePayInfo(payModel);
+        return result;
+    }
+
+    private String savePicture(MultipartFile picture, HttpServletRequest request) throws Exception{
+        String fileName=picture.getOriginalFilename();
+        //存凭证
+        String url=null;
+        // 项目在容器中实际发布运行的根路径
+        String realPath=request.getSession().getServletContext().getRealPath("/");
+        // 设置存放图片文件的路径
+        url=realPath+"pictures/";
+        File file=new File(url);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        // 转存文件到指定的路径
+        picture.transferTo(new File(url + fileName));
+        return url + fileName;
+    }
 }

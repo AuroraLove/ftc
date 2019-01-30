@@ -70,7 +70,7 @@ public class Ufilter {
     private MultipartFile picture;
     
     /**
-     * 留言类型
+     * 留言类型,11留言，12回复留言
      */
     private Integer mType;
 

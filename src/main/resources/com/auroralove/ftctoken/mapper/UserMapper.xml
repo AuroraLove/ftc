@@ -100,7 +100,7 @@ where t1.uid= #{uid}
     </select>
 
     <select id="getRewardAccount"  resultMap="RewardAccount" >
- select sum(amount) as FTCRewardAcct from ftc_reward
+ select sum(amount) as FTCRewardAcct ,rid,uid,level,reward_date,status from ftc_reward
 where uid= #{id} GROUP BY uid
     </select>
 
@@ -108,7 +108,7 @@ where uid= #{id} GROUP BY uid
     <insert id="uploadMsg" >
         INSERT INTO
         <include refid="MESSAGE" />
-        (id,uid,leaving_date,  msg, pic_url) 
+        (id,uid,leaving_date,  msg, pic_url)
         VALUES
         (
         #{id},
@@ -118,23 +118,38 @@ where uid= #{id} GROUP BY uid
         #{url}
         )
     </insert>
-    
-        <insert id="replayMsg" >
+
+    <update id="replayMsg">
         UPDATE
-        <include refid="MESSAGE" />
-        (replay_date,  r_msg, pic_url) 
-        VALUES
-        (
-        NOW(),
-        #{message},
-        #{url}
-        )
+        <include refid="MESSAGE"/>
+        set
+        replay_date = NOW(),
+        r_msg = #{message}
         WHERE id=#{mesId}
-    </insert>
-    
+    </update>
+
     <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
         SELECT msg,r_msg,leaving_date,replay_date FROM ftc_message
       where
       uid=#{uid}
     </select>
+
+    <insert id="savePayInfo">
+        INSERT INTO ftc_user_payinfo
+        (pid,uid,name,phone,card_id,bank_name,ali_pay,ali_url,wechat_pay,
+        wechat_url)
+        VALUES
+        (
+        #{pid},
+        #{uid},
+        #{name},
+        #{phone},
+        #{card_id},
+        #{bank_name},
+        #{ali_pay},
+        #{ali_url},
+        #{wechat_pay},
+        #{wechat_url}
+        )
+    </insert>
 </mapper>

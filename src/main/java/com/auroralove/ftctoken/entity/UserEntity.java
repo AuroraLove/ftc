@@ -65,14 +65,14 @@ public class UserEntity {
     }
 
     public UserEntity(UserModel userModel, AccountModel accountModel,AccountModel rewardModel) {
-        this.id = userModel.getId() == null?null: userModel.getId();
-        this.phone = userModel.getPhone() == null?null: userModel.getPhone();
-        this.amdinStatus = userModel.getAmdinStatus()== null?null: userModel.getAmdinStatus();
-        this.teamId = userModel.getTeamId()== null?null:userModel.getTeamId() ;
-        this.parentId = userModel.getParentId()== null?null: userModel.getParentId();
-        this.FTCLockedAcct = accountModel.getFTCLockedAcct()== null?null:accountModel.getFTCLockedAcct() ;
-        this.tradeableAcct = accountModel.getTradeableAcct()== null?null:accountModel.getTradeableAcct() ;
-        this.FTCRewardAcct = rewardModel.getFTCRewardAcct()== null?null:rewardModel.getFTCRewardAcct() ;
+        this.id = userModel.getId() ;
+        this.phone = userModel.getPhone();
+        this.amdinStatus = userModel.getAmdinStatus();
+        this.teamId = userModel.getTeamId();
+        this.parentId = userModel.getParentId();
+        this.FTCLockedAcct = accountModel.getFTCLockedAcct();
+        this.tradeableAcct = accountModel.getTradeableAcct();
+        this.FTCRewardAcct = rewardModel.getFTCRewardAcct();
     }
 
 }

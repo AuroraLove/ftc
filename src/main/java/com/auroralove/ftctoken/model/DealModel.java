@@ -56,6 +56,11 @@ public class DealModel {
     private String phone;
 
     /**
+     * 用户实名
+     */
+    private String user_name;
+
+    /**
      * 交易类型，0，买，1，卖，2，充值
      */
     private Integer type;
@@ -69,9 +74,12 @@ public class DealModel {
     }
 
     public DealModel(Dfilter dfilter) {
-        this.uid = dfilter.getId() == null?null:dfilter.getId();
-        this.type = dfilter.getTrctFlag()== null?null:dfilter.getTrctFlag();
-        this.univalent = dfilter.getUnivalent()== null?null:dfilter.getUnivalent();
-        this.quantity = dfilter.getQuantity()== null?null:dfilter.getQuantity();
+        this.uid = dfilter.getId();
+        this.type = dfilter.getDealType();
+        this.univalent = dfilter.getUnivalent();
+        this.quantity = dfilter.getQuantity();
+        this.deal_amount = dfilter.getQuantity() * dfilter.getUnivalent();
+        this.phone = dfilter.getPhone();
+        this.user_name = dfilter.getUserName();
     }
 }

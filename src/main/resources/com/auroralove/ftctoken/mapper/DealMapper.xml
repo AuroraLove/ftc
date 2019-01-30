@@ -14,18 +14,22 @@
         deal_amount,
         deal_date,
         type,
-        status
+        status,
+        phone,
+        user_name
         )
         VALUES
         (
-        #{dealId},
-        #{userId},
+        #{tid},
+        #{uid},
         #{univalent},
         #{quantity},
-        #{amount},
+        #{deal_amount},
         NOW(),
         #{type},
-        #{status}
+        #{status},
+        #{phone},
+        #{user_name}
         )
     </insert>
 
@@ -42,7 +46,7 @@
     SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
     </select>
 
-    <insert id="newOrders" parameterType="java.util.List" >
+    <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.DealModel" >
         INSERT INTO ftc_order
         (
         oid,
@@ -59,27 +63,25 @@
         deal_amount
         )
         VALUES
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.oid},
-            #{item.deal_buy_id},
-            #{item.deal_sell_id},
-            #{item.seller_id},
-            #{item.buyer_id},
-            #{item.seller_phone},
-            #{item.buyer_phone},
+          (
+            #{oid},
+            #{deal_buy_id},
+            #{deal_sell_id},
+            #{seller_id},
+            #{buyer_id},
+            #{seller_phone},
+            #{buyer_phone},
             NOW(),
-            #{item.status},
-            #{item.univalent},
-            #{item.quantity},
-            #{item.deal_amount}
-            )
-        </foreach>
+            #{status},
+            #{univalent},
+            #{quantity},
+            #{deal_amount}
+           )
     </insert>
 
-    <select id="getOrder" resultMap="OrderModel" >
+    <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
     SELECT (
-        oid,
+            oid,
         deal_buy_id,
         deal_sell_id,
         seller_id,
@@ -97,6 +99,17 @@
         finnish_date
     ) from ftc_order where oid = #{oid}
     </select>
+
+    <select id="getRewardList" resultMap="reward">
+    SELECT uid ,amount,reward_date ,status
+    from ftc_reward where uid = #{id} and status in (0,1,7)
+    </select>
+    <resultMap type="com.auroralove.ftctoken.entity.AssetEntity" id="reward">
+        <result column="uid" property="id"/>
+        <result column="amount" property="tradingAmount"/>
+        <result column="reward_date" property="tadingDate"/>
+        <result column="status" property="tradingStatus"/>
+    </resultMap>
     <resultMap type="com.auroralove.ftctoken.model.OrderModel" id="OrderModel">
         <result column="oid" property="orderId"/>
         <result column="deal_buy_id" property="dealBuyId"/>
