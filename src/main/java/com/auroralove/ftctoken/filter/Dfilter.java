@@ -26,6 +26,11 @@ public class Dfilter{
     private Double quantity;
 
     /**
+     * 总价
+     */
+    private Double amount;
+
+    /**
      * 交易标识，0为买，1为卖，2注册充值
      */
     private Integer dealType;
@@ -49,4 +54,14 @@ public class Dfilter{
      * 用户实名
      */
     private String userName;
+
+    /**
+     * 订单状态，4待支付，5已支付未确认收款，6确认收款，订单完成，8订单冻结
+     */
+    private Integer orderStatus;
+
+    /**
+     * 交易方式，20银行卡，21支付宝，22微信支付
+     */
+    private Integer payWay;
 }

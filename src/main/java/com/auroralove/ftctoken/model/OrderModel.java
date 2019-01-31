@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.model;
 
 import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.filter.Dfilter;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -93,6 +94,16 @@ public class OrderModel {
      */
     private Timestamp finish_date;
 
+    /**
+     * 买方实名
+     */
+    private String buyer_name;
+
+    /**
+     * 卖方实名
+     */
+    private String seller_name;
+
     public OrderModel() {
     }
 
@@ -100,6 +111,8 @@ public class OrderModel {
         this.seller_id = sell.getUid() ;
         this.buyer_id = purchase.getUid();
         this.seller_phone = sell.getPhone();
+        this.seller_name = sell.getUser_name();
+        this.buyer_name = purchase.getUser_name();
         this.buyer_phone = purchase.getPhone();
         this.status = DealEnum.UNPAID.getValue();
         this.quantity = purchase.getQuantity();
@@ -107,5 +120,11 @@ public class OrderModel {
         this.deal_amount = purchase.getDeal_amount();
         this.deal_buy_id = purchase.getTid();
         this.deal_sell_id = sell.getTid();
+    }
+
+    public OrderModel(Dfilter dfilter) {
+        this.oid = dfilter.getOid();
+        this.pay_way = dfilter.getPayWay();
+        this.status = dfilter.getOrderStatus();
     }
 }

@@ -78,7 +78,7 @@ public class DealModel {
         this.type = dfilter.getDealType();
         this.univalent = dfilter.getUnivalent();
         this.quantity = dfilter.getQuantity();
-        this.deal_amount = dfilter.getQuantity() * dfilter.getUnivalent();
+        this.deal_amount = dfilter.getAmount();
         this.phone = dfilter.getPhone();
         this.user_name = dfilter.getUserName();
     }

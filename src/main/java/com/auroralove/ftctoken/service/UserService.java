@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.List;
 
 /**
  * @author zyu
@@ -158,8 +159,8 @@ public class UserService {
      * @param uid
      * @return
      */
-    public MessageModel messageInfo(Long uid) {
-    	MessageModel reslut = userMapper.messageInfo(uid);
+    public List<MessageModel> messageInfo(Long uid) {
+        List<MessageModel> reslut = userMapper.messageInfo(uid);
         return reslut;
     }
 
@@ -196,5 +197,9 @@ public class UserService {
         // 转存文件到指定的路径
         picture.transferTo(new File(url + fileName));
         return url + fileName;
+    }
+
+    public UserPayModel getPayInfo(Long uid) {
+        return userMapper.getPayInfo(uid);
     }
 }

@@ -27,7 +27,10 @@ public enum DealEnum {
      */
     RELEASE_FLAG(7),
 
-
+    /**
+     * 交易类型TYPE,撤销
+     */
+    CANCLE_FLAG(9),
 
     /**
      * 交易状态STATUS，匹配中
@@ -48,6 +51,26 @@ public enum DealEnum {
      * 交易状态STATUS,确认收款，支付完成
      */
     FINISHING(6),
+
+    /**
+     * 交易状态STATUS,订单冻结
+     */
+    FROZEN(8),
+
+    /**
+     * 银行卡支付
+     */
+    BANK_CARD(20),
+
+    /**
+     * 支付宝支付
+     */
+    ALI_PAY(21),
+
+    /**
+     * 微信支付
+     */
+    WECHAT_PAY(22)
     ;
 
     private Integer value;

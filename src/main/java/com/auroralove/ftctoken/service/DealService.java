@@ -74,11 +74,15 @@ public class DealService {
         int min = purchaseDeals.size() < sellDeals.size() ? purchaseDeals.size() : sellDeals.size();
         for (int i = 0;i < min;i++){
             //匹配生成订单
-            OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
-            orderModel.setOid(idWorker.nextId());
-            int n = dealMapper.newOrder(orderModel);
-            if (n > 0){
-                orders.add(orderModel);
+            if (purchaseDeals.get(i).getUid() != sellDeals.get(i).getUid()
+                    && purchaseDeals.get(i).getDeal_amount() == sellDeals.get(i).getDeal_amount()){
+                OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
+                orderModel.setOid(idWorker.nextId());
+                int n = dealMapper.newOrder(orderModel);
+                if (n > 0){
+                    orders.add(orderModel);
+                }
+
             }
         }
         System.out.println("===========匹配任务"+ System.currentTimeMillis()+"================");
@@ -90,18 +94,30 @@ public class DealService {
      * @return
      */
     public OrderEntity orderInfo(Dfilter dfilter) {
-        List<OrderEntity> orderEntities = dealMapper.getOrder(dfilter.getDid());
-        OrderEntity orderEntity = (OrderEntity) Collections.singletonList(orderEntities);
-        //获取买单用户支付信息
-        List<UserPayModel> payModel = userMapper.getPayInfo(orderEntity.getBuyer_id());
+        OrderModel orderModel = dealMapper.getOrder(dfilter.getDid());
+        OrderEntity orderEntity = new OrderEntity(orderModel);
+        //获取卖单用户收款信息
+        UserPayModel payModel = userMapper.getPayInfo(orderModel.getDeal_sell_id());
         orderEntity.setPayInfo(payModel);
         return orderEntity;
     }
 
+    /**
+     * 获取交易记录
+     * @param dfilter
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     public PageInfo<AssetEntity> commutableAssets(Dfilter dfilter, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum,pageSize);
         //取奖励金额
         Page<AssetEntity> rewards = dealMapper.getRewardList(dfilter.getId());
         return new PageInfo<>(rewards);
+    }
+
+    public int updateOrder(Dfilter dfilter) {
+        OrderModel orderModel = new OrderModel(dfilter);
+        return dealMapper.updateOrder(orderModel);
     }
 }

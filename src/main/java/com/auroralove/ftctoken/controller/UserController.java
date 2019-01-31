@@ -2,6 +2,8 @@ package com.auroralove.ftctoken.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -215,9 +217,13 @@ public class UserController {
     @PostMapping("/home/messageInfo")
     public ResponseResult messageInfo(Ufilter ufilter){
     	if (ufilter.getId() != null){
-    		MessageModel messageInfo=userService.messageInfo(ufilter.getId());
-    		MessageEntity messageEntity=new MessageEntity(messageInfo);
-    		return new ResponseResult(ResponseMessage.OK,messageEntity);
+    	    List<MessageEntity> messageEntities = new ArrayList<>();
+            List<MessageModel> messageInfos=userService.messageInfo(ufilter.getId());
+            for (MessageModel messageModel : messageInfos) {
+                MessageEntity messageEntity=new MessageEntity(messageModel);
+                messageEntities.add(messageEntity);
+            }
+    		return new ResponseResult(ResponseMessage.OK,messageEntities);
     	}
     	 return new ResponseResult(ResponseMessage.FAIL,false);
     }
@@ -230,12 +236,16 @@ public class UserController {
     @PostMapping("/home/userData")
     public ResponseResult userData(PayFilter payFilter,HttpServletRequest request) throws Exception{
         if (payFilter.getId() != null){
+            if (userService.getPayInfo(payFilter.getId()) != null){
+                return new ResponseResult(ResponseMessage.FAIL,"用户交易资料已存在");
+            }
             int result = userService.saveUserData(payFilter,request);
             if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,true);
+                    return new ResponseResult(ResponseMessage.OK,"保存用户资料成功");
             }
+
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }
 
     /**

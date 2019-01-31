@@ -62,6 +62,22 @@ public class DealController {
     }
 
     /**
+     * 订单状态修改
+     * @param
+     * @return
+     */
+    @PostMapping("/myDeal/orderStatus")
+    public ResponseResult orderStatus(Dfilter dfilter){
+        if (dfilter.getOid() != null){
+            int result = dealService.updateOrder(dfilter);
+            if (result > 0){
+                return new ResponseResult(ResponseMessage.OK,true);
+            }
+        }
+        return new ResponseResult(ResponseMessage.FAIL,false);
+    }
+
+    /**
      * 订单详情查询
      * @param
      * @return
@@ -70,10 +86,11 @@ public class DealController {
     public ResponseResult orderInfo(Dfilter dfilter){
         if (dfilter.getDid() != null){
             OrderEntity result = dealService.orderInfo(dfilter);
-                return new ResponseResult(ResponseMessage.OK,result);
+            return new ResponseResult(ResponseMessage.OK,result);
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
+
 
     /**
      * 可交易资产查询
@@ -89,18 +106,5 @@ public class DealController {
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }
 
-    /**
-     * 订单状态修改
-     * @param
-     * @return
-     */
-    @PostMapping("/myDeal/orderStatus")
-    public ResponseResult orderStatus(Dfilter dfilter){
-        if (dfilter.getOid() != null){
-            OrderEntity result = dealService.orderInfo(dfilter);
-            return new ResponseResult(ResponseMessage.OK,result);
-        }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
-    }
 
 }

@@ -81,7 +81,7 @@ public interface UserMapper {
      * @param buyer_id
      * @return
      */
-    List<UserPayModel> getPayInfo(Long buyer_id);
+    UserPayModel getPayInfo(Long buyer_id);
 
     /**
      * 返回用户账户信息详情
@@ -120,7 +120,7 @@ public interface UserMapper {
      * @param message
      * @return Result<UserModel>
      */
-    MessageModel messageInfo(Long uid);
+    List<MessageModel> messageInfo(Long uid);
 
     /**
      * 存储用户支付信息

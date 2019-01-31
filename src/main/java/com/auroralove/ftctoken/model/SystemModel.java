@@ -53,4 +53,14 @@ public class SystemModel {
      * 系统公共信息
      */
     private String publicInfo;
+
+    /**
+     * 手续费百分比
+     */
+    private String poundage;
+
+    /**
+     * 佣金文案
+     */
+    private String commissionScheme;
 }

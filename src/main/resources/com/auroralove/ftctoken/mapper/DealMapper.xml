@@ -46,7 +46,7 @@
     SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
     </select>
 
-    <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.DealModel" >
+    <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.OrderModel" >
         INSERT INTO ftc_order
         (
         oid,
@@ -55,7 +55,9 @@
         seller_id,
         buyer_id,
         seller_phone,
+        seller_name,
         buyer_phone,
+        buyer_name,
         oder_date,
         status,
         univalent,
@@ -81,7 +83,7 @@
 
     <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
     SELECT (
-            oid,
+        oid,
         deal_buy_id,
         deal_sell_id,
         seller_id,
@@ -100,10 +102,26 @@
     ) from ftc_order where oid = #{oid}
     </select>
 
+
     <select id="getRewardList" resultMap="reward">
     SELECT uid ,amount,reward_date ,status
     from ftc_reward where uid = #{id} and status in (0,1,7)
     </select>
+
+    <update id="updateOrder" parameterType="com.auroralove.ftctoken.model.OrderModel">
+        update ftc_order
+        <set>
+          <if test="status==5">
+              status = #{status},
+              pay_way = #{pay_way},
+              pay_date = NOW(),
+          </if>
+            <if test="status==6">
+                status = #{status},
+                affirm_date = NOW(),
+            </if>
+        </set>
+    </update>
     <resultMap type="com.auroralove.ftctoken.entity.AssetEntity" id="reward">
         <result column="uid" property="id"/>
         <result column="amount" property="tradingAmount"/>

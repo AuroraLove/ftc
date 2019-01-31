@@ -43,11 +43,17 @@ public interface DealMapper {
      * 查询订单
      * @return
      */
-    List<OrderEntity> getOrder(Long oid);
+    OrderModel getOrder(Long oid);
 
     /**
      * 获取奖励记录
      * @return
      */
     Page<AssetEntity> getRewardList(Long id);
+
+    /**
+     * 修改订单状态
+     * @return
+     */
+    int updateOrder(OrderModel orderModel);
 }
