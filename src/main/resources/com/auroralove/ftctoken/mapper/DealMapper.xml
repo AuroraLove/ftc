@@ -102,14 +102,14 @@
     ) from ftc_order where oid = #{oid}
     </select>
 
-    <select id="getCommutableAssets" resultMap="reward">
+    <select id="getCommutableAssets" resultMap="commutableAssests">
     SELECT uid ,deal_amount,deal_date ,status
     from ftc_deal where uid = #{id} and type in (0,1,7)
     </select>
 
-    <select id="getRewardRecord" resultMap="reward">
-    SELECT uid ,deal_amount,deal_date ,status
-    from ftc_reward where uid = #{id} and type in (0,1,7)
+    <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RecordModel" >
+    SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
+    from ftc_reward where uid = #{id}
     </select>
 
     <update id="updateOrder" parameterType="com.auroralove.ftctoken.model.OrderModel">
@@ -126,7 +126,7 @@
             </if>
         </set>
     </update>
-    <resultMap type="com.auroralove.ftctoken.entity.AssetEntity" id="reward">
+    <resultMap type="com.auroralove.ftctoken.entity.AssetEntity" id="commutableAssests">
         <result column="uid" property="id"/>
         <result column="deal_amount" property="tradingAmount"/>
         <result column="deal_date" property="tadingDate"/>
