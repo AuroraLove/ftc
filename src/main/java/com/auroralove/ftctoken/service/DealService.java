@@ -2,7 +2,7 @@ package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.entity.AssetEntity;
-import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.entity.RecordEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.DealMapper;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,12 +42,28 @@ public class DealService {
      private IdWorker idWorker;
 
     /**
+     * 获取交易记录
+     * @param dfilter
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    public PageInfo<AssetEntity> commutableAssets(Dfilter dfilter, Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        //取奖励金额
+        Page<AssetEntity> rewards = dealMapper.getCommutableAssets(dfilter.getId());
+        return new PageInfo<>(rewards);
+    }
+
+    /**
      * 分佣奖励查询
      * @param ufilter
      * @return
      */
-    public List<UserEntity> subReward(Ufilter ufilter) {
-        return null;
+    public PageInfo<RecordEntity> subReward(Ufilter ufilter,Integer pageNum, Integer pageSize) {
+        PageHelper.startPage(pageNum,pageSize);
+        Page<RecordEntity> dealEntities = dealMapper.getRewardRecord(ufilter.getId());
+        return new PageInfo<>(dealEntities);
     }
 
     /**
@@ -100,20 +115,6 @@ public class DealService {
         UserPayModel payModel = userMapper.getPayInfo(orderModel.getDeal_sell_id());
         orderEntity.setPayInfo(payModel);
         return orderEntity;
-    }
-
-    /**
-     * 获取交易记录
-     * @param dfilter
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    public PageInfo<AssetEntity> commutableAssets(Dfilter dfilter, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum,pageSize);
-        //取奖励金额
-        Page<AssetEntity> rewards = dealMapper.getRewardList(dfilter.getId());
-        return new PageInfo<>(rewards);
     }
 
     public int updateOrder(Dfilter dfilter) {

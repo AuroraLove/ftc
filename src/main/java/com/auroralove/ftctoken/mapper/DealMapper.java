@@ -1,8 +1,8 @@
 package com.auroralove.ftctoken.mapper;
 
 import com.auroralove.ftctoken.entity.AssetEntity;
+import com.auroralove.ftctoken.entity.RecordEntity;
 import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.model.OrderModel;
 import com.github.pagehelper.Page;
 
@@ -46,14 +46,20 @@ public interface DealMapper {
     OrderModel getOrder(Long oid);
 
     /**
-     * 获取奖励记录
+     * 获取交易记录
      * @return
      */
-    Page<AssetEntity> getRewardList(Long id);
+    Page<AssetEntity> getCommutableAssets(Long id);
 
     /**
      * 修改订单状态
      * @return
      */
     int updateOrder(OrderModel orderModel);
+
+    /**
+     * 获取奖励记录
+     * @return
+     */
+    Page<RecordEntity> getRewardRecord(Long id);
 }

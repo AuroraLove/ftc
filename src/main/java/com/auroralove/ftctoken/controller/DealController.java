@@ -1,7 +1,7 @@
 package com.auroralove.ftctoken.controller;
 
 import com.auroralove.ftctoken.entity.AssetEntity;
-import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.entity.RecordEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.entity.OrderEntity;
@@ -9,7 +9,6 @@ import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.DealService;
 import com.auroralove.ftctoken.utils.PageInfo;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,15 +31,29 @@ public class DealController {
     private DealService dealService;
 
     /**
+     * 可交易资产查询
+     * @param
+     * @return
+     */
+    @PostMapping("/home/commutableAssets")
+    public ResponseResult commutableAssets(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
+        if (dfilter.getId() != null){
+            PageInfo<AssetEntity> result = dealService.commutableAssets(dfilter,pageNum,pageSize);
+            return new ResponseResult(ResponseMessage.OK,result);
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+    }
+
+    /**
      * 分佣奖励
      * @param
      * @return
      */
     @PostMapping("/home/rewardRecord")
-    public ResponseResult team(Ufilter ufilter){
-        if (ufilter.getTeamId() != null){
-            List<UserEntity> userEntities = dealService.subReward(ufilter);
-            return new ResponseResult(ResponseMessage.OK,userEntities);
+    public ResponseResult rewardRecord(Ufilter ufilter,@RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
+        if (ufilter.getId() != null){
+            PageInfo<RecordEntity> dealEntities = dealService.subReward(ufilter,pageNum,pageSize);
+            return new ResponseResult(ResponseMessage.OK,dealEntities);
         }
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }
@@ -90,21 +103,5 @@ public class DealController {
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
-
-
-    /**
-     * 可交易资产查询
-     * @param
-     * @return
-     */
-    @PostMapping("/home/commutableAssets")
-    public ResponseResult commutableAssets(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
-        if (dfilter.getId() != null){
-            PageInfo<AssetEntity> result = dealService.commutableAssets(dfilter,pageNum,pageSize);
-            return new ResponseResult(ResponseMessage.OK,result);
-        }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
-    }
-
 
 }
