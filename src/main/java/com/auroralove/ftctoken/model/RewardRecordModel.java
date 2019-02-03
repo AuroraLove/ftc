@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * @date 2019/1/25
  */
 @Data
-public class RecordModel {
+public class RewardRecordModel {
 
     /**
      * 记录id
@@ -31,6 +31,11 @@ public class RecordModel {
      * 买单用户手机号
      */
     private String childPhone;
+
+    /**
+     * 奖励人用户手机号
+     */
+    private String parentPhone;
 
     /**
      * 直销级别

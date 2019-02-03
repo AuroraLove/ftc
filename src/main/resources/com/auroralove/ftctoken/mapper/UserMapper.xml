@@ -100,7 +100,7 @@ where t1.uid= #{uid}
     </select>
 
     <select id="getRewardAccount"  resultMap="RewardAccount" >
- select sum(amount) as FTCRewardAcct ,rid,uid,level,reward_date,status from ftc_reward
+ select sum(amount) as FTCRewardAcct  from ftc_reward
 where uid= #{id} GROUP BY uid
     </select>
 
@@ -130,6 +130,14 @@ where uid= #{id} GROUP BY uid
 
     <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
         SELECT msg,r_msg,leaving_date,replay_date FROM ftc_message
+      where
+      uid=#{uid}
+    </select>
+
+    <select id="getRewardChilds" resultType="com.auroralove.ftctoken.model.RewardRecordModel">
+        SELECT rid,uid,parent_phone as parentPhone,child_phone as childPhone,level,amount
+        reward_date as rewardDate,status,childid
+         FROM ftc_reward
       where
       uid=#{uid}
     </select>

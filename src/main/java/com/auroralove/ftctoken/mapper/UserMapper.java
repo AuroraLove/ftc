@@ -1,14 +1,8 @@
 package com.auroralove.ftctoken.mapper;
 
-import com.auroralove.ftctoken.entity.UserEntity;
-import com.auroralove.ftctoken.model.AccountModel;
-import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.model.MessageModel;
-import com.auroralove.ftctoken.model.UserModel;
-import com.auroralove.ftctoken.model.UserPayModel;
+import com.auroralove.ftctoken.model.*;
 
 import org.apache.ibatis.annotations.Param;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -129,4 +123,12 @@ public interface UserMapper {
      * @return Result<UserModel>
      */
     int savePayInfo(UserPayModel payModel);
+
+    /**
+     * 取团队信息
+     *
+     * @param uid
+     * @return Result<UserModel>
+     */
+    List<RewardRecordModel> getRewardChilds(@Param("uid") Long uid);
 }

@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.entity.RewardRecordEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -202,4 +204,29 @@ public class UserService {
     public UserPayModel getPayInfo(Long uid) {
         return userMapper.getPayInfo(uid);
     }
+
+    /**
+     *  取团队详情
+     * @return
+     */
+    public RewardRecordEntity getTeam(Ufilter ufilter) {
+        RewardRecordEntity result = new RewardRecordEntity();
+        result.setPhone(ufilter.getPhone());
+        List<RewardRecordModel> recordModels = userMapper.getRewardChilds(ufilter.getId());
+        if (recordModels.size() > 0){
+            List<RewardRecordEntity> childs = new ArrayList<>();
+            for (RewardRecordModel rewardRecordModel:recordModels) {
+                RewardRecordEntity child = new RewardRecordEntity();
+                child.setPhone(rewardRecordModel.getChildPhone());
+                Ufilter filter = new Ufilter(rewardRecordModel.getChildId(),rewardRecordModel.getChildPhone());
+                RewardRecordEntity team = getTeam(filter);
+                childs.add(team);
+            }
+            result.setChilds(childs);
+        }else {
+            return result;
+        }
+        return result;
+    }
+
 }

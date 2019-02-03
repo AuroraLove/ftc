@@ -21,6 +21,7 @@ import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -246,6 +247,19 @@ public class UserController {
 
         }
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+    }
+
+    /**
+     * 获取团队详情
+     * @param
+     * @return
+     */
+    @PostMapping("/home/teamInfo")
+    public ResponseResult teamInfo(Ufilter ufilter) throws Exception{
+        if (ufilter.getId() != null) {
+            return new ResponseResult(ResponseMessage.OK,userService.getTeam(ufilter));
+        }
+        return new ResponseResult(ResponseMessage.ABANDON_FAIL,"系统出错");
     }
 
     /**

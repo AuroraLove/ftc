@@ -117,8 +117,14 @@ public class DealService {
         return orderEntity;
     }
 
+    /**
+     * 更新订单状态
+     * @param dfilter
+     * @return
+     */
     public int updateOrder(Dfilter dfilter) {
         OrderModel orderModel = new OrderModel(dfilter);
         return dealMapper.updateOrder(orderModel);
     }
+
 }

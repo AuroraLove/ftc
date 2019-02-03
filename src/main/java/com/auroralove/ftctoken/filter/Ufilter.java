@@ -76,7 +76,12 @@ public class Ufilter {
 
     private Double amount;
 
-	public Long getId() {
+    public Ufilter(Long childId, String childPhone) {
+    	this.id = childId;
+    	this.phone = childPhone;
+    }
+
+    public Long getId() {
 		return id;
 	}
 
