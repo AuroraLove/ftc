@@ -1,6 +1,8 @@
 package com.auroralove.ftctoken.model;
 
-import java.sql.Timestamp;
+import lombok.Data;
+
+import java.util.Date;
 
 /**
  * 用户实体模型，与数据库字段相对应
@@ -8,6 +10,7 @@ import java.sql.Timestamp;
  * @author zyu
  * @date 2019/1/22
  */
+@Data
 public class UserModel {
 
     /**
@@ -43,7 +46,7 @@ public class UserModel {
     /**
      * 注册时间
      */
-    private Timestamp registTime;
+    private Date registTime;
 
     /**
      *  我的团队id
@@ -60,83 +63,4 @@ public class UserModel {
      */
     private String pay_pwd;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public Integer getAmdinStatus() {
-        return amdinStatus;
-    }
-
-    public void setAmdinStatus(Integer amdinStatus) {
-        this.amdinStatus = amdinStatus;
-    }
-
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
-    }
-
-    public Timestamp getRegistTime() {
-        return registTime;
-    }
-
-    public void setRegistTime(Timestamp registTime) {
-        this.registTime = registTime;
-    }
-
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public Integer getFlag() {
-        return flag;
-    }
-
-    public void setFlag(Integer flag) {
-        this.flag = flag;
-    }
-    
-	public String getPay_pwd() {
-		return pay_pwd;
-	}
-
-	public void setPay_pwd(String pay_pwd) {
-		this.pay_pwd = pay_pwd;
-	}
 }

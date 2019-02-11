@@ -1,8 +1,9 @@
 package com.auroralove.ftctoken.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 奖励模型
@@ -50,5 +51,11 @@ public class RewardRecordModel {
     /**
      * 奖励日期
      */
-    private Timestamp rewardDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date rewardDate;
+
+    /**
+     * 奖励日期
+     */
+    private Integer status;
 }

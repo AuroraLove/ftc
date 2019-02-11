@@ -2,10 +2,8 @@ package com.auroralove.ftctoken.entity;
 
 import com.auroralove.ftctoken.model.AccountModel;
 import com.auroralove.ftctoken.model.UserModel;
+import com.auroralove.ftctoken.model.UserPayModel;
 import lombok.Data;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 实体业务模型，用于返回值
@@ -60,11 +58,17 @@ public class UserEntity {
      */
     private Double tradeableAcct;
 
+    /**
+     * 用户交易资料
+     */
+    private UserPayModel payInfo;
+
     public UserEntity() {
 
     }
 
-    public UserEntity(UserModel userModel, AccountModel accountModel,AccountModel rewardModel) {
+    public UserEntity(UserModel userModel, AccountModel accountModel, AccountModel rewardModel,
+                      UserPayModel userPayModel) {
         this.id = userModel.getId() ;
         this.phone = userModel.getPhone();
         this.amdinStatus = userModel.getAmdinStatus();
@@ -73,6 +77,7 @@ public class UserEntity {
         this.FTCLockedAcct = accountModel.getFTCLockedAcct();
         this.tradeableAcct = accountModel.getTradeableAcct();
         this.FTCRewardAcct = rewardModel.getFTCRewardAcct();
+        this.payInfo = userPayModel;
     }
 
 }

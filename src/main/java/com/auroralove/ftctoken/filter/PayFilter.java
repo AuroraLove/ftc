@@ -61,4 +61,9 @@ public class PayFilter {
      * 银行地址
      */
     private String bankAddress;
+
+    /**
+     * 用户交易密码
+     */
+    private String payPwd;
 }

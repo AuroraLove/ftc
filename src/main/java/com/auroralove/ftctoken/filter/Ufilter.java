@@ -1,10 +1,8 @@
 package com.auroralove.ftctoken.filter;
 
 
-import org.springframework.web.multipart.MultipartFile;
-import org.w3c.dom.Text;
-
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户访问过滤器
@@ -53,7 +51,7 @@ public class Ufilter {
     /**
      * 支付密码
      */
-    private String pay_pwd;
+    private String payPwd;
     
     /**
      * 留言id
@@ -72,119 +70,20 @@ public class Ufilter {
     /**
      * 留言类型,11留言，12回复留言
      */
-    private Integer mType;
+    private Integer type;
 
+    /**
+     * 总价
+     */
     private Double amount;
+
+    /**
+     * 图片地址
+     */
+    private String pictureUrl;
 
     public Ufilter(Long childId, String childPhone) {
     	this.id = childId;
     	this.phone = childPhone;
     }
-
-    public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPassWord() {
-		return passWord;
-	}
-
-	public void setPassWord(String passWord) {
-		this.passWord = passWord;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public Integer getCode() {
-		return code;
-	}
-
-	public void setCode(Integer code) {
-		this.code = code;
-	}
-
-	public Long getTeamId() {
-		return teamId;
-	}
-
-	public void setTeamId(Long teamId) {
-		this.teamId = teamId;
-	}
-
-	public Double getAmount() {
-		return amount;
-	}
-
-	public void setAmount(Double amount) {
-		this.amount = amount;
-	}
-    
-	public String getPay_pwd() {
-		return pay_pwd;
-	}
-
-	public void setPay_pwd(String pay_pwd) {
-		this.pay_pwd = pay_pwd;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
-	public MultipartFile getPicture() {
-		return picture;
-	}
-
-	public void setPicture(MultipartFile picture) {
-		this.picture = picture;
-	}
-
-	public Integer getmType() {
-		return mType;
-	}
-
-	public void setmType(Integer mType) {
-		this.mType = mType;
-	}
-
-	public Long getMesId() {
-		return mesId;
-	}
-
-	public void setMesId(Long mesId) {
-		this.mesId = mesId;
-	}
-    
-	
-
 }

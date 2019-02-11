@@ -11,6 +11,7 @@ public class FTCApplicationTests {
 
     @Test
     public void contextLoads() {
+//        JPushInstance.SendPush("test");
     }
 
 }

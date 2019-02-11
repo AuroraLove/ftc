@@ -28,7 +28,7 @@ public enum DealEnum {
     RELEASE_FLAG(7),
 
     /**
-     * 交易类型TYPE,撤销
+     * 交易状态STATUS,撤销
      */
     CANCLE_FLAG(9),
 

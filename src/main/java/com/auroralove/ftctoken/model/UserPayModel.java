@@ -28,6 +28,11 @@ public class UserPayModel {
     private String name;
 
     /**
+     * 交易密码
+     */
+    private String payPwd;
+
+    /**
      * 用户手机号
      */
     private String phone;
@@ -78,5 +83,6 @@ public class UserPayModel {
         this.phone = payFilter.getUserPhone();
         this.card_id = payFilter.getBankCard();
         this.bank_name = payFilter.getBankName();
+        this.payPwd = payFilter.getPayPwd();
     }
 }

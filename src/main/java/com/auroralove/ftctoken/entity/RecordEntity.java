@@ -1,8 +1,10 @@
 package com.auroralove.ftctoken.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 分佣记录业务模型
@@ -35,7 +37,8 @@ public class RecordEntity {
     /**
      * 奖励时间
      */
-    private Timestamp rewardDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date rewardDate;
 
 
 

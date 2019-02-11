@@ -2,10 +2,10 @@ package com.auroralove.ftctoken.entity;
 
 import com.auroralove.ftctoken.model.OrderModel;
 import com.auroralove.ftctoken.model.UserPayModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.sql.Timestamp;
-import java.util.List;
+import java.util.Date;
 
 /**
  * @author zyu
@@ -22,17 +22,17 @@ public class OrderEntity{
     /**
      * 售单id
      */
-    private Long deal_sell_id;
+    private Long dealSellId;
 
     /**
      * 买单id
      */
-    private Long deal_buy_id;
+    private Long dealBuyId;
 
     /**
      * 出售人id
      */
-    private Long seller_id;
+    private Long sellerId;
 
     /**
      * 交易数量
@@ -47,7 +47,7 @@ public class OrderEntity{
     /**
      * 购买人id
      */
-    private Long buyer_id;
+    private Long buyerId;
 
     /**
      * 订单状态
@@ -57,52 +57,46 @@ public class OrderEntity{
     /**
      * 出售人手机号
      */
-    private String seller_phone;
+    private String sellerPhone;
 
     /**
      * 购买人手机号
      */
-    private String buyer_phone;
+    private String buyerPhone;
 
     /**
      * 支付方式
      */
-    private Integer pay_way;
+    private Integer payWay;
 
     /**
      * 订单金额
      */
-    private Double deal_amount;
+    private Double dealAmount;
 
     /**
      * 确认支付日期
      */
-    private Timestamp affirm_date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date affirmDate;
 
     /**
      * 支付日期
      */
-    private Timestamp pay_date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date payDate;
 
     /**
      * 下单日期
      */
-    private Timestamp order_date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date orderDate;
 
     /**
      * 完成订单日期
      */
-    private Timestamp finish_date;
-
-    /**
-     * 买方实名
-     */
-    private String buyer_name;
-
-    /**
-     * 卖方实名
-     */
-    private String seller_name;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date finishDate;
 
     /**
      * 出售人实名
@@ -125,23 +119,24 @@ public class OrderEntity{
 
     public OrderEntity(OrderModel orderModel) {
         this.oid = orderModel.getOid();
-        this.buyer_id = orderModel.getBuyer_id();
-        this.buyer_name = orderModel.getBuyer_name();
-        this.seller_id = orderModel.getSeller_id();
-        this.seller_name = orderModel.getSeller_name();
-        this.buyer_phone = orderModel.getBuyer_phone();
-        this.seller_phone = orderModel.getSeller_phone();
-        this.deal_buy_id = orderModel.getDeal_buy_id();
-        this.deal_sell_id = orderModel.getDeal_sell_id();
+        this.buyerId = orderModel.getBuyer_id();
+        this.buyerName = orderModel.getBuyer_name();
+        this.sellerId = orderModel.getSeller_id();
+        this.sellerName = orderModel.getSeller_name();
+        this.buyerPhone = orderModel.getBuyer_phone();
+        this.sellerPhone = orderModel.getSeller_phone();
+        this.dealBuyId = orderModel.getDeal_buy_id();
+        this.dealSellId = orderModel.getDeal_sell_id();
         this.quantity = orderModel.getQuantity();
         this.univalent = orderModel.getUnivalent();
-        this.deal_amount =orderModel.getDeal_amount();
-        this.affirm_date = orderModel.getAffirm_date();
-        this.pay_way = orderModel.getPay_way();
-        this.order_date = orderModel.getOrder_date();
-        this.pay_date = orderModel.getPay_date();
-        this.affirm_date = orderModel.getAffirm_date();
-        this.finish_date = orderModel.getFinish_date();
+        this.dealAmount =orderModel.getDeal_amount();
+        this.affirmDate = orderModel.getAffirm_date();
+        this.payWay = orderModel.getPay_way();
+        this.orderDate = orderModel.getOrder_date();
+        this.payDate = orderModel.getPay_date();
+        this.affirmDate = orderModel.getAffirm_date();
+        this.finishDate = orderModel.getFinish_date();
+        this.status = orderModel.getStatus();
     }
 
 }

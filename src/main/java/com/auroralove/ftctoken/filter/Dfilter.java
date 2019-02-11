@@ -56,12 +56,22 @@ public class Dfilter{
     private String userName;
 
     /**
-     * 订单状态，4待支付，5已支付未确认收款，6确认收款，订单完成，8订单冻结
+     * 订单状态，4待支付，5已支付未确认收款，6确认收款，订单完成，8订单冻结，9撤销
      */
     private Integer orderStatus;
+
+    /**
+     * 订单状态，9撤销
+     */
+    private Integer dealStatus;
 
     /**
      * 交易方式，20银行卡，21支付宝，22微信支付
      */
     private Integer payWay;
+
+    /**
+     * 支付密码
+     */
+    private String payPwd;
 }

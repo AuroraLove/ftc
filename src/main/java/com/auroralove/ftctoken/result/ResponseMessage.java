@@ -125,7 +125,17 @@ public enum ResponseMessage {
 	/**
 	 * 注册手机号已存在
 	 */
-	PHONE_EXITS(517,"注册手机号已存在");
+	PHONE_EXITS(517,"注册手机号已存在"),
+
+	/**
+	 * 更新用户交易资料成功!
+	 */
+	USERDATA_UPDATE_SUCCESS(200,"更新用户交易资料成功!"),
+
+	/**
+	 * 更新用户资料失败
+	 */
+	USERDATA_FAIL(519,"更新用户资料失败");
 
 	private final int status;
 	

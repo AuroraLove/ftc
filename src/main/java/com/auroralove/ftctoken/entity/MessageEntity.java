@@ -1,16 +1,17 @@
 package com.auroralove.ftctoken.entity;
 
 import com.auroralove.ftctoken.model.MessageModel;
-import com.auroralove.ftctoken.model.UserModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
 /**
  * 实体业务模型，用于返回值
  * @author zyu
  * @date 2019-1-22  20:43
  */
+@Data
 public class MessageEntity {
 
     /**
@@ -24,43 +25,13 @@ public class MessageEntity {
     /**
      * 留言时间
      */
-    private String leavingDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date leavingDate;
     /**
      * 回复时间
      */
-    private String replayDate;
-    
-	public String getLeavingMsg() {
-		return leavingMsg;
-	}
-
-	public void setLeavingMsg(String leavingMsg) {
-		this.leavingMsg = leavingMsg;
-	}
-
-	public String getReplayMsg() {
-		return replayMsg;
-	}
-
-	public void setReplayMsg(String replayMsg) {
-		this.replayMsg = replayMsg;
-	}
-
-	public String getLeavingDate() {
-		return leavingDate;
-	}
-
-	public void setLeavingDate(String leavingDate) {
-		this.leavingDate = leavingDate;
-	}
-
-	public String getReplayDate() {
-		return replayDate;
-	}
-
-	public void setReplayDate(String replayDate) {
-		this.replayDate = replayDate;
-	}
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date replayDate;
 
     public MessageEntity() {
 

@@ -1,28 +1,31 @@
 package com.auroralove.ftctoken.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.entity.MessageEntity;
+import com.auroralove.ftctoken.entity.TeamEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.model.MessageModel;
 import com.auroralove.ftctoken.model.UserModel;
+import com.auroralove.ftctoken.model.UserPayModel;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用户中心REST访问接口
@@ -39,6 +42,8 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
+    @Value("${picture.url}")
+    private String pictureUrl;
 
     /**
      * 登录
@@ -97,23 +102,13 @@ public class UserController {
     }
 
     /**
-     * 查看我的团队
-     * @param
-     * @return
-     */
-    @PostMapping("/home/team")
-    public ResponseResult team(Ufilter ufilter){
-        return null;
-    }
-
-    /**
      * 修改登陆密码
      * @param
      * @return
      */
     @PostMapping("/home/changeLoginPwd")
     public ResponseResult changeLoginPwd(Ufilter ufilter){
-    	if (ufilter.getId() != null && ufilter.getPassWord() != null){
+    	if (ufilter.getPhone() != null && ufilter.getPassWord() != null){
     		int result = userService.changeLoginPwd(ufilter);
     		 if (result > 0){
                  return new ResponseResult(ResponseMessage.OK,true);
@@ -130,7 +125,7 @@ public class UserController {
      */
     @PostMapping("/home/changePayPwd")
     public ResponseResult changePayPwd(Ufilter ufilter){
-    	if (ufilter.getId() != null && ufilter.getPay_pwd() != null){
+    	if (ufilter.getId() != null && ufilter.getPayPwd() != null){
     		int result = userService.changePayPwd(ufilter);
     		 if (result > 0){
                 return new ResponseResult(ResponseMessage.OK,true);
@@ -148,26 +143,20 @@ public class UserController {
      */
     @PostMapping("/home/uploadMsg")
     public ResponseResult uploadMsg(Ufilter ufilter,HttpServletRequest request){
-    	if (ufilter.getId() != null && ufilter.getmType() != null&& ufilter.getMessage() != null){
+    	if (ufilter.getId() != null && ufilter.getType() != null&& ufilter.getMessage() != null){
     		int res=0;
     		if(ufilter.getPicture()!=null){
     			try {
 	    			String fileName=ufilter.getPicture().getOriginalFilename();
-	    			//存凭证
-	    			String url=null;
-	    			// 项目在容器中实际发布运行的根路径
-	    			String realPath=request.getSession().getServletContext().getRealPath("/");
-	    			// 设置存放图片文件的路径
-	    			url=realPath+"pictures/";
-	    			File file=new File(url);
+	    			File file=new File(pictureUrl);
 	    			if (!file.exists()) {
 	    				file.mkdirs();
 	    			}
 	    			 // 转存文件到指定的路径
-					ufilter.getPicture().transferTo(new File(url + fileName));
+					ufilter.getPicture().transferTo(new File(pictureUrl + fileName));
 	    			//type=11，类型为上传留言
-	    			if(ufilter.getmType()==11){
-	    				res=userService.uploadMsg(ufilter, url+"/"+fileName);
+	    			if(ufilter.getType()==11){
+	    				res=userService.uploadMsg(ufilter, fileName);
 	    			}
 				} catch (IllegalStateException e) {
 					return new ResponseResult(ResponseMessage.FAIL,false);
@@ -176,7 +165,7 @@ public class UserController {
 				}
     		}else{
     			//直接存数据库
-    			if(ufilter.getmType()==11){
+    			if(ufilter.getType()==11){
     				res=userService.uploadMsg(ufilter, null);
     			}
     		}
@@ -210,6 +199,7 @@ public class UserController {
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
+
     /**
      * 查询留言簿
      * @param
@@ -237,14 +227,24 @@ public class UserController {
     @PostMapping("/home/userData")
     public ResponseResult userData(PayFilter payFilter,HttpServletRequest request) throws Exception{
         if (payFilter.getId() != null){
-            if (userService.getPayInfo(payFilter.getId()) != null){
-                return new ResponseResult(ResponseMessage.FAIL,"用户交易资料已存在");
+            UserPayModel payInfo = userService.getPayInfo(payFilter.getId());
+            if (payInfo != null){
+                //更新用户资料
+                UserPayModel userPayModel = userService.updatePayInfo(payFilter,request);
+                int n = 0;
+                //更新交易密码
+                if (payFilter.getPayPwd() != null){
+                    n = userService.updatePayPwd(payFilter);
+                }
+                if (userPayModel != null && n > 0){
+                    return new ResponseResult(ResponseMessage.USERDATA_UPDATE_SUCCESS,userPayModel);
+                }
+                return new ResponseResult(ResponseMessage.USERDATA_FAIL,"更新用户交易资料失败!");
             }
-            int result = userService.saveUserData(payFilter,request);
-            if (result > 0){
-                    return new ResponseResult(ResponseMessage.OK,"保存用户资料成功");
+            UserPayModel userPayModel = userService.saveUserData(payFilter,request);
+            if (userPayModel != null){
+                return new ResponseResult(ResponseMessage.OK,userPayModel);
             }
-
         }
         return new ResponseResult(ResponseMessage.FAIL,"系统出错");
     }
@@ -257,9 +257,25 @@ public class UserController {
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception{
         if (ufilter.getId() != null) {
-            return new ResponseResult(ResponseMessage.OK,userService.getTeam(ufilter));
+            TeamEntity team = userService.getTeam(ufilter, -1,1L);
+            Long total = userService.getTotal(team,0L);
+            team.setTotal(total);
+            return new ResponseResult(ResponseMessage.OK,team);
         }
         return new ResponseResult(ResponseMessage.ABANDON_FAIL,"系统出错");
+    }
+
+    /**
+     * 上传留言
+     * @param
+     * @return
+     */
+    @PostMapping("/home/showPicture")
+    public ResponseResult showPicture(Ufilter ufilter,HttpServletRequest request){
+        if (ufilter.getPictureUrl() != null){
+
+        }
+        return new ResponseResult(ResponseMessage.FAIL,false);
     }
 
     /**

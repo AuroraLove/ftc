@@ -1,7 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
-import com.auroralove.ftctoken.entity.RewardRecordEntity;
+import com.auroralove.ftctoken.entity.TeamEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
@@ -12,6 +12,7 @@ import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.utils.IdWorker;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +36,9 @@ public class UserService {
 
     @Autowired
     private IdWorker idWorker;
+
+    @Value("${picture.url}")
+    private String pictureUrl;
 
     /**
      * 通过手机号查找用户
@@ -86,7 +90,9 @@ public class UserService {
         if (rewardAccount == null){
             rewardAccount = new AccountModel();
         }
-        UserEntity userEntity = new UserEntity(userModel,dealAccount,rewardAccount);
+        //获取用户交易资料
+        UserPayModel payModel = userMapper.getPayInfo(userModel.getId());
+        UserEntity userEntity = new UserEntity(userModel,dealAccount,rewardAccount,payModel);
         return userEntity;
     }
 
@@ -113,7 +119,7 @@ public class UserService {
      * @return
      */
     public int changeLoginPwd(Ufilter ufilter) {
-    	int reslut = userMapper.changeLoginPwd(ufilter.getId(),ufilter.getPassWord());
+    	int reslut = userMapper.changeLoginPwd(ufilter.getPhone(),ufilter.getPassWord());
         return reslut;
     }
     
@@ -123,7 +129,7 @@ public class UserService {
      * @return
      */
     public int changePayPwd(Ufilter ufilter) {
-    	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPay_pwd());
+    	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPayPwd());
         return reslut;
     }
 
@@ -171,7 +177,7 @@ public class UserService {
      * @param payFilter
      * @return
      */
-    public int saveUserData(PayFilter payFilter,HttpServletRequest request) throws Exception{
+    public UserPayModel saveUserData(PayFilter payFilter,HttpServletRequest request) throws Exception{
         UserPayModel payModel = new UserPayModel(payFilter);
         payModel.setPid(idWorker.nextId());
         if(payFilter.getAliPayCode() != null){
@@ -181,17 +187,25 @@ public class UserService {
             payModel.setWechat_url(savePicture(payFilter.getWehatPayCode(),request));
         }
         int result =userMapper.savePayInfo(payModel);
-        return result;
+        if (result > 0){
+            return payModel;
+        }
+        return null;
     }
 
+    /**
+     * 存储图片
+     * @param picture
+     * @param request
+     * @return
+     * @throws Exception
+     */
     private String savePicture(MultipartFile picture, HttpServletRequest request) throws Exception{
         String fileName=picture.getOriginalFilename();
         //存凭证
         String url=null;
-        // 项目在容器中实际发布运行的根路径
-        String realPath=request.getSession().getServletContext().getRealPath("/");
         // 设置存放图片文件的路径
-        url=realPath+"pictures/";
+        url=pictureUrl+"pictures/";
         File file=new File(url);
         if (!file.exists()) {
             file.mkdirs();
@@ -209,24 +223,82 @@ public class UserService {
      *  取团队详情
      * @return
      */
-    public RewardRecordEntity getTeam(Ufilter ufilter) {
-        RewardRecordEntity result = new RewardRecordEntity();
+    public TeamEntity getTeam(Ufilter ufilter, Integer level, Long count) {
+
+        TeamEntity result = new TeamEntity();
+        //设置根用户手机号
         result.setPhone(ufilter.getPhone());
-        List<RewardRecordModel> recordModels = userMapper.getRewardChilds(ufilter.getId());
-        if (recordModels.size() > 0){
-            List<RewardRecordEntity> childs = new ArrayList<>();
-            for (RewardRecordModel rewardRecordModel:recordModels) {
-                RewardRecordEntity child = new RewardRecordEntity();
-                child.setPhone(rewardRecordModel.getChildPhone());
-                Ufilter filter = new Ufilter(rewardRecordModel.getChildId(),rewardRecordModel.getChildPhone());
-                RewardRecordEntity team = getTeam(filter);
-                childs.add(team);
+        result.setUid(ufilter.getId());
+        //获取子记录
+        List<UserModel> userChilds = userMapper.getUserChilds(ufilter.getId());
+        level ++;
+        if (userChilds.size() > 0){
+            List<TeamEntity> childs = new ArrayList<>();
+            for (UserModel userModel:userChilds) {
+                //设置子用户级别
+                result.setLevel(level);
+                //设置子用户级别人数
+                result.setCount(count);
+                Ufilter filter = new Ufilter(userModel.getId(),userModel.getPhone());
+                //递归获取子用户
+                TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
+                childs.add(userChild);
             }
             result.setChilds(childs);
         }else {
-            return result;
+            //设置子用户级别
+            result.setLevel(level);
+            //设置子用户级别人数
+            result.setCount(count);
         }
         return result;
     }
 
+    /**
+     * 获取团队总人数
+     * @param team
+     * @param total
+     * @return
+     */
+    public Long getTotal(TeamEntity team, Long total) {
+        List<TeamEntity> childs = team.getChilds();
+        if (childs != null){
+            total += childs.size();
+            if (childs.size()>0){
+                for (TeamEntity teamEntity :childs){
+                    total = getTotal(teamEntity,total);
+                }
+            }
+        }
+        return total;
+    }
+
+    /**
+     * 更新用户资料
+     * @param payInfo
+     * @return
+     */
+    public UserPayModel updatePayInfo(PayFilter payFilter,HttpServletRequest request) throws Exception{
+        UserPayModel payModel = new UserPayModel(payFilter);
+        if(payFilter.getAliPayCode() != null){
+            payModel.setAli_url(savePicture(payFilter.getAliPayCode(),request));
+        }
+        if (payFilter.getWehatPayCode() != null){
+            payModel.setWechat_url(savePicture(payFilter.getWehatPayCode(),request));
+        }
+        int result =userMapper.updatePayInfo(payModel);
+        if (result > 0){
+            return payModel;
+        }
+        return null;
+    }
+
+    /**
+     * 更新用户交易密码
+     * @param payFilter
+     * @return
+     */
+    public int updatePayPwd(PayFilter payFilter) {
+        return userMapper.updatePayPwd(payFilter.getId(),payFilter.getPayPwd());
+    }
 }

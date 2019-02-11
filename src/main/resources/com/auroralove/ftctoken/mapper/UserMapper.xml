@@ -21,7 +21,7 @@
     </select>
 
     <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
-        SELECT id,phone,password,teamid,admin_status FROM ftc_user
+        SELECT id,phone,password,teamid,admin_status,pay_pwd FROM ftc_user
       where
       id=#{id}
     </select>
@@ -77,19 +77,50 @@
      <update id="changeLoginPwd">
         UPDATE <include refid="USER" />
         SET password = #{password}
-        WHERE id = #{id}
+        WHERE phone = #{phone}
     </update>
     
      <update id="changePayPwd">
         UPDATE <include refid="USER" />
-        SET PAY_PWD = #{pay_pwd}
+        SET PAY_PWD = #{payPwd}
         WHERE id = #{id}
     </update>
 
     <select id="getPayInfo" resultType="com.auroralove.ftctoken.model.UserPayModel">
-        SELECT pid,uid,name,card_id,bank_name,ali_pay,ali_url,wechat_pay,wechat_url,bank_address
-        WHERE uid = #{id}
+        SELECT pid,uid,name,card_id,bank_name,ali_pay,ali_url,wechat_pay,wechat_url,bank_address from ftc_user_payinfo
+        WHERE uid = #{uid}
     </select>
+
+    <update id="updatePayInfo" parameterType="com.auroralove.ftctoken.model.UserPayModel">
+        update ftc_user_payinfo
+        <set>
+        <if test=" name!=null">
+            name=#{name},
+        </if>
+            <if test="phone !=null">
+                phone=#{phone},
+            </if>
+            <if test="card_id !=null">
+               card_id=#{card_id},
+            </if>
+            <if test="bank_name !=null">
+                bank_name=#{bank_name},
+            </if>
+            <if test="ali_pay !=null">
+                ali_pay=#{ali_pay},
+            </if>
+            <if test=" ali_url!=null">
+                ali_url=#{ali_url},
+            </if>
+            <if test="wechat_pay !=null">
+                wechat_pay=#{wechat_pay},
+            </if>
+            <if test="wechat_url !=null">
+                wechat_url=#{wechat_url},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
 
     <select id="getDealAccountInfo" resultMap="DealAccountInfo" >
 select (buy_release_amount- sell_amount) as tradeableAcct,FTCLockedAcct from
@@ -134,12 +165,11 @@ where uid= #{id} GROUP BY uid
       uid=#{uid}
     </select>
 
-    <select id="getRewardChilds" resultType="com.auroralove.ftctoken.model.RewardRecordModel">
-        SELECT rid,uid,parent_phone as parentPhone,child_phone as childPhone,level,amount
-        reward_date as rewardDate,status,childid
-         FROM ftc_reward
+    <select id="getUserChilds" resultType="com.auroralove.ftctoken.model.UserModel">
+        SELECT id,phone,name,regist_flag
+         FROM ftc_user
       where
-      uid=#{uid}
+      parent_id=#{uid} and regist_flag=1
     </select>
 
     <insert id="savePayInfo">
@@ -160,4 +190,12 @@ where uid= #{id} GROUP BY uid
         #{wechat_url}
         )
     </insert>
+
+    <update id="updatePayPwd">
+        update ftc_user
+        <set>
+        pay_pwd = #{payPwd}
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

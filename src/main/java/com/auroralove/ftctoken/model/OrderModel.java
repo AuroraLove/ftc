@@ -4,7 +4,7 @@ import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.filter.Dfilter;
 import lombok.Data;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * 订单表模型
@@ -77,22 +77,32 @@ public class OrderModel {
     /**
      * 确认支付日期
      */
-    private Timestamp affirm_date;
+    private Date affirm_date;
 
     /**
      * 支付日期
      */
-    private Timestamp pay_date;
+    private Date pay_date;
 
     /**
      * 下单日期
      */
-    private Timestamp order_date;
+    private Date order_date;
 
     /**
      * 完成订单日期
      */
-    private Timestamp finish_date;
+    private Date finish_date;
+
+    /**
+     * 冻结订单日期
+     */
+    private Date freeze_date;
+
+    /**
+     * 撤销订单日期
+     */
+    private Date cancle_date;
 
     /**
      * 买方实名

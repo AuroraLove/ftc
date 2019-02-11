@@ -33,17 +33,21 @@
         )
     </insert>
 
-    <select id="getPurchaseDeals" resultType="com.auroralove.ftctoken.model.DealModel">
-     SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where uid in
-(select t1.uid from
+    <select id="getTradeableAmount" resultType="com.auroralove.ftctoken.model.DealModel">
+select t1.uid,(t1.buy_release_amount- t2.sell_amount) as  tradeableAmount from
 (select uid,sum(deal_amount) as buy_release_amount from ftc_deal  where type in(0,7) and status=6 GROUP BY uid) as t1 left   join
- (select uid,sum(deal_amount) as sell_amount from ftc_deal  where type=1 and status=6 GROUP BY uid)  as t2 ON t1.uid = t2.uid order by
- (t1.buy_release_amount- t2.sell_amount) desc) and type = 0 and status = 3
+ (select uid,sum(deal_amount) as sell_amount from ftc_deal  where type=1 and status=6 GROUP BY uid)  as t2 ON t1.uid = t2.uid
+ where t1.uid = #{uid}
+    </select>
+
+    <select id="getPurchaseDeals" resultType="com.auroralove.ftctoken.model.DealModel">
+     SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal
+     where type = 0 and status = 3
     </select>
 
 
     <select id="getSellDeals" resultType="com.auroralove.ftctoken.model.DealModel">
-    SELECT tid,uid,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
+    SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
     </select>
 
     <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.OrderModel" >
@@ -58,7 +62,7 @@
         seller_name,
         buyer_phone,
         buyer_name,
-        oder_date,
+        order_date,
         status,
         univalent,
         quantity,
@@ -72,7 +76,9 @@
             #{seller_id},
             #{buyer_id},
             #{seller_phone},
+            #{seller_name},
             #{buyer_phone},
+            #{buyer_name},
             NOW(),
             #{status},
             #{univalent},
@@ -82,15 +88,16 @@
     </insert>
 
     <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
-    SELECT (
+    SELECT
         oid,
         deal_buy_id,
         deal_sell_id,
         seller_id,
+        seller_name,
         buyer_id,
+        buyer_name,
         seller_phone,
         buyer_phone,
-        oder_date,
         status,
         univalent,
         quantity,
@@ -98,19 +105,44 @@
         pay_way,
         affirm_date,
         order_date,
-        finnish_date
-    ) from ftc_order where oid = #{oid}
+        finish_date,
+        cancle_date,
+        freeze_date
+    from ftc_order where oid = #{oid}
     </select>
 
-    <select id="getCommutableAssets" resultMap="commutableAssests">
-    SELECT uid ,deal_amount,deal_date ,status
+    <select id="getDealRecord" resultMap="dealEntity">
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type
     from ftc_deal where uid = #{id} and type in (0,1,7)
     </select>
 
-    <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RecordModel" >
-    SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
-    from ftc_reward where uid = #{id}
+    <select id="getDealStatus" resultMap="dealEntity">
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type
+    from ftc_deal where uid = #{id} and type in (0,1) and status <![CDATA[!= ]]> 6
     </select>
+
+    <select id="getSingleSell" resultMap="dealEntity">
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type
+    from ftc_deal where uid = #{id} and type =1 and to_days(deal_date)=to_days(NOW())
+    </select>
+
+    <select id="getUnfinishedDeal" resultType="java.lang.Integer">
+    SELECT count(1)
+    from ftc_deal where uid = #{uid} and status in (3,4,5,8)
+    </select>
+
+    <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RewardRecordModel" >
+    SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
+    from ftc_reward where uid = #{uid}
+    </select>
+
+    <update id="updateDealStatus" >
+        update ftc_deal
+        <set>
+            status = #{dealStatus}
+        </set>
+        where tid =#{did}
+    </update>
 
     <update id="updateOrder" parameterType="com.auroralove.ftctoken.model.OrderModel">
         update ftc_order
@@ -124,13 +156,25 @@
                 status = #{status},
                 affirm_date = NOW(),
             </if>
+            <if test="status==9">
+                status = #{status},
+                cancle_date = NOW(),
+            </if>
+            <if test="status==8">
+                status = #{status},
+                freeze_date = NOW(),
+            </if>
         </set>
+        where oid =#{oid}
     </update>
-    <resultMap type="com.auroralove.ftctoken.entity.AssetEntity" id="commutableAssests">
+    <resultMap type="com.auroralove.ftctoken.entity.DealEntity" id="dealEntity">
         <result column="uid" property="id"/>
+        <result column="tid" property="did"/>
+        <result column="oid" property="oid"/>
         <result column="deal_amount" property="tradingAmount"/>
         <result column="deal_date" property="tadingDate"/>
         <result column="status" property="tradingStatus"/>
+        <result column="type" property="type"/>
     </resultMap>
     <resultMap type="com.auroralove.ftctoken.model.OrderModel" id="OrderModel">
         <result column="oid" property="orderId"/>

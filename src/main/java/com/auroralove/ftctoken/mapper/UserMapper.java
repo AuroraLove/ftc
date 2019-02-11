@@ -56,26 +56,26 @@ public interface UserMapper {
     /**
      * 修改登陆密码
      *
-     * @param id
+     * @param phone
      * @param password
      * @return Result<int>
      */
-    int changeLoginPwd(@Param("id") Long id,@Param("password")String password);
+    int changeLoginPwd(@Param("phone") String phone,@Param("password")String password);
     /**
      * 修改支付密码
      *
      * @param id
-     * @param pay_pwd
+     * @param payPwd
      * @return Result<int>
      */
-    int changePayPwd(@Param("id") Long id,@Param("pay_pwd")String pay_pwd);
+    int changePayPwd(@Param("id") Long id,@Param("payPwd")String payPwd);
 
     /**
      * 获取支付信息
-     * @param buyer_id
+     * @param uid
      * @return
      */
-    UserPayModel getPayInfo(Long buyer_id);
+    UserPayModel getPayInfo(@Param("uid") Long uid);
 
     /**
      * 返回用户账户信息详情
@@ -101,7 +101,6 @@ public interface UserMapper {
     /**
      * 回复留言
      *
-     * @param id
      * @param message
      * @return Result<int>
      */
@@ -110,8 +109,7 @@ public interface UserMapper {
     /**
      * 查询留言
      *
-     * @param id
-     * @param message
+     * @param uid
      * @return Result<UserModel>
      */
     List<MessageModel> messageInfo(Long uid);
@@ -130,5 +128,21 @@ public interface UserMapper {
      * @param uid
      * @return Result<UserModel>
      */
-    List<RewardRecordModel> getRewardChilds(@Param("uid") Long uid);
+    List<UserModel> getUserChilds(@Param("uid") Long uid);
+
+    /**
+     * 更新用户资料
+     *
+     * @param payModel
+     * @return Result<UserModel>
+     */
+    int updatePayInfo(UserPayModel payModel);
+
+    /**
+     * 更新用户交易密码
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int updatePayPwd(@Param("id") Long id, @Param("payPwd") String payPwd);
 }

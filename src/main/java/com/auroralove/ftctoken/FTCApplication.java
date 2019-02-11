@@ -2,7 +2,6 @@ package com.auroralove.ftctoken;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -29,7 +28,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableScheduling//启动定时任务
 @EnableTransactionManagement
 @MapperScan("com.auroralove.ftctoken.mapper")
-public class FTCApplication  {
+@ComponentScan(basePackages = {"com.auroralove.ftctoken.*"})
+public class FTCApplication extends SpringBootServletInitializer {
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(FTCApplication.class);
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(FTCApplication.class, args);
