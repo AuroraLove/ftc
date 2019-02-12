@@ -46,6 +46,7 @@ public class UserService {
      * @return
      */
     public UserModel findByUserphone(String phone){
+        System.out.println(phone);
         return userMapper.findByUserphone(phone);
     }
 
