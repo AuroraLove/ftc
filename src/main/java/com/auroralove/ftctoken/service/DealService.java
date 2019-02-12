@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -139,7 +140,7 @@ public class DealService {
         OrderModel orderModel = dealMapper.getOrder(dfilter.getOid());
         OrderEntity orderEntity = new OrderEntity(orderModel);
         //获取卖单用户收款信息
-        UserPayModel payModel = userMapper.getPayInfo(orderModel.getDeal_sell_id());
+        UserPayModel payModel = userMapper.getPayInfo(orderModel.getSeller_id());
         orderEntity.setPayInfo(payModel);
         return orderEntity;
     }
@@ -181,19 +182,41 @@ public class DealService {
         //获取卖单数
         List<DealModel> sellDeals =  dealMapper.getSellDeals();
         List<OrderModel> orders = new ArrayList<>();
-        int min = purchaseDeals.size() < sellDeals.size() ? purchaseDeals.size() : sellDeals.size();
-        for (int i = 0;i < min;i++){
-            //匹配生成订单
-            if (!purchaseDeals.get(i).getUid().equals(sellDeals.get(i).getUid())
-                    && purchaseDeals.get(i).getDeal_amount().equals(sellDeals.get(i).getDeal_amount())){
-                OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
-                orderModel.setOid(idWorker.nextId());
-                int n = dealMapper.newOrder(orderModel);
-                if (n > 0){
-                    orders.add(orderModel);
+
+        //遍历订单进行匹配
+        Iterator purchaseIterator = purchaseDeals.iterator();
+        //遍历卖方
+        Iterator sellIterator = sellDeals.iterator();
+        while (purchaseIterator.hasNext()){
+            DealModel purchaseDeal = (DealModel) purchaseIterator.next();
+            while (sellIterator.hasNext()){
+                DealModel sellDeal = (DealModel) purchaseIterator.next();
+                if (!purchaseDeal.equals(sellDeal.getUid())
+                        && purchaseDeal.getDeal_amount().equals(sellDeal.getDeal_amount())){
+                    OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
+                    orderModel.setOid(idWorker.nextId());
+                    int n = dealMapper.newOrder(orderModel);
+                    if (n > 0){
+                        orders.add(orderModel);
+                        //跳出当前循环
+                        break;
+                    }
                 }
             }
         }
+//        int min = purchaseDeals.size() < sellDeals.size() ? purchaseDeals.size() : sellDeals.size();
+//        for (int i = 0;i < min;i++){
+//            //匹配生成订单
+//            if (!purchaseDeals.get(i).getUid().equals(sellDeals.get(i).getUid())
+//                    && purchaseDeals.get(i).getDeal_amount().equals(sellDeals.get(i).getDeal_amount())){
+//                OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
+//                orderModel.setOid(idWorker.nextId());
+//                int n = dealMapper.newOrder(orderModel);
+//                if (n > 0){
+//                    orders.add(orderModel);
+//                }
+//            }
+//        }
         if (orders.size() > 0){
             for (OrderModel orderModel:orders) {
                 //调用极光推送消息

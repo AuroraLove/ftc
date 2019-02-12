@@ -203,17 +203,14 @@ public class UserService {
      */
     private String savePicture(MultipartFile picture, HttpServletRequest request) throws Exception{
         String fileName=picture.getOriginalFilename();
-        //存凭证
-        String url=null;
         // 设置存放图片文件的路径
-        url=pictureUrl+"pictures/";
-        File file=new File(url);
+        File file=new File(pictureUrl);
         if (!file.exists()) {
             file.mkdirs();
         }
         // 转存文件到指定的路径
-        picture.transferTo(new File(url + fileName));
-        return url + fileName;
+        picture.transferTo(new File(pictureUrl + fileName));
+        return  fileName;
     }
 
     public UserPayModel getPayInfo(Long uid) {

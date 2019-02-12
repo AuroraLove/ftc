@@ -45,7 +45,6 @@ select t1.uid,(t1.buy_release_amount- t2.sell_amount) as  tradeableAmount from
      where type = 0 and status = 3
     </select>
 
-
     <select id="getSellDeals" resultType="com.auroralove.ftctoken.model.DealModel">
     SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
     </select>
@@ -113,7 +112,7 @@ select t1.uid,(t1.buy_release_amount- t2.sell_amount) as  tradeableAmount from
 
     <select id="getDealRecord" resultMap="dealEntity">
     SELECT uid ,tid,oid,deal_amount,deal_date ,status,type
-    from ftc_deal where uid = #{id} and type in (0,1,7)
+    from ftc_deal where uid = #{id} and type in (0,1,7) order by deal_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">
