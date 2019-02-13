@@ -135,6 +135,18 @@ where t1.uid= #{uid}
 where uid= #{id} GROUP BY uid
     </select>
 
+    <select id="getPublicMsg" resultType="com.auroralove.ftctoken.model.PublicInfoModel">
+     SELECT pid,information,date from ftc_publicinfo
+    </select>
+
+    <insert id="newPublicMsg" parameterType="java.lang.String">
+       insert into ftc_publicinfo(information,date)
+       VALUES (#{information},NOW())
+    </insert>
+
+    <delete id="deletePublicMsg" parameterType="java.lang.Long">
+        delete from ftc_publicinfo where pid = #{pid}
+    </delete>
 
     <insert id="uploadMsg" >
         INSERT INTO

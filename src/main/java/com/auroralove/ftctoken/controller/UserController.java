@@ -8,6 +8,7 @@ import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.model.MessageModel;
+import com.auroralove.ftctoken.model.PublicInfoModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.model.UserPayModel;
 import com.auroralove.ftctoken.result.ResponseMessage;
@@ -16,10 +17,7 @@ import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -266,16 +264,42 @@ public class UserController {
     }
 
     /**
-     * 上传留言
+     * 取公告信息
      * @param
      * @return
      */
-    @PostMapping("/home/showPicture")
-    public ResponseResult showPicture(Ufilter ufilter,HttpServletRequest request){
-        if (ufilter.getPictureUrl() != null){
+    @PostMapping("/home/getPublicMsg")
+    public ResponseResult getPublicMsg(){
+        List<PublicInfoModel> publicInfoModel = userService.getPublicMsg();
+        return new ResponseResult(ResponseMessage.OK,publicInfoModel);
+    }
 
+    /**
+     * 新增公告
+     * @param
+     * @return
+     */
+    @PostMapping("/home/newPublicMsg")
+    public ResponseResult newPublicMsg(String information){
+        int result = userService.newPublicMsg(information);
+        if (result > 0){
+            return new ResponseResult(ResponseMessage.OK,result);
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.FAIL,"新增公告失败");
+    }
+
+    /**
+     * 删除公告
+     * @param
+     * @return
+     */
+    @PostMapping("/home/deletePublicMsg")
+    public ResponseResult deletePublicMsg(Long pid){
+        int result = userService.deletePublicMsg(pid);
+        if (result > 0){
+            return new ResponseResult(ResponseMessage.OK,result);
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"删除公告失败");
     }
 
     /**

@@ -191,12 +191,18 @@ public class DealService {
             DealModel purchaseDeal = (DealModel) purchaseIterator.next();
             while (sellIterator.hasNext()){
                 DealModel sellDeal = (DealModel) purchaseIterator.next();
+                //卖方交易金额
+                Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
+                //买房交易金额
+                Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
                 if (!purchaseDeal.equals(sellDeal.getUid())
-                        && purchaseDeal.getDeal_amount().equals(sellDeal.getDeal_amount())){
+                        && sellAmount.equals(buyAmount)){
                     OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
                     orderModel.setOid(idWorker.nextId());
                     int n = dealMapper.newOrder(orderModel);
                     if (n > 0){
+                        //移除以匹配订单
+                        sellIterator.remove();
                         orders.add(orderModel);
                         //跳出当前循环
                         break;

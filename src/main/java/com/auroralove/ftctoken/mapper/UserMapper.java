@@ -145,4 +145,26 @@ public interface UserMapper {
      * @return
      */
     int updatePayPwd(@Param("id") Long id, @Param("payPwd") String payPwd);
+
+    /**
+     * 获取公告信息
+     * @return
+     */
+    List<PublicInfoModel> getPublicMsg();
+
+    /**
+     * 新增公告信息
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int newPublicMsg(String information);
+
+    /**
+     * 获取公告信息
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int deletePublicMsg(Long pid);
 }

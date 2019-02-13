@@ -127,7 +127,7 @@ public class OrderModel {
         this.status = DealEnum.UNPAID.getValue();
         this.quantity = purchase.getQuantity();
         this.univalent = purchase.getUnivalent();
-        this.deal_amount = purchase.getDeal_amount();
+        this.deal_amount = purchase.getQuantity() * purchase.getUnivalent();
         this.deal_buy_id = purchase.getTid();
         this.deal_sell_id = sell.getTid();
     }

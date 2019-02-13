@@ -299,4 +299,32 @@ public class UserService {
     public int updatePayPwd(PayFilter payFilter) {
         return userMapper.updatePayPwd(payFilter.getId(),payFilter.getPayPwd());
     }
+
+    /**
+     * 取公告信息
+     * @return
+     */
+    public List<PublicInfoModel> getPublicMsg() {
+        List<PublicInfoModel> publicInfoModels = userMapper.getPublicMsg();
+        if (publicInfoModels == null){
+            return new ArrayList<PublicInfoModel>();
+        }
+        return publicInfoModels;
+    }
+
+    /**
+     * 新增公告信息
+     * @return
+     */
+    public int newPublicMsg(String information) {
+        return userMapper.newPublicMsg(information);
+    }
+
+    /**
+     * 获取公告信息
+     * @return
+     */
+    public int deletePublicMsg(Long pid) {
+        return userMapper.deletePublicMsg(pid);
+    }
 }
