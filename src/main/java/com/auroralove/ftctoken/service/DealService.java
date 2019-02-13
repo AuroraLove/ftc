@@ -151,7 +151,7 @@ public class DealService {
      * @return
      */
     public int updateDealStatus(Dfilter dfilter) {
-        return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus());
+        return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus(),dfilter.getPayWay());
     }
 
     /**
@@ -190,7 +190,7 @@ public class DealService {
         while (purchaseIterator.hasNext()){
             DealModel purchaseDeal = (DealModel) purchaseIterator.next();
             while (sellIterator.hasNext()){
-                DealModel sellDeal = (DealModel) purchaseIterator.next();
+                DealModel sellDeal = (DealModel) sellIterator.next();
                 //卖方交易金额
                 Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
                 //买房交易金额

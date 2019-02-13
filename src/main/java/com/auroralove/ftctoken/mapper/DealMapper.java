@@ -85,7 +85,8 @@ public interface DealMapper {
      * 修改交易订单状态
      * @return
      */
-    int updateDealStatus(@Param("did") Long did,@Param("dealStatus") Integer dealStatus);
+    int updateDealStatus(@Param("did") Long did,@Param("dealStatus") Integer dealStatus,
+                         @Param("payWay")Integer payWay);
 
     /**
      * 获取未完成交易订单数

@@ -63,4 +63,9 @@ public class SystemModel {
      * 佣金文案
      */
     private String commissionScheme;
+
+    /**
+     * 系统收款吗
+     */
+    private String gatheringCode;
 }

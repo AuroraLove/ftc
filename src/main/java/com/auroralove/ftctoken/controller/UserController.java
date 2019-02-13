@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.controller;
 
 import com.auroralove.ftctoken.annotation.UserLoginToken;
+import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.MessageEntity;
 import com.auroralove.ftctoken.entity.TeamEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
@@ -78,6 +79,20 @@ public class UserController {
         Boolean flag = userService.registUser(userModel);
         if(flag != null && flag){
             return new ResponseResult(ResponseMessage.OK,true);
+        }
+        return new ResponseResult(ResponseMessage.FAIL,false);
+    }
+
+    /**
+     * 取用户账户金额
+     * @param ufilter
+     * @return ResponseResult
+     */
+    @PostMapping("/home/userAccount")
+    public ResponseResult userAccount(Ufilter ufilter){
+        AccountEntity userResult = userService.userAccount(ufilter.getId());
+        if(userResult != null){
+            return new ResponseResult(ResponseMessage.OK,userResult);
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }

@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.TeamEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.MsgFilter;
@@ -326,5 +327,26 @@ public class UserService {
      */
     public int deletePublicMsg(Long pid) {
         return userMapper.deletePublicMsg(pid);
+    }
+
+    public AccountEntity userAccount(Long id) {
+
+        //取交易金额
+        AccountModel dealAccount = userMapper.getDealAccountInfo(id);
+        if (dealAccount == null){
+            dealAccount = new AccountModel();
+        }
+        //取奖励金额
+        AccountModel rewardAccount = userMapper.getRewardAccount(id);
+        if (rewardAccount == null){
+            rewardAccount = new AccountModel();
+        }
+
+        //取锁仓金额
+        AccountModel lockedAccount = userMapper.getRewardAccount(id);
+        if (rewardAccount == null){
+            rewardAccount = new AccountModel();
+        }
+
     }
 }
