@@ -18,5 +18,14 @@ public class HtmlController {
         request.setAttribute("uid",uid);
         return "page-register.jsp";
     }
+    @GetMapping("/chart")
+    public String chart(){
+       // request.setAttribute("uid",uid);
+        return "charts-chartjs.jsp";
+    }
+    @GetMapping("/chart1")
+    public String chart1(){
+        return "voucher_center.jsp";
+    }
 
 }
