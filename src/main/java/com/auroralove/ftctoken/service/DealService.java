@@ -7,17 +7,16 @@ import com.auroralove.ftctoken.entity.RecordEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.DealMapper;
+import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
-import com.auroralove.ftctoken.model.DealModel;
-import com.auroralove.ftctoken.model.OrderModel;
-import com.auroralove.ftctoken.model.UserModel;
-import com.auroralove.ftctoken.model.UserPayModel;
+import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.utils.IdWorker;
 import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.*;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -40,6 +39,9 @@ public class DealService {
 
      @Autowired
      private UserMapper userMapper;
+
+     @Autowired
+     private SystemMapper systemMapper;
 
      @Autowired
      private IdWorker idWorker;
@@ -151,7 +153,7 @@ public class DealService {
      * @return
      */
     public int updateDealStatus(Dfilter dfilter) {
-        return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus(),dfilter.getPayWay());
+        return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus());
     }
 
     /**
@@ -171,7 +173,33 @@ public class DealService {
      */
     public int updateOrder(Dfilter dfilter) {
         OrderModel orderModel = new OrderModel(dfilter);
-        return dealMapper.updateOrder(orderModel);
+        int result =  dealMapper.updateOrder(orderModel);
+        //完成订单释放金额
+        if (result >0 && dfilter.getOrderStatus().equals(6)){
+            //取充值金额
+            AccountModel rechargeAccount = userMapper.getRegistAmount(dfilter.getId());
+            if (rechargeAccount == null){
+                rechargeAccount = new AccountModel();
+                rechargeAccount.setRechargeAcct(0.0);
+            }
+            //取释放金额
+            AccountModel realeaseAccount = userMapper.getReleaseAmount(dfilter.getId());
+            if (realeaseAccount == null){
+                realeaseAccount = new AccountModel();
+                realeaseAccount.setReleaseAmount(0.0);
+            }
+            //增加释放记录
+            Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAccount.getReleaseAmount();
+//            Double sysReleaseAmount = systemMapper.getReleaseAmount
+            if (lockedAcct > 100.0){
+                OrderModel order = dealMapper.getOrder(dfilter.getOid());
+                DealModel dealModel = new DealModel(order);
+                dealModel.setTid(idWorker.nextId());
+                dealModel.setDeal_amount(100.0);
+                result = dealMapper.newDealRecord(dealModel);
+            }
+        }
+        return result;
     }
 
 

@@ -46,6 +46,16 @@ public class DealEntity {
     private Double tradingAmount;
 
     /**
+     * FTC买卖单交易单价
+     */
+    private Double univalent;
+
+    /**
+     * FTC买卖单交易数量
+     */
+    private Double quantity;
+
+    /**
      * 交易类型
      */
     private Integer type;

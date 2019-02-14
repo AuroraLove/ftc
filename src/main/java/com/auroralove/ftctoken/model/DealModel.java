@@ -90,4 +90,15 @@ public class DealModel {
         this.phone = dfilter.getPhone();
         this.user_name = dfilter.getUserName();
     }
+
+    public DealModel(OrderModel order) {
+        this.uid = order.getBuyer_id();
+        this.univalent = order.getUnivalent();
+        this.quantity = order.getQuantity();
+        this.phone = order.getBuyer_phone();
+        this.user_name = order.getBuyer_name();
+        this.phone = order.getBuyer_phone();
+        this.type = 7;
+        this.status = 6;
+    }
 }

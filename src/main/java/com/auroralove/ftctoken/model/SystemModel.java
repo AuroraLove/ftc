@@ -2,6 +2,8 @@ package com.auroralove.ftctoken.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author zyu
  * @date 2019/1/28
@@ -52,7 +54,7 @@ public class SystemModel {
     /**
      * 系统公共信息
      */
-    private String publicInfo;
+    private List<PublicInfoModel> publicInfo;
 
     /**
      * 手续费百分比
@@ -68,4 +70,5 @@ public class SystemModel {
      * 系统收款吗
      */
     private String gatheringCode;
+
 }

@@ -82,7 +82,33 @@ public interface UserMapper {
      * @param uid
      * @return
      */
-    AccountModel getDealAccountInfo(Long uid);
+    AccountModel getTradableAccountInfo(@Param("uid")Long uid);
+
+    /**
+     * 获取用户买单总金额
+     * @param uid
+     * @return
+     */
+    AccountModel getBuyAmount(@Param("uid")Long uid);
+    /**
+     * 获取用户卖单金额
+     * @param uid
+     * @return
+     */
+    AccountModel getSellAmount(@Param("uid")Long uid);
+    /**
+     * 获取用户注册金额
+     * @param uid
+     * @return
+     */
+    AccountModel getRegistAmount(@Param("uid")Long uid);
+
+    /**
+     * 获取用户释放金额
+     * @param uid
+     * @return
+     */
+    AccountModel getReleaseAmount(@Param("uid")Long uid);
 
     /**
      * 返回用户账户奖励金额信息详情

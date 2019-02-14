@@ -59,6 +59,16 @@ public class UserEntity {
     private Double tradeableAcct;
 
     /**
+     * 充值金额
+     */
+    private Double recharegeAcct;
+
+    /**
+     * 释放金额
+     */
+    private Double realeaseAcct;
+
+    /**
      * 用户交易资料
      */
     private UserPayModel payInfo;
@@ -67,17 +77,32 @@ public class UserEntity {
 
     }
 
-    public UserEntity(UserModel userModel, AccountModel accountModel, AccountModel rewardModel,
-                      UserPayModel userPayModel) {
+    public UserEntity(UserModel userModel, AccountModel tradableAccountInfo, AccountModel rewardModel,
+                      UserPayModel userPayModel, AccountModel rechargeModel,AccountModel realeaseAcct) {
         this.id = userModel.getId() ;
         this.phone = userModel.getPhone();
         this.amdinStatus = userModel.getAmdinStatus();
         this.teamId = userModel.getTeamId();
         this.parentId = userModel.getParentId();
-        this.FTCLockedAcct = accountModel.getFTCLockedAcct();
-        this.tradeableAcct = accountModel.getTradeableAcct();
+        this.recharegeAcct = rechargeModel.getRechargeAcct();
+        this.realeaseAcct = realeaseAcct.getReleaseAmount();
+        this.FTCLockedAcct = rechargeModel.getRechargeAcct() - realeaseAcct.getReleaseAmount();
+        this.tradeableAcct = tradableAccountInfo.getTradeableAcct();
         this.FTCRewardAcct = rewardModel.getFTCRewardAcct();
         this.payInfo = userPayModel;
     }
 
+    public UserEntity(UserModel userModel, AccountEntity accountEntity, UserPayModel payModel) {
+        this.id = userModel.getId() ;
+        this.phone = userModel.getPhone();
+        this.amdinStatus = userModel.getAmdinStatus();
+        this.teamId = userModel.getTeamId();
+        this.parentId = userModel.getParentId();
+        this.recharegeAcct = accountEntity.getRecharegeAcct();
+        this.realeaseAcct = accountEntity.getRealeaseAcct();
+        this.FTCLockedAcct = accountEntity.getRealeaseAcct();
+        this.tradeableAcct = accountEntity.getTradeableAcct();
+        this.FTCRewardAcct = accountEntity.getFTCRewardAcct();
+        this.payInfo = payModel;
+    }
 }

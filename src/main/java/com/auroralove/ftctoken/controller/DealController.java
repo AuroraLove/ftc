@@ -115,7 +115,7 @@ public class DealController {
      */
     @PostMapping("/myDeal/updateDealStatus")
     public ResponseResult updateDealStatus(Dfilter dfilter){
-        if (dfilter.getDid() != null && dfilter.getDealStatus() != null){
+        if (dfilter.getDid() != null ){
             int result = dealService.updateDealStatus(dfilter);
             if (result > 0){
                 return new ResponseResult(ResponseMessage.OK,true);
@@ -123,7 +123,6 @@ public class DealController {
         }
         return new ResponseResult(ResponseMessage.FAIL,false);
     }
-
 
     /**
      * 订单详情查询

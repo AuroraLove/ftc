@@ -3,7 +3,7 @@
 <mapper namespace="com.auroralove.ftctoken.mapper.SystemMapper">
 
     <select id="getSystemInfo" resultType="com.auroralove.ftctoken.model.SystemModel">
-      SELECT EOS,FTCLocked,FTCPrice,univalent,quantity ,User_level as userLevel,version ,public_info as publicInfo,poundage,commission_scheme as commissionScheme,
+      SELECT EOS,FTC,FTCLocked,FTCPrice,univalent,quantity ,User_level as userLevel,version ,public_info as publicInfo,poundage,commission_scheme as commissionScheme,
       gathering_code as gatheringCode
       FROM ftc_system
       where

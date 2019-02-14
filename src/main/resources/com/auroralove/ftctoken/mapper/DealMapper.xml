@@ -102,6 +102,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         quantity,
         deal_amount,
         pay_way,
+        pay_date,
         affirm_date,
         order_date,
         finish_date,
@@ -111,8 +112,8 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="getDealRecord" resultMap="dealEntity">
-    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type
-    from ftc_deal where uid = #{id} and type in (0,1,7) order by deal_date desc
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity
+    from ftc_deal where uid = #{id} and type in (0,1) and status in (3,4,5,6,8) order by deal_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">
@@ -154,6 +155,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
             <if test="status==6">
                 status = #{status},
                 affirm_date = NOW(),
+                finish_date = NOW()
             </if>
             <if test="status==9">
                 status = #{status},
@@ -174,6 +176,8 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         <result column="deal_date" property="tadingDate"/>
         <result column="status" property="tradingStatus"/>
         <result column="type" property="type"/>
+        <result column="univalent" property="univalent"/>
+        <result column="quantity" property="quantity"/>
     </resultMap>
     <resultMap type="com.auroralove.ftctoken.model.OrderModel" id="OrderModel">
         <result column="oid" property="orderId"/>

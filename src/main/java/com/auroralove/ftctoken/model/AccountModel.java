@@ -25,4 +25,30 @@ public class AccountModel {
      * FTC总奖励额
      */
     private Double FTCRewardAcct;
+
+    /**
+     * 充值金额
+     */
+    private Double rechargeAcct;
+
+    /**
+     * 释放金额
+     */
+    private Double releaseAmount;
+
+    /**
+     * 买单金额
+     */
+    private Double buyAcct;
+
+    /**
+     * 卖单总金额
+     */
+    private Double sellAcct;
+
+    /**
+     * 注册总金额
+     */
+    private Double registAcct;
+
 }

@@ -47,7 +47,6 @@ public class UserService {
      * @return
      */
     public UserModel findByUserphone(String phone){
-        System.out.println(phone);
         return userMapper.findByUserphone(phone);
     }
 
@@ -82,19 +81,14 @@ public class UserService {
      * @return
      */
     public UserEntity getUserInfo(UserModel userModel) {
-        //取交易金额
-        AccountModel dealAccount = userMapper.getDealAccountInfo(userModel.getId());
-        if (dealAccount == null){
-            dealAccount = new AccountModel();
-        }
-        //取奖励金额
-        AccountModel rewardAccount = userMapper.getRewardAccount(userModel.getId());
-        if (rewardAccount == null){
-            rewardAccount = new AccountModel();
-        }
+        AccountEntity accountEntity = userAccount(userModel.getId());
         //获取用户交易资料
         UserPayModel payModel = userMapper.getPayInfo(userModel.getId());
-        UserEntity userEntity = new UserEntity(userModel,dealAccount,rewardAccount,payModel);
+        if (payModel == null){
+            payModel = new UserPayModel();
+        }
+        payModel.setPayPwd(userModel.getPay_pwd());
+        UserEntity userEntity = new UserEntity(userModel, accountEntity, payModel);
         return userEntity;
     }
 
@@ -140,7 +134,13 @@ public class UserService {
      * @return
      */
     public SystemModel getSystem() {
+        //取公告信息
+        List<PublicInfoModel> publicInfoModel = userMapper.getPublicMsg();
+        if(publicInfoModel == null){
+            publicInfoModel = new ArrayList<PublicInfoModel>();
+        }
         SystemModel reslut = systemMapper.getSystemInfo();
+        reslut.setPublicInfo(publicInfoModel);
         return reslut;
     }
 
@@ -274,7 +274,7 @@ public class UserService {
 
     /**
      * 更新用户资料
-     * @param payInfo
+     * @param payFilter
      * @return
      */
     public UserPayModel updatePayInfo(PayFilter payFilter,HttpServletRequest request) throws Exception{
@@ -329,24 +329,45 @@ public class UserService {
         return userMapper.deletePublicMsg(pid);
     }
 
-    public AccountEntity userAccount(Long id) {
-
-        //取交易金额
-        AccountModel dealAccount = userMapper.getDealAccountInfo(id);
-        if (dealAccount == null){
-            dealAccount = new AccountModel();
+    /**
+     * 用户账户余额查询
+     * @param uid
+     * @return
+     */
+    public AccountEntity userAccount(Long uid) {
+        //取可买单总金额
+        AccountModel buyAccountInfo = userMapper.getBuyAmount(uid);
+        if (buyAccountInfo == null){
+            buyAccountInfo = new AccountModel();
+            buyAccountInfo.setBuyAcct(0.0);
+        }
+        //取可卖单总金额
+        AccountModel sellAccountInfo = userMapper.getSellAmount(uid);
+        if (sellAccountInfo == null){
+            sellAccountInfo = new AccountModel();
+            sellAccountInfo.setSellAcct(0.0);
         }
         //取奖励金额
-        AccountModel rewardAccount = userMapper.getRewardAccount(id);
+        AccountModel rewardAccount = userMapper.getRewardAccount(uid);
         if (rewardAccount == null){
             rewardAccount = new AccountModel();
+            rewardAccount.setFTCRewardAcct(0.0);
+        }
+        //取充值金额
+        AccountModel rechargeAccount = userMapper.getRegistAmount(uid);
+        if (rechargeAccount == null){
+            rechargeAccount = new AccountModel();
+            rechargeAccount.setRechargeAcct(0.0);
+        }
+        //取释放金额
+        AccountModel realeaseAccount = userMapper.getReleaseAmount(uid);
+        if (realeaseAccount == null){
+            realeaseAccount = new AccountModel();
+            realeaseAccount.setReleaseAmount(0.0);
         }
 
-        //取锁仓金额
-        AccountModel lockedAccount = userMapper.getRewardAccount(id);
-        if (rewardAccount == null){
-            rewardAccount = new AccountModel();
-        }
-
+        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,rechargeAccount,realeaseAccount);
+        return  accountEntity;
     }
+
 }

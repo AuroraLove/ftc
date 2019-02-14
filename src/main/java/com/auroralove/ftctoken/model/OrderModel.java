@@ -2,6 +2,7 @@ package com.auroralove.ftctoken.model;
 
 import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.filter.Dfilter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -77,31 +78,37 @@ public class OrderModel {
     /**
      * 确认支付日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date affirm_date;
 
     /**
      * 支付日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date pay_date;
 
     /**
      * 下单日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date order_date;
 
     /**
      * 完成订单日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date finish_date;
 
     /**
      * 冻结订单日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date freeze_date;
 
     /**
      * 撤销订单日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cancle_date;
 
     /**
