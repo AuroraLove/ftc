@@ -1,8 +1,5 @@
-<!doctype html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -18,21 +15,13 @@
 <link rel="stylesheet" href="assets/css/themify-icons.css">
 <link rel="stylesheet" href="assets/css/pe-icon-7-filled.css">
     <link rel="stylesheet" href="assets/css/flag-icon.min.css"><link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/jqvmap.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="assets/css/charts/chartist.min.css" rel="stylesheet"><link href="assets/css/lib/vector-map/jqvmap.min.css" rel="stylesheet"></head>
 
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
-
-    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
-
-</head>
 <body>
     <!-- Left Panel -->
-
     <aside id="left-panel" class="left-panel">
         <nav class="navbar navbar-expand-sm navbar-default">
-
             <div id="main-menu" class="main-menu collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li>
@@ -81,7 +70,7 @@
                     <li>
                         <a href="widgets.html"> <i class="menu-icon ti-email"></i>Widgets </a>
                     </li>
-                    <li class="menu-item-has-children dropdown">
+                    <li class="menu-item-has-children active dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-bar-chart"></i>Charts</a>
                         <ul class="sub-menu children dropdown-menu">
                             <li><i class="menu-icon fa fa-line-chart"></i><a href="charts-chartjs.html">Chart JS</a></li>
@@ -90,7 +79,7 @@
                         </ul>
                     </li>
 
-                    <li class="menu-item-has-children active dropdown">
+                    <li class="menu-item-has-children dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="menu-icon fa fa-area-chart"></i>Maps</a>
                         <ul class="sub-menu children dropdown-menu">
                             <li><i class="menu-icon fa fa-map-o"></i><a href="maps-gmap.html">Google Maps</a></li>
@@ -109,14 +98,10 @@
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>
-    </aside><!-- /#left-panel -->
-
-    <!-- Left Panel -->
-
+    </aside>
+    <!-- /#left-panel -->
     <!-- Right Panel -->
-
     <div id="right-panel" class="right-panel">
-
         <!-- Header-->
         <header id="header" class="header">
             <div class="top-left">
@@ -208,20 +193,21 @@
                         </a>
 
                         <div class="user-menu dropdown-menu">
-                            <a class="nav-link" href="#"><i class="fa fa-user"></i>My Profile</a>
+                            <a class="nav-link" href="#"><i class="fa fa- user"></i>My Profile</a>
 
-                            <a class="nav-link" href="#"><i class="fa fa-bell-o"></i>Notifications <span class="count">13</span></a>
+                            <a class="nav-link" href="#"><i class="fa fa- user"></i>Notifications <span class="count">13</span></a>
 
-                            <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+                            <a class="nav-link" href="#"><i class="fa fa -cog"></i>Settings</a>
 
-                            <a class="nav-link" href="#"><i class="fa fa-power-off"></i>Logout</a>
+                            <a class="nav-link" href="#"><i class="fa fa-power -off"></i>Logout</a>
                         </div>
                     </div>
+
                 </div>
             </div>
-        </header><!-- /header -->
-        <!-- Header-->
-
+        </header>
+        <!-- /#header -->
+        <!-- Breadcrumbs-->
         <div class="breadcrumbs">
             <div class="breadcrumbs-inner">
                 <div class="row m-0">
@@ -237,8 +223,8 @@
                             <div class="page-title">
                                 <ol class="breadcrumb text-right">
                                     <li><a href="#">Dashboard</a></li>
-                                    <li><a href="#">Map</a></li>
-                                    <li class="active">Vector map</li>
+                                    <li><a href="#">Charts</a></li>
+                                    <li class="active">Chartjs</li>
                                 </ol>
                             </div>
                         </div>
@@ -246,230 +232,130 @@
                 </div>
             </div>
         </div>
-
+        <!-- /.breadcrumbs-->
+        <!-- Content -->
         <div class="content">
             <div class="animated fadeIn">
+                <div class="row">
 
-             <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>World</h4>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Yearly Sales </h4>
+                                <canvas id="sales-chart"></canvas>
+                            </div>
                         </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap" class="vmap"></div>
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Team Commits </h4>
+                                <canvas id="team-chart"></canvas>
+                            </div>
                         </div>
-                    </div>
-                    <!-- /# card -->
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Bar chart </h4>
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Rader chart </h4>
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Line Chart </h4>
+                                <canvas id="lineChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="mb-3">Doughut Chart </h4>
+                                    <canvas id="doughutChart"></canvas>
+                                </div>
+                            </div>
+                        </div><!-- /# column -->
+
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Pie Chart </h4>
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                    </div><!-- /# column -->
+
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Polar Chart </h4>
+                                <canvas id="polarChart"></canvas>
+                            </div>
+                        </div>
+                    </div><!-- /# column -->
+
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="mb-3">Single Bar Chart </h4>
+                                <canvas id="singelBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div><!-- /# column -->
+
+
+
                 </div>
-                <!-- /# column -->
 
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Algeria</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap2" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Argentina</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap3" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Brazil</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap4" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap5" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Germany</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap6" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Greece</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap7" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Russia</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap10" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Tunasia</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap11" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Europe</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap12" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>USA</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap13" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Turkey</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap14" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4>Inactive Regions</h4>
-                        </div>
-                        <div class="Vector-map-js">
-                            <div id="vmap15" class="vmap"></div>
-                        </div>
-                    </div>
-                    <!-- /# card -->
-                </div>
-                <!-- /# column -->
-
-
-
-            </div>
-            <!-- /# row -->
-
-
-        </div><!-- .animated -->
-    </div><!-- .content -->
-
-    <div class="clearfix"></div>
-
-    <footer class="site-footer">
-        <div class="footer-inner bg-white">
-            <div class="row">
-                <div class="col-sm-6">
-                    Copyright &copy; 2018 Ela Admin. More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
-                </div>
-                <div class="col-sm-6 text-right"> Designed by Colorlib
-                </div>
-            </div>
+            </div><!-- .animated -->
         </div>
-    </footer>
+        <!-- /.content -->
+        <div class="clearfix"></div>
+        <!-- Footer -->
+        <footer class="site-footer">
+            <div class="footer-inner bg-white">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Copyright &copy; 2018 Ela Admin. More Templates <a href="http://www.cssmoban.com/" target="_blank" title="æ¨¡æ¿ä¹å®¶">æ¨¡æ¿ä¹å®¶</a> - Collect from <a href="http://www.cssmoban.com/" title="ç½é¡µæ¨¡æ¿" target="_blank">ç½é¡µæ¨¡æ¿</a>
+                    </div>
+                    <div class="col-sm-6 text-right"> Designed by Colorlib
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- /.site-footer -->
+    </div>
+    <!-- /#right-panel -->
 
-</div><!-- /#right-panel -->
-
-<!-- Right Panel -->
-
-<!-- Scripts -->
-<script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
-<script src="assets/js/popper.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/jquery.matchHeight.min.js"></script>
-<script src="assets/js/main.js"></script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/jquery.vmap.min.js"></script>
-<script src="assets/js/vmap.sampledata.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.world.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.algeria.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.argentina.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.brazil.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.france.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.germany.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.greece.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.iran.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.iraq.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.russia.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.tunisia.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.europe.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.usa.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqvmap/1.5.1/maps/jquery.vmap.turkey.js"></script>
-<script src="assets/js/init/vector-init.js"></script>
-
+    <!-- Scripts -->
+    <script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/jquery.matchHeight.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    <!--  Chart js -->
+    <script src="assets/js/lib/chart-js/Chart.bundle.js"></script>
+    <script src="assets/js/init/chartjs-init.js"></script>
+    <!--Flot Chart-->
+    <script src="assets/js/lib/flot-chart/jquery.flot.js"></script>
+    <script src="assets/js/lib/flot-chart/jquery.flot.spline.js"></script>
 </body>
 </html>
