@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken.controller;
 
+import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
@@ -7,6 +8,7 @@ import com.auroralove.ftctoken.result.DealResult;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.DealService;
+import com.auroralove.ftctoken.service.UserService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +28,9 @@ public class DealController {
 
     @Autowired
     private DealService dealService;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * 交易记录查询
@@ -66,7 +71,8 @@ public class DealController {
     @PostMapping("/transaction/deal")
     public ResponseResult deal(Dfilter dfilter){
         if (dfilter.getId() != null){
-            int result = dealService.deal(dfilter);
+            AccountEntity accountEntity = userService.userAccount(dfilter.getId());
+            int result = dealService.deal(dfilter,accountEntity);
             if (result == -5){
                 return new ResponseResult(ResponseMessage.FAIL,"每天仅可挂卖一次!");
             }

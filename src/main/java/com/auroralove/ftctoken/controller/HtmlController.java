@@ -28,4 +28,9 @@ public class HtmlController {
         return "voucher_center.jsp";
     }
 
+    @GetMapping("/download")
+    public String download(){
+        return "page-download.jsp";
+    }
+
 }

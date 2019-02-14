@@ -1,10 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<!doctype html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,21 +37,21 @@
                     </a>
                 </div>
                 <div class="login-form">
-                    <form>
+                    <form action="/v1/rest/regist">
                         <div class="form-group">
                             <label>注册手机号</label>
-                            <input type="phone" class="form-control" placeholder="phone">
+                            <input type="phone" id="phone" class="form-control" >
                         </div>
                         <div class="form-group">
                             <label>邀请人</label>
-                            <input type="parentid" class="form-control" >
+                            <input type="parentid" id="parentId" class="form-control" >
                         </div>
                         <div class="form-group">
                             <label>密码</label>
-                            <input type="password" class="form-control" placeholder="Password">
+                            <input type="password" id="passWord" class="form-control" placeholder="Password">
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-flat m-b-30 m-t-30">注册</button>
+                        <input type="submit" onclick="doSubmit()" class="btn btn-primary btn-flat m-b-30 m-t-30">注册</input>
                         <div class="social-login-content">
                         </div>
                         <div class="register-link m-t-15 text-center">
@@ -70,4 +70,27 @@
     <script src="assets/js/main.js"></script>
 
 </body>
+<script>
+    function doSubmit(){
+        $.ajax({
+            url:"/v1/rest/regist",
+            type:"post",
+            data:{
+                "phone":$("#phone").val(),
+                "parentId":$("#parentId").val(),
+                "passWord":$("#passWord").val()
+            },
+            success:function(data){
+                if(data.msg==true){
+                    alert("注册成功！");
+                }else{
+                    alert("注册失败");
+                }
+               // window.location.reload();//刷新当前页面
+            }
+        });
+    }
+    
+    
+</script>
 </html>

@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.DealEntity;
 import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.entity.RecordEntity;
@@ -13,10 +14,9 @@ import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.utils.IdWorker;
 import com.auroralove.ftctoken.utils.JsonUtils;
-import com.github.pagehelper.*;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -88,28 +88,28 @@ public class DealService {
      * @param dfilter
      * @return
      */
-    public int deal(Dfilter dfilter) {
+    public int deal(Dfilter dfilter, AccountEntity accountEntity) {
         DealModel dealModel = new DealModel(dfilter);
         if (dfilter.getDealType() == DealEnum.RECHARGE_FLAG.getValue()
                 || dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealModel> dealModels = dealMapper.getSingleSell(dfilter.getId());
-//                if (dealModels.size() > 0){
-//                    return -5;
-//                }
+                if (dealModels.size() > 0){
+                    return -5;
+                }
                 //判断可交易金额是否大于订单提交金额
-                DealModel tradeableAmount = tradeableAmount(dfilter);
-                if (tradeableAmount == null || tradeableAmount.getTradeableAmount() < dfilter.getAmount()){
+                Double tradeableAcct = accountEntity.getTradeableAcct();
+                if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
                     return -6;
                 }
 
             }
             //判断用户是否有未完成订单
             List<DealModel> dealModels = dealMapper.getDealStatus(dfilter.getId());
-//            if (dealModels.size()>0){
-//                return -4;
-//            }
+            if (dealModels.size()>0){
+                return -4;
+            }
             //买卖交易判断用户资料是否完整
             UserPayModel payInfo = userMapper.getPayInfo(dfilter.getId());
             if (payInfo == null){
