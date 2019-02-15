@@ -12,8 +12,6 @@
     <meta name="description" content="FtcToken下载页面">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
@@ -46,12 +44,12 @@
 
 
         <div class="login-content">
-            <div style="width: 100%;padding-bottom:10px;border-bottom: 10px">
-                    <div style="width: auto;float: left">
-                    <input type="image" src="images/anroid.png" onclick="doSubmit()" ></input>
+            <div style="width: 100%;padding-bottom:10px;border-bottom: 25px;display:inline"align="center">
+                    <div style="width: 70%;display:inline;margin-bottom: 10px;float: left">
+                    <input type="image" style="width: 50%" src="images/anroid.png" onclick="doAnroid()" ></input>
                     </div>
-                <div style="float: right;width: auto">
-                <input type="image" src="images/ios.png" onclick="doSubmit()" ></input>
+                <div style="width:70%;display:inline;float: right">
+                <input type="image" style="width: 50%" src="images/ios.png" onclick="doIOS()" ></input>
                 </div>
 
             </div>
@@ -61,55 +59,18 @@
                     <img class="align-content" src="images/download04.jpg" alt="">
                 </a>
             </div>
-
+        </div>
     </div>
 </div>
 
 </body>
 <script>
-    function doSubmit(){
-        var str = jQuery("#passWord").val();
-        var str1 = jQuery("#rePassWord").val();
-        var phone = jQuery("#phone").val();
-        if(!(/^1[34578]\d{9}$/.test(phone))) {
-            alert("您输入的手机号码有误，请重填!");
-            return false;
-        }
-         if (str == null || str.length <6 || str.length >12) {
-            alert("您输入的密码长度应为6~12位!");
-            return false;
-        }
-         if (str != str1){
-             alert("您输入的两次密码不一致!");
-             return flase;
-         }
-        var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);
-        if (reg.test(str)) {
-            return true;
-        } else {
-            alert("您的密码应包含数字加字母 不能包含特殊符号！");
-            return false;
-        }
-
-        jQuery.ajax({
-            url:"/v1/rest/regist",
-            type:"post",
-            data:{
-                "phone":jQuery("#phone").val(),
-                "parentId":jQuery("#parentId").val(),
-                "passWord":jQuery("#passWord").val()
-            },
-            success:function(data){
-                if(data.msg==true){
-                    alert("注册成功！");
-                }else{
-                    alert("注册失败");
-                }
-                // window.location.reload();//刷新当前页面
-            }
-        });
+    function doAnroid(){
+        window.location.href = '/app-debug.apk';
     }
-
+    function doIOS(){
+        window.location.href = '/download';
+    }
 
 </script>
 </html>

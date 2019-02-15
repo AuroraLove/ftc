@@ -12,8 +12,6 @@
     <meta name="description" content="欢迎来到FtcToken，邀请您的加入！">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
     <link rel="stylesheet" href="assets/css/normalize.css">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/font-awesome.min.css">
@@ -68,7 +66,6 @@
                     <div class="register-link m-t-15 text-center">
                         <p>FtcToken邀请注册</p>
                     </div>
-                <%--</form>--%>
             </div>
         </div>
     </div>
@@ -93,9 +90,7 @@
              return flase;
          }
         var reg = new RegExp(/[A-Za-z].*[0-9]|[0-9].*[A-Za-z]/);
-        if (reg.test(str)) {
-            return true;
-        } else {
+        if (!reg.test(str)) {
             alert("您的密码应包含数字加字母 不能包含特殊符号！");
             return false;
         }
@@ -109,12 +104,12 @@
                 "passWord":jQuery("#passWord").val()
             },
             success:function(data){
-                if(data.msg==true){
-                    alert("注册成功！");
+                if(data.result==true){
+                    alert("注册成功！")
+                    window.location.href = '/download';
                 }else{
-                    alert("注册失败");
+                    alert("注册失败！");
                 }
-                // window.location.reload();//刷新当前页面
             }
         });
     }
