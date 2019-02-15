@@ -94,7 +94,7 @@ public class DealService {
                 || dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
-                List<DealModel> dealModels = dealMapper.getSingleSell(dfilter.getId());
+                List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
                 if (dealModels.size() > 0){
                     return -5;
                 }
@@ -105,8 +105,16 @@ public class DealService {
                 }
 
             }
+            //判断用户是否当日有撤销操作
+            List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
+            for (DealEntity cancleModel:cancleModels) {
+                //判断是否为订单撤销操作
+                if (cancleModel.getOid() != null){
+                   return -7;
+                }
+            }
             //判断用户是否有未完成订单
-            List<DealModel> dealModels = dealMapper.getDealStatus(dfilter.getId());
+            List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
             if (dealModels.size()>0){
                 return -4;
             }
@@ -183,14 +191,13 @@ public class DealService {
                 rechargeAccount.setRechargeAcct(0.0);
             }
             //取释放金额
-            AccountModel realeaseAccount = userMapper.getReleaseAmount(dfilter.getId());
-            if (realeaseAccount == null){
-                realeaseAccount = new AccountModel();
-                realeaseAccount.setReleaseAmount(0.0);
+            AccountModel realeaseAcct = userMapper.getReleaseAmount(dfilter.getId());
+            if (realeaseAcct == null){
+                realeaseAcct = new AccountModel();
+                realeaseAcct.setReleaseAmount(0.0);
             }
             //增加释放记录
-            Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAccount.getReleaseAmount();
-//            Double sysReleaseAmount = systemMapper.getReleaseAmount
+            Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAcct.getReleaseAmount();;
             if (lockedAcct > 100.0){
                 OrderModel order = dealMapper.getOrder(dfilter.getOid());
                 DealModel dealModel = new DealModel(order);

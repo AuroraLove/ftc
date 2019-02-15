@@ -80,6 +80,9 @@ public class DealController {
                 return new ResponseResult(ResponseMessage.FAIL,"您没有足够可交易的FTC!");
             }
             if (result == -4){
+                return new ResponseResult(ResponseMessage.FAIL,"您有撤销订单今日将限制交易!");
+            }
+            if (result == -4){
                 return new ResponseResult(ResponseMessage.FAIL,"您还有未完成的订单!");
             }
             if (result == -1){
@@ -141,7 +144,7 @@ public class DealController {
             OrderEntity result = dealService.orderInfo(dfilter);
             return new ResponseResult(ResponseMessage.OK,result);
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.FAIL,"找不到相应的订单！");
     }
 
 }

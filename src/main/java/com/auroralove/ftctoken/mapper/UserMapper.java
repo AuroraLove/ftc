@@ -193,4 +193,28 @@ public interface UserMapper {
      * @return
      */
     int deletePublicMsg(Long pid);
+
+    /**
+     * 获取短信验证码信息
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    VeritifyModel getVeritifyInfo(String phone);
+
+    /**
+     * 更新验证码
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int updateVeritifyInfo(@Param("phone")String phone,@Param("code") Integer code);
+
+    /**
+     * 新增验证码
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int newVeritifyInfo(@Param("phone")String phone,@Param("code") Integer code);
 }

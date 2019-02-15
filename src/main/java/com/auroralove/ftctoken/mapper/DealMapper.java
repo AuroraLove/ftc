@@ -73,13 +73,13 @@ public interface DealMapper {
      * 判断用户是否有未完成订单信息
      * @return
      */
-    List<DealModel> getDealStatus(@Param("id")Long id);
+    List<DealEntity> getDealStatus(@Param("id")Long id);
 
     /**
      * 判断是否只挂卖一次
      * @return
      */
-    List<DealModel> getSingleSell(@Param("id")Long id);
+    List<DealEntity> getSingleSell(@Param("id")Long id);
 
     /**
      * 修改交易订单状态
@@ -92,4 +92,10 @@ public interface DealMapper {
      * @return
      */
     Integer getUnfinishedDeal(@Param("uid")Long uid);
+
+    /**
+     * 获取当日是否有撤销订单交易记录
+     * @return
+     */
+    List<DealEntity> getCancleAction(@Param("uid")Long uid);
 }

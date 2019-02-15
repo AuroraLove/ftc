@@ -48,7 +48,7 @@
                         <label>注册手机号</label>
                         <input type="phone" id="phone" class="form-control" >
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none">
                         <label>邀请人</label>
                         <input type="parentid" id="parentId" value="${uid}" class="form-control" disabled="disabled">
                     </div>
@@ -57,7 +57,7 @@
                         <input type="password" id="passWord" class="form-control" >
                     </div>
                   <div class="form-group">
-                      <label>重复密码</label>
+                      <label>确认密码</label>
                       <input type="password" id="rePassWord" class="form-control" >
                   </div>
                     <input type="submit" onclick="doSubmit()" class="btn btn-primary btn-flat m-b-30 m-t-30"></input>

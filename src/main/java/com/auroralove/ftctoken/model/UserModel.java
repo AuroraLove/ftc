@@ -63,4 +63,8 @@ public class UserModel {
      */
     private String pay_pwd;
 
+    /**
+     * 短信验证码
+     */
+    private Integer code;
 }

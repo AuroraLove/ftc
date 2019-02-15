@@ -27,11 +27,6 @@ public class AccountModel {
     private Double FTCRewardAcct;
 
     /**
-     * 充值金额
-     */
-    private Double rechargeAcct;
-
-    /**
      * 释放金额
      */
     private Double releaseAmount;
@@ -49,6 +44,6 @@ public class AccountModel {
     /**
      * 注册总金额
      */
-    private Double registAcct;
+    private Double rechargeAcct;
 
 }

@@ -23,6 +23,11 @@ public class DealModel {
     private Long tid;
 
     /**
+     * 订单id
+     */
+    private Long oid;
+
+    /**
      * 用户id
      */
     private Long uid;

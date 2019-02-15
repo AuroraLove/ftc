@@ -16,6 +16,7 @@ import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.TokenService;
 import com.auroralove.ftctoken.service.UserService;
+import com.auroralove.ftctoken.utils.SendSMSUitl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 用户中心REST访问接口
@@ -56,10 +58,10 @@ public class UserController {
     public ResponseResult login(Ufilter ufilter){
         UserModel userForBase = userService.findByUserphone(ufilter.getPhone());
         if(userForBase ==null){
-            return new ResponseResult(ResponseMessage.DATA_NOT_FOUND,false);
+            return new ResponseResult(ResponseMessage.FAIL,"账号或密码错误！");
         }else {
             if (!userForBase.getPassWord().equals(ufilter.getPassWord())){
-                return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR,false);
+                return new ResponseResult(ResponseMessage.FAIL,"账号或密码错误!");
             }else {
                 String token = tokenService.getToken(userForBase);
                 UserEntity userResult = userService.getUserInfo(userForBase);
@@ -70,6 +72,30 @@ public class UserController {
     }
 
     /**
+     * 发送短信
+     * @param ufilter
+     * @return ResponseResult
+     */
+    @PostMapping("/sendMsg")
+    public ResponseResult sendMsg(Ufilter ufilter){
+        if (ufilter.getPhone() != null){
+            //生成随机验证码
+            Integer code = new Random().nextInt(899999) + 100000;
+            //发送短信
+            boolean flag = SendSMSUitl.sendSMS(ufilter.getPhone(),code);
+            //验证码入库
+            if(flag){
+                int result = userService.newVeritifyCode(ufilter.getPhone(),code);
+                if (result > 0){
+                    return new ResponseResult(ResponseMessage.OK,"短信已成功发送！");
+                }
+            }
+            return new ResponseResult(ResponseMessage.FAIL,"发送短信失败！请重试");
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"请输入手机号！");
+    }
+
+    /**
      * 注册
      * @param userModel
      * @return ResponseResult
@@ -77,13 +103,20 @@ public class UserController {
     @PostMapping("/regist")
     public ResponseResult regist(UserModel userModel){
         if(userService.findByUserphone(userModel.getPhone()) != null){
-            return new ResponseResult(ResponseMessage.PHONE_EXITS,false);
+            return new ResponseResult(ResponseMessage.PHONE_EXITS,"注册手机号已存在!");
         }
-        Boolean flag = userService.registUser(userModel);
-        if(flag != null && flag){
-            return new ResponseResult(ResponseMessage.OK,true);
+        int i = userService.veritifyCode(userModel.getPhone(),userModel.getCode());
+        if (i == -1){
+            return new ResponseResult(ResponseMessage.FAIL,"您的验证码已过期！");
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        if (i == -2){
+            return new ResponseResult(ResponseMessage.FAIL,"您的验证码输入有误！");
+        }
+        Integer flag = userService.registUser(userModel);
+        if(flag != null && flag > 0){
+            return new ResponseResult(ResponseMessage.OK,"注册成功！");
+        }
+        return new ResponseResult(ResponseMessage.FAIL,"服务器出错");
     }
 
     /**
@@ -97,7 +130,7 @@ public class UserController {
         if(userResult != null){
             return new ResponseResult(ResponseMessage.OK,userResult);
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.FAIL,"服务器出错");
     }
 
     /**

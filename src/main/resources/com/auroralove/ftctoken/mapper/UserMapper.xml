@@ -133,7 +133,7 @@ select uid,IFNULL(sum(deal_amount),0) as buyAcct from ftc_deal  where type=0 and
 select uid,IFNULL(sum(deal_amount),0) as sellAcct from ftc_deal  where type=1 and status=6 and uid= #{uid} GROUP BY uid
     </select>
     <select id="getRegistAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
-select uid,IFNULL(sum(deal_amount),0) as registAcct from ftc_deal  where type=2 and status=6 and uid= #{uid} GROUP BY uid
+select uid,IFNULL(sum(deal_amount),0) as rechargeAcct from ftc_deal  where type=2 and status=6 and uid= #{uid} GROUP BY uid
     </select>
 
     <select id="getReleaseAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
@@ -182,7 +182,7 @@ where uid= #{id} GROUP BY uid
     </update>
 
     <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT msg,r_msg,leaving_date,replay_date FROM ftc_message
+        SELECT IFNULL(msg,''),IFNULL(r_msg,''),IFNULL(leaving_date,''),IFNULL(replay_date,'') FROM ftc_message
       where
       uid=#{uid}
     </select>
@@ -220,4 +220,27 @@ where uid= #{id} GROUP BY uid
         </set>
         where id = #{id}
     </update>
+
+    <select id="getVeritifyInfo" resultType="com.auroralove.ftctoken.model.VeritifyModel">
+        SELECT vid,phone,code,new_time as newDate,loss_time as lossDate
+         FROM ftc_veritify
+      where
+      phone=#{phone}
+    </select>
+
+    <update id="updateVeritifyInfo">
+        update ftc_veritify
+        <set>
+            code = #{code},
+            new_time = NOW(),
+            loss_time = ADDDATE(NOW(),interval 60 second)
+        </set>
+        where phone = #{phone}
+    </update>
+
+    <insert id="newVeritifyInfo" >
+        insert into ftc_veritify (phone,code,new_time,loss_time)
+        values (#{phone},#{code},NOW(),ADDDATE(NOW(),interval 60 second))
+    </insert>
+
 </mapper>

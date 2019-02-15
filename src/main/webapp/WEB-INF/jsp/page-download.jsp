@@ -45,11 +45,11 @@
 
         <div class="login-content">
             <div style="width: 100%;padding-bottom:10px;border-bottom: 25px;display:inline"align="center">
-                    <div style="width: 70%;display:inline;margin-bottom: 10px;float: left">
-                    <input type="image" style="width: 50%" src="images/anroid.png" onclick="doAnroid()" ></input>
+                    <div style="width: 40%;float: left;margin-bottom: 5%;margin-left: 10%;">
+                    <input type="image" style="width: 80%" src="images/anroid.png" onclick="doAnroid()" ></input>
                     </div>
-                <div style="width:70%;display:inline;float: right">
-                <input type="image" style="width: 50%" src="images/ios.png" onclick="doIOS()" ></input>
+                <div style="width:40%;float: right;margin-right:10%;">
+                <input type="image" style="width: 80%" src="images/ios.png" onclick="doIOS()" ></input>
                 </div>
 
             </div>
@@ -66,10 +66,10 @@
 </body>
 <script>
     function doAnroid(){
-        window.location.href = '/app-debug.apk';
+        window.location.href = '/ftctoken/app-debug.apk';
     }
     function doIOS(){
-        window.location.href = '/download';
+        // window.location.href = '/download';
     }
 
 </script>

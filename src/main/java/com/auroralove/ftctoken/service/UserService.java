@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,15 +65,15 @@ public class UserService {
      * @param userModel
      * @return
      */
-    public Boolean registUser(UserModel userModel) {
+    public Integer registUser(UserModel userModel) {
         userModel.setId(idWorker.nextId());
         userModel.setTeamId(idWorker.nextId());
         int reslut = userMapper.newUser(userModel);
         //注册成功
         if(reslut > 0){
-            return true;
+            return reslut;
         }
-        return false;
+        return reslut;
     }
 
     /**
@@ -354,10 +355,10 @@ public class UserService {
             rewardAccount.setFTCRewardAcct(0.0);
         }
         //取充值金额
-        AccountModel rechargeAccount = userMapper.getRegistAmount(uid);
-        if (rechargeAccount == null){
-            rechargeAccount = new AccountModel();
-            rechargeAccount.setRechargeAcct(0.0);
+        AccountModel registAmount = userMapper.getRegistAmount(uid);
+        if (registAmount == null){
+            registAmount = new AccountModel();
+            registAmount.setRechargeAcct(0.0);
         }
         //取释放金额
         AccountModel realeaseAccount = userMapper.getReleaseAmount(uid);
@@ -366,8 +367,44 @@ public class UserService {
             realeaseAccount.setReleaseAmount(0.0);
         }
 
-        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,rechargeAccount,realeaseAccount);
+        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,registAmount,realeaseAccount);
         return  accountEntity;
     }
 
+    /**
+     * 短信验证码入库
+     * @param phone
+     * @param code
+     * @return
+     */
+    public int newVeritifyCode(String phone, Integer code) {
+        int flag = 0;
+        VeritifyModel veritifyModel = userMapper.getVeritifyInfo(phone);
+        if (veritifyModel != null){
+            flag = userMapper.updateVeritifyInfo(phone, code);
+        }else {
+            flag = userMapper.newVeritifyInfo(phone, code);
+        }
+        return flag;
+    }
+
+    /**
+     * 验证短信码是否正确
+     * @param phone
+     * @param code
+     * @return
+     */
+    public int veritifyCode(String phone, Integer code) {
+        int flag = 0;
+        VeritifyModel veritifyModel = userMapper.getVeritifyInfo(phone);
+        //验证过期时间
+        if (veritifyModel.getLossDate().before(new Date())){
+            return -1;
+        }
+        //验证码值是否一致
+        if (!veritifyModel.getCode().equals(code)){
+            return -2;
+        }
+        return flag;
+    }
 }

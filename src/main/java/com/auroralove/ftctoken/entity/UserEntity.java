@@ -77,21 +77,6 @@ public class UserEntity {
 
     }
 
-    public UserEntity(UserModel userModel, AccountModel tradableAccountInfo, AccountModel rewardModel,
-                      UserPayModel userPayModel, AccountModel rechargeModel,AccountModel realeaseAcct) {
-        this.id = userModel.getId() ;
-        this.phone = userModel.getPhone();
-        this.amdinStatus = userModel.getAmdinStatus();
-        this.teamId = userModel.getTeamId();
-        this.parentId = userModel.getParentId();
-        this.recharegeAcct = rechargeModel.getRechargeAcct();
-        this.realeaseAcct = realeaseAcct.getReleaseAmount();
-        this.FTCLockedAcct = rechargeModel.getRechargeAcct() - realeaseAcct.getReleaseAmount();
-        this.tradeableAcct = tradableAccountInfo.getTradeableAcct();
-        this.FTCRewardAcct = rewardModel.getFTCRewardAcct();
-        this.payInfo = userPayModel;
-    }
-
     public UserEntity(UserModel userModel, AccountEntity accountEntity, UserPayModel payModel) {
         this.id = userModel.getId() ;
         this.phone = userModel.getPhone();

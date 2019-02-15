@@ -47,8 +47,8 @@ public class AccountEntity {
     public AccountEntity(AccountModel buyAccountInfo, AccountModel sellAccountInfo, AccountModel rewardAccount, AccountModel rechargeAccount, AccountModel realeaseAcct) {
         this.recharegeAcct = rechargeAccount.getRechargeAcct();
         this.FTCLockedAcct = rechargeAccount.getRechargeAcct() - realeaseAcct.getReleaseAmount();
-        this.tradeableAcct = buyAccountInfo.getBuyAcct() - sellAccountInfo.getSellAcct();
         this.FTCRewardAcct = rewardAccount.getFTCRewardAcct();
+        this.tradeableAcct = rewardAccount.getFTCRewardAcct() + buyAccountInfo.getBuyAcct() + realeaseAcct.getReleaseAmount() - sellAccountInfo.getSellAcct();
         this.realeaseAcct = realeaseAcct.getReleaseAmount();
         this.buyAcct = buyAccountInfo.getBuyAcct();
         this.sellAcct = sellAccountInfo.getSellAcct();
