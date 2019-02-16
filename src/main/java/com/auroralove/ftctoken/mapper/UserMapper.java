@@ -217,4 +217,6 @@ public interface UserMapper {
      * @return
      */
     int newVeritifyInfo(@Param("phone")String phone,@Param("code") Integer code);
+
+    int updateUserInfo(UserModel userModel);
 }

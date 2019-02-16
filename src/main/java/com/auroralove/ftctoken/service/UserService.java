@@ -116,6 +116,11 @@ public class UserService {
      * @return
      */
     public int changeLoginPwd(Ufilter ufilter) {
+        //短信验证码是否正确
+        int n = veritifyCode(ufilter.getPhone(),ufilter.getCode());
+        if (n != 0){
+            return -1;
+        }
     	int reslut = userMapper.changeLoginPwd(ufilter.getPhone(),ufilter.getPassWord());
         return reslut;
     }
@@ -126,6 +131,11 @@ public class UserService {
      * @return
      */
     public int changePayPwd(Ufilter ufilter) {
+        //短信验证码是否正确
+        int n = veritifyCode(ufilter.getPhone(),ufilter.getCode());
+        if (n != 0){
+            return -1;
+        }
     	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPayPwd());
         return reslut;
     }
@@ -406,5 +416,16 @@ public class UserService {
             return -2;
         }
         return flag;
+    }
+
+    /**
+     * 修改用户资料密码
+     * @param ufilter
+     * @return
+     */
+    public int updateUserInfo(Ufilter ufilter) {
+        UserModel userModel = new UserModel(ufilter);
+        int i = userMapper.updateUserInfo(userModel);
+        return i;
     }
 }

@@ -20,7 +20,7 @@ public enum ResponseMessage {
 	/**
 	 * 用户身份认证失败，禁止访问
 	 */
-	AUTHORIZED_ERROR(450, "用户身份认证失败，禁止访问!"),
+	AUTHORIZED_ERROR(450, "账号或密码错误！"),
 
 	/**
 	 * 用户令牌无效，禁止访问
@@ -80,7 +80,7 @@ public enum ResponseMessage {
 	/**
 	 * 基本信息不完整
 	 */
-	BASE_INCOMPLETE_INFORMATION(508, "基本信息不完整!"),
+	BASE_INCOMPLETE_INFORMATION(508,"您的交易资料不完整!"),
 	
 	/**
 	 * 版本信息不完整
@@ -135,7 +135,42 @@ public enum ResponseMessage {
 	/**
 	 * 更新用户资料失败
 	 */
-	USERDATA_FAIL(519,"更新用户资料失败");
+	USERDATA_FAIL(519,"更新用户资料失败"),
+
+	FAIL_CODE(520,"您的验证码已过期！"),
+
+	PAYPWD_FIAL(530,"支付密码错误!"),
+
+	UNFINISHED_ORDER_FIAL(530,"您还有未完成的订单!"),
+
+	SMS_UNUSED(521,"您的验证码已过期！"),
+
+	SMS_CODE_FAIL(523,"您的验证码输入有误！"),
+
+	RECHARGE_FAIL(524,"充值失败"),
+
+	SINGLE_SAIL_FAIL(530,"每天仅可挂卖一次!"),
+
+	BANLANCE_FAIL(530,"您没有足够可交易的FTC!"),
+
+	CANCLE_FAIL(530,"您有撤销订单今日将限制交易!"),
+
+	UNFINISHED_FAIL(530,"您有还有未完成的订单将限制交易!"),
+
+	LEAVING_FAIL(526,"留言失败"),
+
+	UPDATE_FAIL(525,"更新失败"),
+
+	PHONE_ERROR(525,"手机号不存在"),
+
+	USERPASSWORD_FAIL(525,"修改密码失败"),
+
+	REGIST_OK(200,"注册成功！"),
+
+	RECHARGE_OK(200,"充值成功"),
+
+	SMS_FAIL(522,"发送短信失败！请重试");
+
 
 	private final int status;
 	

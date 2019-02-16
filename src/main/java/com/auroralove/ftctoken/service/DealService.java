@@ -95,39 +95,39 @@ public class DealService {
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-                if (dealModels.size() > 0){
-                    return -5;
-                }
+//                if (dealModels.size() > 0){
+//                    return -5;
+//                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
-                if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
-                    return -6;
-                }
+//                if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
+//                    return -6;
+//                }
 
             }
             //判断用户是否当日有撤销操作
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-                if (cancleModel.getOid() != null){
-                   return -7;
-                }
+//                if (cancleModel.getOid() != null){
+//                   return -7;
+//                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-            if (dealModels.size()>0){
-                return -4;
-            }
+//            if (dealModels.size()>0){
+//                return -4;
+//            }
             //买卖交易判断用户资料是否完整
             UserPayModel payInfo = userMapper.getPayInfo(dfilter.getId());
-            if (payInfo == null){
-                return -1;
-            }
+//            if (payInfo == null){
+//                return -1;
+//            }
             //验证用户支付密码
             UserModel user = userMapper.findUserById(dfilter.getId());
-            if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
-                return -3;
-            }
+//            if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
+//                return -3;
+//            }
             dealModel.setUser_name(payInfo.getName());
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());

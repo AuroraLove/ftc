@@ -71,4 +71,8 @@ public class SystemModel {
      */
     private String gatheringCode;
 
+    /**
+     * 系统账户
+     */
+    private String systemAccount;
 }

@@ -4,7 +4,7 @@
 
     <select id="getSystemInfo" resultType="com.auroralove.ftctoken.model.SystemModel">
       SELECT EOS,FTC,FTCLocked,FTCPrice,univalent,quantity ,User_level as userLevel,version ,public_info as publicInfo,poundage,commission_scheme as commissionScheme,
-      gathering_code as gatheringCode
+      gathering_code as gatheringCode,system_account as systemAccount
       FROM ftc_system
       where
       sid = 1

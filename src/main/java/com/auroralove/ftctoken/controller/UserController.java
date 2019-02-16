@@ -58,10 +58,10 @@ public class UserController {
     public ResponseResult login(Ufilter ufilter){
         UserModel userForBase = userService.findByUserphone(ufilter.getPhone());
         if(userForBase ==null){
-            return new ResponseResult(ResponseMessage.FAIL,"账号或密码错误！");
+            return new ResponseResult(ResponseMessage.PHONE_ERROR);
         }else {
             if (!userForBase.getPassWord().equals(ufilter.getPassWord())){
-                return new ResponseResult(ResponseMessage.FAIL,"账号或密码错误!");
+                return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR);
             }else {
                 String token = tokenService.getToken(userForBase);
                 UserEntity userResult = userService.getUserInfo(userForBase);
@@ -69,6 +69,33 @@ public class UserController {
                 return new ResponseResult(ResponseMessage.OK, userResult);
             }
         }
+    }
+
+    /**
+     * 找回密码
+     * @param ufilter
+     * @return ResponseResult
+     */
+    @PostMapping("/forgetPassword")
+    public ResponseResult forgetPassword(Ufilter ufilter){
+        UserModel userForBase = userService.findByUserphone(ufilter.getPhone());
+        if(userForBase ==null){
+            return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR);
+        }else {
+            //验证手机验证码是否正确
+            int i = userService.veritifyCode(ufilter.getPhone(),ufilter.getCode());
+            if (i == -1){
+                return new ResponseResult(ResponseMessage.FAIL_CODE);
+            }
+            if (i == -2){
+                return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
+            }
+            int result = userService.updateUserInfo(ufilter);
+            if (result > 0){
+                return new ResponseResult(ResponseMessage.OK);
+            }
+        }
+        return new ResponseResult(ResponseMessage.USERPASSWORD_FAIL);
     }
 
     /**
@@ -90,9 +117,9 @@ public class UserController {
                     return new ResponseResult(ResponseMessage.OK,"短信已成功发送！");
                 }
             }
-            return new ResponseResult(ResponseMessage.FAIL,"发送短信失败！请重试");
+            return new ResponseResult(ResponseMessage.SMS_FAIL);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"请输入手机号！");
+        return new ResponseResult(ResponseMessage.FAIL);
     }
 
     /**
@@ -103,20 +130,20 @@ public class UserController {
     @PostMapping("/regist")
     public ResponseResult regist(UserModel userModel){
         if(userService.findByUserphone(userModel.getPhone()) != null){
-            return new ResponseResult(ResponseMessage.PHONE_EXITS,"注册手机号已存在!");
+            return new ResponseResult(ResponseMessage.PHONE_EXITS);
         }
         int i = userService.veritifyCode(userModel.getPhone(),userModel.getCode());
         if (i == -1){
-            return new ResponseResult(ResponseMessage.FAIL,"您的验证码已过期！");
+            return new ResponseResult(ResponseMessage.FAIL_CODE);
         }
         if (i == -2){
-            return new ResponseResult(ResponseMessage.FAIL,"您的验证码输入有误！");
+            return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
         }
         Integer flag = userService.registUser(userModel);
         if(flag != null && flag > 0){
-            return new ResponseResult(ResponseMessage.OK,"注册成功！");
+            return new ResponseResult(ResponseMessage.REGIST_OK);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"服务器出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -143,11 +170,11 @@ public class UserController {
         if (ufilter.getId() != null && ufilter.getAmount() != null){
             int result = userService.recharge(ufilter);
             if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,"充值成功");
+                return new ResponseResult(ResponseMessage.RECHARGE_OK);
             }
-            return new ResponseResult(ResponseMessage.FAIL,"充值失败");
+            return new ResponseResult(ResponseMessage.RECHARGE_FAIL);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -160,11 +187,11 @@ public class UserController {
     	if (ufilter.getPhone() != null && ufilter.getPassWord() != null){
     		int result = userService.changeLoginPwd(ufilter);
     		 if (result > 0){
-                 return new ResponseResult(ResponseMessage.OK,true);
+                 return new ResponseResult(ResponseMessage.OK);
              }
-             return new ResponseResult(ResponseMessage.FAIL,false);
+             return new ResponseResult(ResponseMessage.UPDATE_FAIL);
     	}
-    	 return new ResponseResult(ResponseMessage.FAIL,false);
+    	 return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -172,17 +199,20 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/changePayPwd")
     public ResponseResult changePayPwd(Ufilter ufilter){
     	if (ufilter.getId() != null && ufilter.getPayPwd() != null){
     		int result = userService.changePayPwd(ufilter);
-    		 if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,true);
+    		if (result == -1){
+    		    return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
             }
-            return new ResponseResult(ResponseMessage.FAIL,false);
-    	}
-    	 return new ResponseResult(ResponseMessage.FAIL,false);
-
+    		 if (result > 0){
+                 return new ResponseResult(ResponseMessage.OK);
+             }
+            return new ResponseResult(ResponseMessage.UPDATE_FAIL);
+        }
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -190,6 +220,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/uploadMsg")
     public ResponseResult uploadMsg(Ufilter ufilter,HttpServletRequest request){
     	if (ufilter.getId() != null && ufilter.getType() != null&& ufilter.getMessage() != null){
@@ -208,23 +239,23 @@ public class UserController {
 	    				res=userService.uploadMsg(ufilter, fileName);
 	    			}
 				} catch (IllegalStateException e) {
-					return new ResponseResult(ResponseMessage.FAIL,false);
+					return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
 				} catch (IOException e) {
-					return new ResponseResult(ResponseMessage.FAIL,false);
+					return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
 				}
     		}else{
     			//直接存数据库
     			if(ufilter.getType()==11){
-    				res=userService.uploadMsg(ufilter, null);
+    				res=userService.uploadMsg(ufilter, "");
     			}
     		}
     		 if (res > 0){
                  return new ResponseResult(ResponseMessage.OK,true);
              }
-             return new ResponseResult(ResponseMessage.FAIL,false);
+             return new ResponseResult(ResponseMessage.LEAVING_FAIL);
 
     	}
-         return new ResponseResult(ResponseMessage.FAIL,false);
+         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
 
     }
     /**
@@ -243,10 +274,10 @@ public class UserController {
             if (res > 0){
                 return new ResponseResult(ResponseMessage.OK,true);
             }
-            return new ResponseResult(ResponseMessage.FAIL,false);
+            return new ResponseResult(ResponseMessage.LEAVING_FAIL);
 
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -254,6 +285,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/messageInfo")
     public ResponseResult messageInfo(Ufilter ufilter){
     	if (ufilter.getId() != null){
@@ -265,7 +297,7 @@ public class UserController {
             }
     		return new ResponseResult(ResponseMessage.OK,messageEntities);
     	}
-    	 return new ResponseResult(ResponseMessage.FAIL,false);
+    	 return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -273,9 +305,17 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/userData")
     public ResponseResult userData(PayFilter payFilter,HttpServletRequest request) throws Exception{
         if (payFilter.getId() != null){
+            int i = userService.veritifyCode(payFilter.getUserPhone(),payFilter.getCode());
+            if (i == -1){
+                return new ResponseResult(ResponseMessage.FAIL_CODE);
+            }
+            if (i == -2){
+                return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
+            }
             UserPayModel payInfo = userService.getPayInfo(payFilter.getId());
             if (payInfo != null){
                 //更新用户资料
@@ -288,14 +328,14 @@ public class UserController {
                 if (userPayModel != null && n > 0){
                     return new ResponseResult(ResponseMessage.USERDATA_UPDATE_SUCCESS,userPayModel);
                 }
-                return new ResponseResult(ResponseMessage.USERDATA_FAIL,"更新用户交易资料失败!");
+                return new ResponseResult(ResponseMessage.USERDATA_FAIL);
             }
             UserPayModel userPayModel = userService.saveUserData(payFilter,request);
             if (userPayModel != null){
                 return new ResponseResult(ResponseMessage.OK,userPayModel);
             }
         }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -303,6 +343,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception{
         if (ufilter.getId() != null) {
@@ -311,7 +352,7 @@ public class UserController {
             team.setTotal(total);
             return new ResponseResult(ResponseMessage.OK,team);
         }
-        return new ResponseResult(ResponseMessage.ABANDON_FAIL,"系统出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -319,6 +360,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/getPublicMsg")
     public ResponseResult getPublicMsg(){
         List<PublicInfoModel> publicInfoModel = userService.getPublicMsg();
@@ -330,13 +372,14 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/newPublicMsg")
     public ResponseResult newPublicMsg(String information){
         int result = userService.newPublicMsg(information);
         if (result > 0){
             return new ResponseResult(ResponseMessage.OK,result);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"新增公告失败");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -344,13 +387,14 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/deletePublicMsg")
     public ResponseResult deletePublicMsg(Long pid){
         int result = userService.deletePublicMsg(pid);
         if (result > 0){
             return new ResponseResult(ResponseMessage.OK,result);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"删除公告失败");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**

@@ -66,4 +66,9 @@ public class PayFilter {
      * 用户交易密码
      */
     private String payPwd;
+
+    /**
+     * 手机验证码
+     */
+    private Integer code;
 }

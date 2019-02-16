@@ -38,10 +38,10 @@ public class MessageEntity {
     }
 
     public MessageEntity(MessageModel messageModel) {
-        this.leavingMsg = messageModel.getMsg();
+        this.leavingMsg = messageModel.getMsg() == null ? "":messageModel.getMsg();
         this.leavingDate = messageModel.getLeaving_date();
         this.replayDate = messageModel.getReplay_date();
-        this.replayMsg = messageModel.getR_msg();
+        this.replayMsg = messageModel.getR_msg() == null ? "":messageModel.getR_msg();
     }
 
 

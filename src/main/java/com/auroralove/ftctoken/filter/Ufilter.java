@@ -47,7 +47,12 @@ public class Ufilter {
      *  我的团队id
      */
     private Long teamId;
-    
+
+    /**
+     *  邀请人id
+     */
+    private Long parentId;
+
     /**
      * 支付密码
      */
@@ -81,6 +86,14 @@ public class Ufilter {
      * 图片地址
      */
     private String pictureUrl;
+
+    /**
+     * 用户管理状态
+     */
+    private Integer amdinstatus;
+
+    public Ufilter() {
+    }
 
     public Ufilter(Long childId, String childPhone) {
     	this.id = childId;

@@ -118,7 +118,18 @@
         </set>
         where uid = #{uid}
     </update>
-
+    <update id="updateUserInfo" parameterType="com.auroralove.ftctoken.model.UserModel">
+        update ftc_user
+        <set>
+            <if test=" pay_pwd!=null">
+                pay_pwd=#{pay_pwd},
+            </if>
+            <if test=" password!=null">
+                password=#{passWord},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
     <select id="getTradableAccountInfo" resultType="com.auroralove.ftctoken.model.DealModel">
 select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tradeableAmount from
 (select uid,IFNULL(sum(deal_amount),0) as buy_release_amount from ftc_deal  where type in(0,7) and status=6 GROUP BY uid) as t1 left   join
@@ -182,7 +193,7 @@ where uid= #{id} GROUP BY uid
     </update>
 
     <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT IFNULL(msg,''),IFNULL(r_msg,''),IFNULL(leaving_date,''),IFNULL(replay_date,'') FROM ftc_message
+        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date FROM ftc_message
       where
       uid=#{uid}
     </select>

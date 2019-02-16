@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken.model;
 
+import com.auroralove.ftctoken.filter.Ufilter;
 import lombok.Data;
 
 import java.util.Date;
@@ -67,4 +68,14 @@ public class UserModel {
      * 短信验证码
      */
     private Integer code;
+
+    public UserModel(Ufilter ufilter) {
+        this.id = ufilter.getId();
+        this.phone = ufilter.getPhone();
+        this.name = ufilter.getName();
+        this.passWord = ufilter.getPassWord();
+        this.amdinStatus = ufilter.getAmdinstatus();
+        this.parentId = ufilter.getParentId();
+        this.pay_pwd = ufilter.getPayPwd();
+    }
 }

@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken.controller;
 
+import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
@@ -37,6 +38,7 @@ public class DealController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/dealRecord")
     public ResponseResult dealRecord(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
         if (dfilter.getId() != null){
@@ -46,7 +48,7 @@ public class DealController {
             responseResult.setUnfinished(dealService.getUnfinishedDeal(dfilter.getId()));
             return responseResult;
         }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -54,13 +56,14 @@ public class DealController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/rewardRecord")
     public ResponseResult rewardRecord(Ufilter ufilter,@RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
         if (ufilter.getId() != null){
             PageInfo dealEntities = dealService.subReward(ufilter,pageNum,pageSize);
             return new ResponseResult(ResponseMessage.OK,dealEntities);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -68,28 +71,29 @@ public class DealController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/transaction/deal")
     public ResponseResult deal(Dfilter dfilter){
         if (dfilter.getId() != null){
             AccountEntity accountEntity = userService.userAccount(dfilter.getId());
             int result = dealService.deal(dfilter,accountEntity);
             if (result == -5){
-                return new ResponseResult(ResponseMessage.FAIL,"每天仅可挂卖一次!");
+                return new ResponseResult(ResponseMessage.SINGLE_SAIL_FAIL);
             }
             if (result == -6){
-                return new ResponseResult(ResponseMessage.FAIL,"您没有足够可交易的FTC!");
+                return new ResponseResult(ResponseMessage.BANLANCE_FAIL);
+            }
+            if (result == -7){
+                return new ResponseResult(ResponseMessage.CANCLE_FAIL);
             }
             if (result == -4){
-                return new ResponseResult(ResponseMessage.FAIL,"您有撤销订单今日将限制交易!");
-            }
-            if (result == -4){
-                return new ResponseResult(ResponseMessage.FAIL,"您还有未完成的订单!");
+                return new ResponseResult(ResponseMessage.UNFINISHED_ORDER_FIAL);
             }
             if (result == -1){
-                return new ResponseResult(ResponseMessage.FAIL,"您的交易资料不完整!");
+                return new ResponseResult(ResponseMessage.BASE_INCOMPLETE_INFORMATION);
             }
             if (result == -3){
-                return new ResponseResult(ResponseMessage.FAIL,"支付密码错误!");
+                return new ResponseResult(ResponseMessage.PAYPWD_FIAL);
             }
             if (result == -2){
                 return new ResponseResult(ResponseMessage.OK,"充值成功!");
@@ -98,7 +102,7 @@ public class DealController {
                 return new ResponseResult(ResponseMessage.OK,"订单匹配中!");
             }
         }
-        return new ResponseResult(ResponseMessage.FAIL,"系统出错!");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -106,6 +110,7 @@ public class DealController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/myDeal/orderStatus")
     public ResponseResult orderStatus(Dfilter dfilter){
         if (dfilter.getOid() != null){
@@ -114,7 +119,7 @@ public class DealController {
                 return new ResponseResult(ResponseMessage.OK,true);
             }
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -130,7 +135,7 @@ public class DealController {
                 return new ResponseResult(ResponseMessage.OK,true);
             }
         }
-        return new ResponseResult(ResponseMessage.FAIL,false);
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -138,13 +143,14 @@ public class DealController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/myDeal/orderInfo")
     public ResponseResult orderInfo(Dfilter dfilter){
         if (dfilter.getOid() != null){
             OrderEntity result = dealService.orderInfo(dfilter);
             return new ResponseResult(ResponseMessage.OK,result);
         }
-        return new ResponseResult(ResponseMessage.FAIL,"找不到相应的订单！");
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
 }
