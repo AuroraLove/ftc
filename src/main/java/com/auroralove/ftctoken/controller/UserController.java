@@ -398,6 +398,15 @@ public class UserController {
     }
 
     /**
+     * 帮助中心
+     * @param
+     * @return
+     */
+    @PostMapping("/help")
+    public ResponseResult help(){
+        return new ResponseResult(ResponseMessage.OK,userService.getHelp());
+    }
+    /**
      * 获取系统参数
      * @param
      * @return

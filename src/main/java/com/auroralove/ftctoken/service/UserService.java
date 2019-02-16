@@ -428,4 +428,16 @@ public class UserService {
         int i = userMapper.updateUserInfo(userModel);
         return i;
     }
+
+    /**
+     * 帮助中心
+     * @return
+     */
+    public List<HelpModel> getHelp() {
+        List<HelpModel> helpModels = systemMapper.getHelpInfo();
+        if (helpModels == null){
+            return new ArrayList<>();
+        }
+        return helpModels;
+    }
 }

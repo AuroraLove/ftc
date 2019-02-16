@@ -1,6 +1,9 @@
 package com.auroralove.ftctoken.mapper;
 
+import com.auroralove.ftctoken.model.HelpModel;
 import com.auroralove.ftctoken.model.SystemModel;
+
+import java.util.List;
 
 /**
  * @author zyu
@@ -13,4 +16,10 @@ public interface SystemMapper {
      * @return
      */
     SystemModel getSystemInfo();
+
+    /**
+     * 获取帮助中心信息
+     * @return
+     */
+    List<HelpModel> getHelpInfo();
 }

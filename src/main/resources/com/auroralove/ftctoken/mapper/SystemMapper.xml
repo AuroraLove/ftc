@@ -10,4 +10,27 @@
       sid = 1
     </select>
 
+
+    <!-- 查询所有的老师级各自的所有学生 -->
+    <select id="getHelpInfo"  resultMap="helpMap">
+    SELECT
+    h.hid,
+    h.pid,
+    h.catalog,
+    h.content,
+    p. picture_url AS pictureUrl
+    FROM
+    ftc_help h
+    LEFT JOIN ftc_picture p ON h.pid = p.pid
+  </select>
+
+    <resultMap type="com.auroralove.ftctoken.model.HelpModel" id="helpMap">
+        <id column="hid" property="hid"/>
+        <result column="pid" property="pid"/>
+        <result column="catalog" property="catalog"/>
+        <result column="content" property="content"/>
+        <collection property="pictureUrl" ofType="java.lang.String" column="pid">
+            <result column="pictureUrl" property="pictureUrl"/>
+        </collection>
+    </resultMap>
 </mapper>
