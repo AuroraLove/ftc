@@ -19,10 +19,14 @@
     <link rel="stylesheet" href="assets/css/pe-icon-7-filled.css">
     <link rel="stylesheet" href="assets/css/flag-icon.min.css"><link rel="stylesheet" href="assets/css/cs-skin-elastic.css">
     <link rel="stylesheet" href="assets/css/style.css">
-
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
-
-    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+    <style type="text/css">
+        *{margin:0; padding:0;}
+        a{text-decoration: none;}
+        img{max-width: 100%; height: auto;}
+        .weixin-tip{display: none; position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80);  height: 100%; width: 100%; z-index: 100;}
+        .weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;}
+    </style>
 </head>
 
 <script src="assets/js/vendor/jquery-2.1.4.min.js"></script>
@@ -32,7 +36,11 @@
 <script src="assets/js/main.js"></script>
 
 <body class="bg-white">
-
+<div class="weixin-tip">
+    <p>
+        <img src="live_weixin.png" alt="微信打开"/>
+    </p>
+</div>
 <div class="sufee-login d-flex align-content-center flex-wrap">
 
     <div align="center" style="width: 100%">
@@ -41,7 +49,6 @@
         </a>
     </div>
     <div class="container">
-
 
         <div class="login-content">
             <div style="width: 100%;padding-bottom:10px;border-bottom: 25px;display:inline"align="center">
@@ -64,6 +71,24 @@
 </div>
 
 </body>
+<script type="text/javascript">
+    $(window).on("load",function(){
+        var winHeight = $(window).height();
+        function is_weixin() {
+            var ua = navigator.userAgent.toLowerCase();
+            if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        var isWeixin = is_weixin();
+        if(isWeixin){
+            $(".weixin-tip").css("height",winHeight);
+            $(".weixin-tip").show();
+        }
+    })
+</script>
 <script>
     function doAnroid(){
         window.location.href = '/ftctoken/app-debug.apk';

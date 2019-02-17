@@ -52,6 +52,11 @@ public interface DealMapper {
     List<DealEntity> getDealRecord(@Param("id")Long id);
 
     /**
+     * 获取可交易资产记录
+     * @return
+     */
+    List<DealEntity> getAssertDealRecord(@Param("id")Long id);
+    /**
      * 修改订单状态
      * @return
      */

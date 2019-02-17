@@ -60,6 +60,11 @@
                       <label>确认密码</label>
                       <input type="password" id="rePassWord" class="form-control" >
                   </div>
+                  <div class="form-group">
+                      <label>验证码</label>
+                      <input type="phone" id="code" class="form-control" >
+                      <div class="input-group-addon"style="margin-top: 5%"><a style="width: 100%;height: 100%" href="javascript:xiaoyueLogin();" id="verbtn" >获取验证码</a></div>
+                  </div>
                     <input type="submit" onclick="doSubmit()" class="btn btn-primary btn-flat m-b-30 m-t-30"></input>
                     <div class="social-login-content">
                     </div>
@@ -73,7 +78,72 @@
 
 </body>
 <script>
-    function doSubmit(){
+    var InterValObj; //timer变量，控制时间
+    var count = 60; //间隔函数，1秒执行
+    var curCount; //当前剩余秒数
+    jQuery(function () {
+        jQuery("#verbtn").click(function () {})
+        jQuery("#lkchage").click(function () {
+            var mobile=jQuery("#phone").val();
+            var ver = jQuery("#reg_verify").val();
+            if(ver==""){
+                alert("验证码不能为空");
+                return;
+            }
+            jQuery.post("/ucenter/member/foundpassword",{mobile:mobile,reg_verify:ver},function (data) {
+                console.log(data);
+                alert(data.msg);
+                location.href="/ucenter/member/login.html";
+            })
+        })
+
+
+    })
+    function xiaoyueLogin() {
+        var mobile=jQuery("#phone").val();
+        var reg = /^1[34578]\d{9}$/;
+        if(!mobile){
+            alert('手机号不能为空');
+            return false;
+        }
+        if (!reg.test(mobile)) {
+            alert('手机号码格式不正确');
+            return false;
+        }
+        curCount = count;
+        jQuery("#verbtn").removeAttr("href");
+        jQuery("#verbtn").html("验证码(" + curCount + ")");
+        InterValObj = window.setInterval(SetRemainTime, 1000); //启动计时器，1秒执行一次
+        jQuery.ajax({
+            url:"/v1/rest/sendMsg",
+            type:"post",
+            data:{
+                "phone":jQuery("#phone").val()
+            },
+            success:function(data){
+                if(data.status==200){
+                    alert("短信发送成功！")
+                }else{
+                    alert("短信发送失败，请重试！");
+                }
+            }
+        });
+    }
+    function SetRemainTime() {
+        if (curCount == 0) {
+            window.clearInterval(InterValObj); //停止计时器
+            jQuery("#verbtn").attr("href", "javascript:xiaoyueLogin();");
+            jQuery("#verbtn").html("重新发送验证码");
+        }
+        else {
+            curCount--;
+            jQuery("#verbtn").html("验证码(" + curCount + ")");
+        }
+    }
+
+</script>
+<script>
+        function doSubmit(){
         var str = jQuery("#passWord").val();
         var str1 = jQuery("#rePassWord").val();
         var phone = jQuery("#phone").val();
@@ -101,7 +171,8 @@
             data:{
                 "phone":jQuery("#phone").val(),
                 "parentId":jQuery("#parentId").val(),
-                "passWord":jQuery("#passWord").val()
+                "passWord":jQuery("#passWord").val(),
+                "code":jQuery("#code").val()
             },
             success:function(data){
                 if(data.result==true){
@@ -113,7 +184,5 @@
             }
         });
     }
-
-
 </script>
 </html>

@@ -74,4 +74,9 @@ public class Dfilter{
      * 支付密码
      */
     private String payPwd;
+
+    /**
+     * 可交易资产标识，0查询交易记录，1查询可交易资产
+     */
+    private Integer assertFlag;
 }

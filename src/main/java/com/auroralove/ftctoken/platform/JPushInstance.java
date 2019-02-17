@@ -75,7 +75,7 @@ public class JPushInstance {
                                 .addExtras(extras).build())
                         .addPlatformNotification(IosNotification.newBuilder()
                                 .incrBadge(1)
-                                .addExtra("extra_key", "extra_value").build())
+                                .addExtra("matching_orders_list", orders).build())
                         .build())
                 .build();
     }

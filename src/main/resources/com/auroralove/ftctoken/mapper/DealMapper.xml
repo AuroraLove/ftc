@@ -112,8 +112,12 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="getDealRecord" resultMap="dealEntity">
-    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity
     from ftc_deal where uid = #{id} and type in (0,1,2,7) order by deal_date desc
+    </select>
+    <select id="getAssertDealRecord" resultMap="dealEntity">
+    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity
+    from ftc_deal where uid = #{id} and type in (0,1,2,7) and status=6 order by deal_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">
