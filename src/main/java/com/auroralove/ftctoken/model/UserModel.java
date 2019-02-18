@@ -69,6 +69,9 @@ public class UserModel {
      */
     private Integer code;
 
+    public UserModel() {
+    }
+
     public UserModel(Ufilter ufilter) {
         this.id = ufilter.getId();
         this.phone = ufilter.getPhone();
