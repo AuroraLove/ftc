@@ -44,7 +44,7 @@
 <div class="sufee-login d-flex align-content-center flex-wrap">
 
     <div align="center" style="width: 100%">
-        <a href="index.html">
+        <a href="index.jsp">
             <img class="align-content" src="images/download02.jpg" alt="">
         </a>
     </div>
@@ -62,7 +62,7 @@
             </div>
 
             <div class="login-logo">
-                <a href="index.html">
+                <a href="index.jsp">
                     <img class="align-content" src="images/download04.jpg" alt="">
                 </a>
             </div>

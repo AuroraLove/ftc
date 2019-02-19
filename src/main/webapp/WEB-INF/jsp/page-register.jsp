@@ -37,7 +37,7 @@
     <div class="container">
         <div class="login-content">
             <div class="login-logo">
-                <a href="index.html">
+                <a href="index.jsp">
                     <img class="align-content" src="logo.png" alt="">
                 </a>
             </div>
@@ -93,7 +93,7 @@
             jQuery.post("/ucenter/member/foundpassword",{mobile:mobile,reg_verify:ver},function (data) {
                 console.log(data);
                 alert(data.msg);
-                location.href="/ucenter/member/login.html";
+                location.href="/ucenter/member/login.jsp";
             })
         })
 
@@ -115,7 +115,7 @@
         jQuery("#verbtn").html("验证码(" + curCount + ")");
         InterValObj = window.setInterval(SetRemainTime, 1000); //启动计时器，1秒执行一次
         jQuery.ajax({
-            url:"/v1/rest/sendMsg",
+            url:"v1/rest/sendMsg",
             type:"post",
             data:{
                 "phone":jQuery("#phone").val()
@@ -175,11 +175,11 @@
                 "code":jQuery("#code").val()
             },
             success:function(data){
-                if(data.result==true){
+                if(data.status==200){
                     alert("注册成功！")
                     window.location.href = '/download';
                 }else{
-                    alert("注册失败！");
+                    alert(data.message);
                 }
             }
         });
