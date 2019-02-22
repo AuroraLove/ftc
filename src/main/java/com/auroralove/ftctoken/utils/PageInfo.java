@@ -169,7 +169,7 @@ public class PageInfo<T> implements Serializable {
         final StringBuffer sb = new StringBuffer("PageInfo{");
         sb.append("pageNum=").append(pageNum);
         sb.append(", pageSize=").append(pageSize);
-        sb.append(", total=").append(total);
+        sb.append(", totalOrders=").append(total);
         sb.append(", pages=").append(pages);
         sb.append(", list=").append(list);
         sb.append(", isFirstPage=").append(isFirstPage);

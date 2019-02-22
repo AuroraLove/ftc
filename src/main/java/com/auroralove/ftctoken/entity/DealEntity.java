@@ -59,4 +59,6 @@ public class DealEntity {
      * 交易类型
      */
     private Integer type;
+
+    private String phone;
 }

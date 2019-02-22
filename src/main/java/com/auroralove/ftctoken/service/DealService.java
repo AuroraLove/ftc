@@ -1,10 +1,7 @@
 package com.auroralove.ftctoken.service;
 
 import com.auroralove.ftctoken.dict.DealEnum;
-import com.auroralove.ftctoken.entity.AccountEntity;
-import com.auroralove.ftctoken.entity.DealEntity;
-import com.auroralove.ftctoken.entity.OrderEntity;
-import com.auroralove.ftctoken.entity.RecordEntity;
+import com.auroralove.ftctoken.entity.*;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.DealMapper;
@@ -103,6 +100,10 @@ public class DealService {
             if (payInfo == null){
                 return -1;
             }
+            //判断账户是否冻结，1冻结，0正常
+//            if (payInfo.getAccountStatus().equals(1)){
+//                return -8;
+//            }
             dealModel.setUser_name(payInfo.getName());
             //验证用户支付密码
             UserModel user = userMapper.findUserById(dfilter.getId());
@@ -112,9 +113,9 @@ public class DealService {
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-                if (dealModels.size() > 0){
-                    return -5;
-                }
+//                if (dealModels.size() > 0){
+//                    return -5;
+//                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
                 if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
@@ -126,15 +127,15 @@ public class DealService {
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-                if (cancleModel.getOid() != null){
-                   return -7;
-                }
+//                if (cancleModel.getOid() != null){
+//                   return -7;
+//                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-            if (dealModels.size()>0){
-                return -4;
-            }
+//            if (dealModels.size()>0){
+//                return -4;
+//            }
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
@@ -142,7 +143,14 @@ public class DealService {
         int result = dealMapper.newDealRecord(dealModel);
         //充值
         if (result > 0 && DealEnum.DEALTYPE_RECHARGE.getValue().equals(dfilter.getDealType())){
-            return -2;
+            UserModel userModel = new UserModel();
+            userModel.setId(dfilter.getId());
+            userModel.setRegistFlag(1);
+            result = userMapper.updateUserInfo(userModel);
+            if (result > 0){
+                return -2;
+            }
+            return -9;
         }
         return result;
     }
@@ -215,6 +223,56 @@ public class DealService {
         return result;
     }
 
+    /**
+     * 获取订单列表
+     * @param dfilter
+     * @return
+     */
+    public OrderListEntity getOrderList(Dfilter dfilter) {
+        if (dfilter.getPageNum() == null){
+            dfilter.setPageNum(1);
+        }
+        if (dfilter.getPageSize() == null){
+            dfilter.setPageSize(10);
+        }
+        PageHelper.startPage(dfilter.getPageNum(),dfilter.getPageSize());
+        List<OrderModel> orderModels = dealMapper.getOrderList(dfilter.getDealStatus(),dfilter.getDealType());
+        PageInfo page = new PageInfo(orderModels);
+        Integer total = dealMapper.getOrderCount(dfilter.getDealStatus(),dfilter.getDealType());
+        OrderListEntity orderListEntity = new OrderListEntity(page,total,dfilter.getDealStatus());
+        return orderListEntity;
+    }
+
+    /**
+     * 获取用户注册列表
+     * @return
+     * @param ufilter
+     */
+    public PageInfo getRecharegeDeals(Ufilter ufilter){
+        if (ufilter.getPageNum() == null){
+            ufilter.setPageNum(1);
+        }
+        if (ufilter.getPageSize() == null){
+            ufilter.setPageSize(10);
+        }
+        //设置用户注册总参数
+        TotalInfoModel totalInfoModel = dealMapper.getTotalInfo();
+        PageHelper.startPage(ufilter.getPageNum(),ufilter.getPageSize());
+        List<DealEntity> dealModels = dealMapper.getRecharegeDeals(ufilter.getPhone());
+        PageInfo page = new PageInfo(dealModels);
+        return page;
+    }
+
+    /**
+     * 获取用户注册列表
+     * @return
+     * @param ufilter
+     */
+    public TotalInfoModel statistacRecharge(Ufilter ufilter){
+        //设置用户注册总参数
+        TotalInfoModel totalInfoModel = dealMapper.getTotalInfo();
+        return totalInfoModel;
+    }
 
     @Scheduled(cron = "${model.Btime.cron}")
     public void matchOrder(){

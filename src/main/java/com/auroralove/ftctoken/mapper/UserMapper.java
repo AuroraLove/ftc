@@ -104,6 +104,12 @@ public interface UserMapper {
     AccountModel getRegistAmount(@Param("uid")Long uid);
 
     /**
+     * 获取用户系统金额
+     * @param uid
+     * @return
+     */
+    AccountModel getSystemAmount(@Param("uid")Long uid);
+    /**
      * 获取用户释放金额
      * @param uid
      * @return
@@ -120,10 +126,11 @@ public interface UserMapper {
      * 上传留言
      *
      * @param id
+     * @param phone
      * @param message
      * @return Result<int>
      */
-    int uploadMsg(@Param("id")Long id,@Param("uid") Long uid,@Param("message")String message,@Param("url")String url);
+    int uploadMsg(@Param("id") Long id, @Param("phone")String phone, @Param("uid") Long uid, @Param("message") String message, @Param("url") String url);
     /**
      * 回复留言
      *
@@ -218,5 +225,29 @@ public interface UserMapper {
      */
     int newVeritifyInfo(@Param("phone")String phone,@Param("code") Integer code);
 
+    /**
+     * 更新用户资料
+     * @param id
+     * @param payPwd
+     * @return
+     */
     int updateUserInfo(UserModel userModel);
+
+    /**
+     * 冻结账户
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    int frozenUser(@Param("id") Long id,@Param("accountStatus") Integer accountStatus);
+
+    /**
+     * 获取留言列表
+     * @param id
+     * @param payPwd
+     * @return
+     */
+    List<MessageModel> getMessages();
+
+    TeamAmount getTeamAmount(@Param("ids")List<Long> ids);
 }

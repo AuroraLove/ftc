@@ -124,8 +124,14 @@
             <if test=" pay_pwd!=null">
                 pay_pwd=#{pay_pwd},
             </if>
-            <if test=" password!=null">
+            <if test=" passWord!=null">
                 password=#{passWord},
+            </if>
+            <if test=" systemAmount!=null">
+                system_amount=#{systemAmount},
+            </if>
+            <if test=" registFlag!=null">
+                regist_flag=#{registFlag},
             </if>
         </set>
         where id = #{id}
@@ -145,6 +151,9 @@ select uid,IFNULL(sum(deal_amount),0) as sellAcct from ftc_deal  where type=1 an
     </select>
     <select id="getRegistAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
 select uid,IFNULL(sum(deal_amount),0) as rechargeAcct from ftc_deal  where type=2 and status=6 and uid= #{uid} GROUP BY uid
+    </select>
+    <select id="getSystemAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
+select id,system_amount as systemAcct from ftc_user  where id= #{uid}
     </select>
 
     <select id="getReleaseAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
@@ -172,30 +181,55 @@ where uid= #{id} GROUP BY uid
     <insert id="uploadMsg" >
         INSERT INTO
         <include refid="MESSAGE" />
-        (id,uid,leaving_date,  msg, pic_url)
+        (id,uid,phone,leaving_date,  msg, pic_url)
         VALUES
         (
         #{id},
         #{uid},
+        #{phone},
         NOW(),
         #{message},
         #{url}
         )
     </insert>
 
+
+    <update id="frozenUser">
+        UPDATE ftc_user
+        set
+        account_status = #{accountStatus}
+        WHERE id=#{id}
+    </update>
+
     <update id="replayMsg">
         UPDATE
         <include refid="MESSAGE"/>
         set
         replay_date = NOW(),
-        r_msg = #{message}
+        r_msg = #{message},
+        replay_flag = 1
         WHERE id=#{mesId}
     </update>
 
+    <select id="getTeamAmount" resultType="com.auroralove.ftctoken.model.TeamAmount">
+        select
+        (select sum(deal_amount) from ftc_deal where type=2 and status=6 and uid in
+        <foreach collection="ids" item="id" index="index" separator="," open="(" close=")">
+            #{ids[${index}],jdbcType=BIGINT}
+        </foreach>) as teamRechargeAmount,
+        (select sum(amount) from ftc_reward where uid in
+        <foreach collection="ids" item="id" index="index" separator="," open="(" close=")">
+            #{ids[${index}],jdbcType=BIGINT}
+        </foreach> ) as teamRewardAmount
+    </select>
+
     <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date FROM ftc_message
+        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,phone FROM ftc_message
       where
       uid=#{uid}
+    </select>
+    <select id="getMessages" resultType="com.auroralove.ftctoken.model.MessageModel">
+        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,replay_flag,phone  FROM ftc_message order by leaving_date desc
     </select>
 
     <select id="getUserChilds" resultType="com.auroralove.ftctoken.model.UserModel">

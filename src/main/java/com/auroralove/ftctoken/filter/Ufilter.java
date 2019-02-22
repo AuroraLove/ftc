@@ -92,6 +92,20 @@ public class Ufilter {
      */
     private Integer amdinstatus;
 
+    /**
+     * 管理员登录
+     */
+    private Integer amdinFlag;
+
+    /**
+     * 冻结标识，0,账户正常，1，账户冻结
+     */
+    private Integer accountStatus;
+
+    private Integer pageSize;
+
+    private Integer pageNum;
+
     public Ufilter() {
     }
 

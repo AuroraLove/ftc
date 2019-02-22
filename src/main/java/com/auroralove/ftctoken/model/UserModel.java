@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.model;
 
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -47,6 +48,7 @@ public class UserModel {
     /**
      * 注册时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date registTime;
 
     /**
@@ -54,16 +56,18 @@ public class UserModel {
      */
     private Long teamId;
 
+    private Integer flag;
+
     /**
      * 用户是否已充值
      */
-    private Integer flag;
-    
+    private Integer registFlag;
     /**
      * 支付密码
      */
     private String pay_pwd;
 
+    private Double systemAmount;
     /**
      * 短信验证码
      */

@@ -166,7 +166,7 @@
         }
 
         jQuery.ajax({
-            url:"/v1/rest/regist",
+            url:"/ftctoken/v1/rest/regist",
             type:"post",
             data:{
                 "phone":jQuery("#phone").val(),
@@ -177,7 +177,7 @@
             success:function(data){
                 if(data.status==200){
                     alert("注册成功！")
-                    window.location.href = '/download';
+                    window.location.href = '/ftctoken/download';
                 }else{
                     alert(data.message);
                 }

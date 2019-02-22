@@ -1,6 +1,5 @@
 package com.auroralove.ftctoken.model;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -33,5 +32,12 @@ public class MessageModel {
      */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date replay_date;
+
+    /**
+     * 回复标识，0未回复，1回复
+     */
+	private Integer replay_flag;
+
+	private String phone;
 
 }

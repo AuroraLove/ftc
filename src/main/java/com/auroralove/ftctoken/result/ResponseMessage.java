@@ -35,7 +35,7 @@ public enum ResponseMessage {
 	/**
 	 * 用户权限不足，禁止访问
 	 */
-	INADEQUATE_PERMISSIONS(450,"用户权限不足，禁止访问!"),
+	INADEQUATE_PERMISSIONS(450,"您没有管理员权限，禁止访问!"),
 
 	/**
 	 * 系统内部错误
@@ -150,6 +150,8 @@ public enum ResponseMessage {
 	RECHARGE_FAIL(524,"充值失败"),
 
 	SINGLE_SAIL_FAIL(530,"每天仅可挂卖一次!"),
+
+	ACCOUNT_FROZEN_FAIL(530,"您的账户已被冻结，禁止交易!"),
 
 	BANLANCE_FAIL(530,"您没有足够可交易的FTC!"),
 

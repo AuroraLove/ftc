@@ -46,4 +46,8 @@ public class AccountModel {
      */
     private Double rechargeAcct;
 
+    /**
+     * 用户系统金额
+     */
+    private Double systemAcct;
 }

@@ -1,9 +1,12 @@
 package com.auroralove.ftctoken.entity;
 
 import com.auroralove.ftctoken.model.AccountModel;
+import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.model.UserPayModel;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * 实体业务模型，用于返回值

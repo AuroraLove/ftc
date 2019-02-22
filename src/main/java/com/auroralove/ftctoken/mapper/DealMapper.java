@@ -4,6 +4,7 @@ import com.auroralove.ftctoken.entity.DealEntity;
 import com.auroralove.ftctoken.entity.RecordEntity;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.OrderModel;
+import com.auroralove.ftctoken.model.TotalInfoModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -32,6 +33,12 @@ public interface DealMapper {
      * @return
      */
     List<DealModel> getSellDeals();
+
+    /**
+     * 获取充值列表
+     * @return
+     */
+    List<DealEntity> getRecharegeDeals(@Param("phone")String phone);
 
     /**
      * 新增订单
@@ -103,4 +110,22 @@ public interface DealMapper {
      * @return
      */
     List<DealEntity> getCancleAction(@Param("uid")Long uid);
+
+    /**
+     * 数据中心
+     * @return
+     */
+    TotalInfoModel getTotalInfo();
+
+    /**
+     * 查询订单列表
+     * @return
+     */
+    List<OrderModel> getOrderList(@Param("status") Integer status,@Param("type") Integer type);
+
+    /**
+     * 查询订单列表总数
+     * @return
+     */
+    Integer getOrderCount(@Param("status") Integer status,@Param("type") Integer type);
 }

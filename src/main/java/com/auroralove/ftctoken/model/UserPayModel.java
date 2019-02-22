@@ -72,6 +72,11 @@ public class UserPayModel {
      */
     private String bank_address;
 
+    /**
+     * 账户状态，0，正常，1冻结
+     */
+    private Integer accountStatus;
+
     public UserPayModel() {
     }
 

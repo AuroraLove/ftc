@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken.mapper;
 
+import com.auroralove.ftctoken.model.DataCenterModel;
 import com.auroralove.ftctoken.model.HelpModel;
 import com.auroralove.ftctoken.model.SystemModel;
 
@@ -22,4 +23,25 @@ public interface SystemMapper {
      * @return
      */
     List<HelpModel> getHelpInfo();
+    /**
+     * 更新系统参数信息
+     * @return
+     */
+    int updateSystem(SystemModel systemModel);
+
+    /**
+     * 数据中心
+     * @return
+     */
+    DataCenterModel getDataCenter();
+
+    int newHelp(HelpModel helpModel);
+
+    int newPicture(HelpModel helpModel);
+
+    int updateHelp(HelpModel helpModel);
+
+    int deleteHelp(HelpModel helpModel);
+
+    int deletePicture(HelpModel helpModel);
 }

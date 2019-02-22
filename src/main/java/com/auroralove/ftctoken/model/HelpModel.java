@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.model;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,7 +33,11 @@ public class HelpModel {
     private String content;
 
     /**
-     * 内容图片
+     * 内容图片地址
      */
     private List<String> pictureUrl;
+    /**
+     * 内容图片
+     */
+    private List<MultipartFile> pictures;
 }

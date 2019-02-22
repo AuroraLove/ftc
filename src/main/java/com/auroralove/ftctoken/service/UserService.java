@@ -7,11 +7,14 @@ import com.auroralove.ftctoken.entity.UserEntity;
 import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.mapper.DealMapper;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.utils.IdWorker;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,9 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private DealMapper dealMapper;
 
     @Autowired
     private SystemMapper systemMapper;
@@ -161,7 +167,7 @@ public class UserService {
      * @return
      */
     public int uploadMsg(Ufilter ufilter,String url) {
-    	int reslut = userMapper.uploadMsg(idWorker.nextId(),ufilter.getId(),ufilter.getMessage(),url);
+    	int reslut = userMapper.uploadMsg(idWorker.nextId(),ufilter.getPhone(),ufilter.getId(),ufilter.getMessage(),url);
         return reslut;
     }
 
@@ -234,11 +240,12 @@ public class UserService {
      * @return
      */
     public TeamEntity getTeam(Ufilter ufilter, Integer level, Long count) {
-
         TeamEntity result = new TeamEntity();
         //设置根用户手机号
         result.setPhone(ufilter.getPhone());
         result.setUid(ufilter.getId());
+        //设置团队用户列表id
+        result.getIds().add(ufilter.getId());
         //获取子记录
         List<UserModel> userChilds = userMapper.getUserChilds(ufilter.getId());
         level ++;
@@ -249,6 +256,8 @@ public class UserService {
                 result.setLevel(level);
                 //设置子用户级别人数
                 result.setCount(count);
+                //设置团队用户列表id
+                result.getIds().add(userModel.getId());
                 Ufilter filter = new Ufilter(userModel.getId(),userModel.getPhone());
                 //递归获取子用户
                 TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
@@ -376,8 +385,13 @@ public class UserService {
             realeaseAccount = new AccountModel();
             realeaseAccount.setReleaseAmount(0.0);
         }
-
-        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,registAmount,realeaseAccount);
+        //取系统账户余额
+        AccountModel systemAccount = userMapper.getSystemAmount(uid);
+        if (systemAccount == null){
+            systemAccount = new AccountModel();
+            systemAccount.setSystemAcct(0.0);
+        }
+        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,registAmount,realeaseAccount,systemAccount);
         return  accountEntity;
     }
 
@@ -439,5 +453,57 @@ public class UserService {
             return new ArrayList<>();
         }
         return helpModels;
+    }
+
+    /**
+     * 更新系统参数
+     * @return
+     */
+    public int updateSystem(SystemModel systemModel) {
+        int i = systemMapper.updateSystem(systemModel);
+        return i;
+    }
+
+    /**
+     * 冻结用户账户
+     * @return
+     */
+    public int frozenUser(Ufilter ufilter) {
+       int i = userMapper.frozenUser(ufilter.getId(),ufilter.getAccountStatus());
+       return i;
+    }
+
+    public PageInfo messageListInfo(Ufilter ufilter) {
+        if (ufilter.getPageNum() == null){
+            ufilter.setPageNum(1);
+        }
+        if (ufilter.getPageSize() == null){
+            ufilter.setPageSize(10);
+        }
+        PageHelper.startPage(ufilter.getPageNum(),ufilter.getPageSize());
+        List<MessageModel> messageModels = userMapper.getMessages();
+        PageInfo page = new PageInfo(messageModels);
+        return  page;
+    }
+
+    public int newHelp(HelpModel helpModel,HttpServletRequest request) throws Exception {
+        Long pid = idWorker.nextId();
+        helpModel.setPid(pid);
+        int i = systemMapper.newHelp(helpModel);
+        if (helpModel.getPictures() != null){
+            List<String> fileNames = new ArrayList<>();
+            for ( MultipartFile picture:helpModel.getPictures()){
+                String fileName = savePicture(picture,request);
+                fileNames.add(fileName);
+            }
+            helpModel.setPictureUrl(fileNames);
+            i = systemMapper.newPicture(helpModel);
+        }
+        return i;
+    }
+
+    public TeamAmount getTeamAmount(List<Long> ids) {
+        TeamAmount teamAmount = userMapper.getTeamAmount(ids);
+        return teamAmount;
     }
 }

@@ -10,8 +10,24 @@
       sid = 1
     </select>
 
+    <select id="getDataCenter" resultType="com.auroralove.ftctoken.model.DataCenterModel">
+     select
+-- 当日充值------
+(select IFNULL(sum(deal_amount),0) from ftc_deal where TO_DAYS(deal_date) = TO_DAYS(NOW()) and type=2 and status=6)  as dayRegistAmount,
+-- 当日释放
+(select IFNULL(sum(deal_amount),0) from ftc_deal where TO_DAYS(deal_date) = TO_DAYS(NOW()) and type=7 and status=6)  as dayReleaseAmount,
+-- 冻结订单数
+(select IFNULL(count(0),0) from ftc_deal where status=8)  as totalFrozenOrder,
+-- 待回消息数
+(SELECT IFNULL(count(0),0)  from ftc_message where replay_flag=0) as totalMessage,
+-- 总充值
+(SELECT IFNULL(sum(deal_amount),0) from ftc_deal where type=2 and status=6)  as totalRegistAmount,
+-- 总释放
+(SELECT IFNULL(sum(deal_amount),0)  from ftc_deal where type=7 and status=6)as totalReleaseAmount,
+-- 总奖励
+(SELECT IFNULL(sum(amount),0)  from ftc_reward where status=6)as totalReward
+    </select>
 
-    <!-- 查询所有的老师级各自的所有学生 -->
     <select id="getHelpInfo"  resultMap="helpMap">
     SELECT
     h.hid,
@@ -24,12 +40,88 @@
     LEFT JOIN ftc_picture p ON h.pid = p.pid
   </select>
 
+    <insert id="newHelp" parameterType="com.auroralove.ftctoken.model.HelpModel">
+         insert into ftc_help(pid,catalog,content)
+         values (#{pid},#{catalog},#{content})
+    </insert>
+
+    <update id="updateHelp" parameterType="com.auroralove.ftctoken.model.HelpModel">
+       update ftc_help
+       <set>
+          <if test="catalog!=null">
+              catalog = #{catalog},
+          </if>
+           <if test="content!=null">
+               content = #{content},
+           </if>
+       </set>
+        where hid = #{hid}
+    </update>
+
+    <delete id="deleteHelp" parameterType="com.auroralove.ftctoken.model.HelpModel">
+        delete from ftc_help where hid = #{hid}
+    </delete>
+
+    <delete id="deletePicture" parameterType="com.auroralove.ftctoken.model.HelpModel">
+        delete from ftc_picture where pid = #{pid}
+    </delete>
+
+    <insert id="newPicture" parameterType="com.auroralove.ftctoken.model.HelpModel">
+         insert into ftc_picture(pid,picture_url)
+        <foreach item="item" index="index" collection="pictureUrl" separator=",">
+            (#{pid},#{item})
+        </foreach>
+         values (#{pid},#{catalog})
+    </insert>
+
+    <update id="updateSystem" parameterType="com.auroralove.ftctoken.model.SystemModel">
+        update ftc_system
+        <set>
+            <if test="EOS!=null">
+               EOS = #{EOS},
+            </if>
+            <if test="FTC!=null">
+               FTC = #{FTC},
+            </if>
+            <if test="FTCLocked!=null">
+                FTCLocked = #{FTCLocked},
+            </if>
+            <if test="FTCPrice!=null">
+                FTCPrice = #{FTCPrice},
+            </if>
+            <if test="univalent!=null">
+                univalent = #{univalent},
+            </if>
+            <if test="quantity!=null">
+                quantity = #{quantity},
+            </if>
+            <if test="userLevel!=null">
+                User_level = #{userLevel},
+            </if>
+            <if test="version!=null">
+                version = #{version},
+            </if>
+            <if test="poundage!=null">
+                poundage = #{poundage},
+            </if>
+            <if test="commissionScheme!=null">
+                commission_scheme=#{commissionScheme},
+            </if>
+            <if test="gatheringCode!=null">
+                gathering_code=#{gatheringCode},
+            </if>
+            <if test="systemAccount!=null">
+                system_account=#{systemAccount},
+            </if>
+        </set>
+        where  sid=1
+    </update>
     <resultMap type="com.auroralove.ftctoken.model.HelpModel" id="helpMap">
         <id column="hid" property="hid"/>
         <result column="pid" property="pid"/>
         <result column="catalog" property="catalog"/>
         <result column="content" property="content"/>
-        <collection property="pictureUrl" ofType="java.lang.String" column="pid">
+        <collection property="pictureUrl" ofType="java.lang.String">
             <result column="pictureUrl" property="pictureUrl"/>
         </collection>
     </resultMap>

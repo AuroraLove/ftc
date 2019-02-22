@@ -79,4 +79,8 @@ public class Dfilter{
      * 可交易资产标识，0查询交易记录，1查询可交易资产
      */
     private Integer assertFlag;
+
+    private Integer pageSize;
+
+    private Integer pageNum;
 }

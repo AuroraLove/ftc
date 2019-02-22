@@ -111,38 +111,68 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     from ftc_order where oid = #{oid}
     </select>
 
+    <select id="getTotalInfo" resultType="com.auroralove.ftctoken.model.TotalInfoModel">
+    select (SELECT IFNULL(count(0),0) from ftc_user )as  regitTotal ,(select IFNULL(count(0),0)  from ftc_user where regist_flag=1)as rechargeTotal
+    </select>
+
+    <select id="getRecharegeDeals" resultMap="dealEntity">
+    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+    from ftc_deal where status =6 and type = 2
+
+    <if test="phone==null">
+    and  DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
+    </if>
+    <if test="phone!=null">
+        and phone = #{phone}
+    </if>
+     order by deal_date desc
+    </select>
     <select id="getDealRecord" resultMap="dealEntity">
-    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{id} and type in (0,1,2,7) order by deal_date desc
     </select>
     <select id="getAssertDealRecord" resultMap="dealEntity">
-    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{id} and type in (0,1,2,7) and status=6 order by deal_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">
-    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8)
     </select>
 
     <select id="getCancleAction" resultMap="dealEntity">
-    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{uid} and status =9 and to_days(deal_date)=to_days(NOW())
     </select>
 
     <select id="getSingleSell" resultMap="dealEntity">
-    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity
+    SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{id} and type =1 and to_days(deal_date)=to_days(NOW())
     </select>
 
     <select id="getUnfinishedDeal" resultType="java.lang.Integer">
-    SELECT count(1)
+    SELECT IFNULL(count(1),0)
     from ftc_deal where uid = #{uid} and status in (3,4,5,8)
     </select>
 
     <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RewardRecordModel" >
     SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
     from ftc_reward where uid = #{uid}
+    </select>
+
+    <select id="getOrderList" resultMap="dealEntity">
+    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
+    from ftc_deal where 1=1
+        <if test="status!=null">and status=#{status}</if>
+        <if test="type!=null">and type=#{type}</if>
+     order by deal_date desc
+    </select>
+    <select id="getOrderCount" resultType="java.lang.Integer">
+    SELECT IFNULL(count(0),0)
+    from ftc_deal where 1=1
+        <if test="status!=null">and status=#{status}</if>
+        <if test="type!=null">and type=#{type}</if>
     </select>
 
     <update id="updateDealStatus" >
@@ -187,6 +217,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         <result column="type" property="type"/>
         <result column="univalent" property="univalent"/>
         <result column="quantity" property="quantity"/>
+        <result column="phone" property="phone"/>
     </resultMap>
     <resultMap type="com.auroralove.ftctoken.model.OrderModel" id="OrderModel">
         <result column="oid" property="orderId"/>
