@@ -292,11 +292,11 @@ public class DealService {
     }
 
     /**
-     * 获取用户注册列表
+     * 获取用户注册参数
      * @return
      * @param ufilter
      */
-    public TotalInfoModel statistacRecharge(Ufilter ufilter){
+    public TotalInfoModel statistacRecharge(){
         //设置用户注册总参数
         TotalInfoModel totalInfoModel = dealMapper.getTotalInfo();
         return totalInfoModel;

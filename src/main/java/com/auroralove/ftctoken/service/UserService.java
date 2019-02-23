@@ -4,6 +4,7 @@ import com.auroralove.ftctoken.dict.DealEnum;
 import com.auroralove.ftctoken.entity.AccountEntity;
 import com.auroralove.ftctoken.entity.TeamEntity;
 import com.auroralove.ftctoken.entity.UserEntity;
+import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.MsgFilter;
 import com.auroralove.ftctoken.filter.PayFilter;
 import com.auroralove.ftctoken.filter.Ufilter;
@@ -102,23 +103,23 @@ public class UserService {
 
     /**
      *  为用户账户充值
-     * @param ufilter
+     * @param dfilter
      * @return
      */
     @Transactional
-    public int recharge(Ufilter ufilter) throws Exception {
-        DealModel dealModel = new DealModel(ufilter);
+    public int recharge(Dfilter dfilter) throws Exception {
+        DealModel dealModel = new DealModel(dfilter);
         dealModel.setType(DealEnum.DEALTYPE_RECHARGE.getValue());
         dealModel.setTid(idWorker.nextId());
         //增加用户充值记录
         int reslut = userMapper.recharge(dealModel);
         if (reslut > 0){
-            //为用户增加充值记录标识
-            reslut = userMapper.rechargeFlag(ufilter.getId(),DealEnum.RECHARGE_FLAG.getValue());
+            //为用户增加充值记录标识,1为已注册充值
+            reslut = userMapper.rechargeFlag(dfilter.getId(),1);
             //更新用户团队人数
             List<SystemLevelModel> systemLevelModels = systemMapper.getSystemLevel();
             //记录对应子id
-            Long childId = ufilter.getId();
+            Long childId = dfilter.getId();
             for (SystemLevelModel systemLevelModel:systemLevelModels) {
                 //取邀请人id
                 UserModel user = userMapper.findUserById(childId);
@@ -478,7 +479,11 @@ public class UserService {
      * 更新系统参数
      * @return
      */
-    public int updateSystem(SystemModel systemModel) {
+    public int updateSystem(SystemModel systemModel,HttpServletRequest request) throws Exception {
+        if (systemModel.getGatheringCode()!= null){
+            String pictureName = savePicture(systemModel.getSystemPicture(),request);
+            systemModel.setGatheringCode(pictureName);
+        }
         int i = systemMapper.updateSystem(systemModel);
         return i;
     }

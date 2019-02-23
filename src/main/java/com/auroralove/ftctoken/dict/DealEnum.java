@@ -70,7 +70,27 @@ public enum DealEnum {
     /**
      * 微信支付
      */
-    WECHAT_PAY(22)
+    WECHAT_PAY(22),
+
+    /**
+     * 冻结账户：0，正常
+     */
+    FROZEN_USER_NROMAL(0),
+
+    /**
+     * 冻结账户：1，7天
+     */
+    FROZEN_USER_WEEK(1),
+
+    /**
+     * 冻结账户：2，30天
+     */
+    FROZEN_USER_MOUNTH(2),
+
+    /**
+     * 冻结账户：3，永久
+     */
+    FROZEN_USER_PERMANENT(3),
     ;
 
     private Integer value;

@@ -99,7 +99,7 @@ public class Ufilter {
     private Integer amdinFlag;
 
     /**
-     * 冻结标识，0,账户正常，1，账户冻结
+     * 冻结标识，0,账户正常，1，账户一周,2,冻结一月,3,冻结永久
      */
     private Integer accountStatus;
 

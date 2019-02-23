@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.model;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -75,4 +76,9 @@ public class SystemModel {
      * 系统账户
      */
     private String systemAccount;
+
+    /**
+     * 系统账户
+     */
+    private MultipartFile systemPicture;
 }

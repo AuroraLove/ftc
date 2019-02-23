@@ -60,7 +60,7 @@ public class DealController {
 //    @UserLoginToken
     @PostMapping("/home/dealRecordList")
     public ResponseResult dealRecordList(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
-            PageInfo result = dealService.dealRecordList(dfilter,pageNum,pageSize);
+        PageInfo result = dealService.dealRecordList(dfilter,pageNum,pageSize);
         //设置未完成订单数
         DealResult responseResult = new DealResult(ResponseMessage.OK, result);
         responseResult.setTotalCount(dealService.getDealTotal(dfilter));

@@ -2,10 +2,7 @@ package com.auroralove.ftctoken.controller;
 
 import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.entity.*;
-import com.auroralove.ftctoken.filter.MsgFilter;
-import com.auroralove.ftctoken.filter.PayFilter;
-import com.auroralove.ftctoken.filter.Sfilter;
-import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.filter.*;
 import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
@@ -78,14 +75,14 @@ public class UserController {
     }
 
     /**
-     * 搜索用户或列表
+     * 搜索用户
      *
      * @param ufilter
      * @return ResponseResult
      */
 //    @UserLoginToken
-    @PostMapping("/findUsers")
-    public ResponseResult findUsers(Ufilter ufilter) {
+    @PostMapping("/findUser")
+    public ResponseResult findUser(Ufilter ufilter) {
         if (ufilter.getPhone() != null) {
             UserModel userModel = userService.findByUserphone(ufilter.getPhone());
             UserEntity userResult = userService.getUserInfo(userModel);
@@ -95,14 +92,14 @@ public class UserController {
     }
 
     /**
-     * 搜索列表
+     * 充值列表
      *
      * @param ufilter
      * @return ResponseResult
      */
 //    @UserLoginToken
-    @PostMapping("/findDeals")
-    public ResponseResult findDeals(Ufilter ufilter) {
+    @PostMapping("/findRecharegeDeals")
+    public ResponseResult findRecharegeDeals(Ufilter ufilter) {
         PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
         return new ResponseResult(ResponseMessage.OK, recharegeDeals);
     }
@@ -115,8 +112,8 @@ public class UserController {
      */
 //    @UserLoginToken
     @PostMapping("/statistacRecharge")
-    public ResponseResult statistacRecharge(Ufilter ufilter) {
-        TotalInfoModel totalInfoModel = dealService.statistacRecharge(ufilter);
+    public ResponseResult statistacRecharge() {
+        TotalInfoModel totalInfoModel = dealService.statistacRecharge();
         return new ResponseResult(ResponseMessage.OK, totalInfoModel);
     }
 
@@ -232,13 +229,13 @@ public class UserController {
     /**
      * 账户充值
      *
-     * @param ufilter
+     * @param dfilter
      * @return
      */
     @PostMapping("/home/recharge")
-    public ResponseResult recharge(Ufilter ufilter) throws Exception{
-        if (ufilter.getId() != null && ufilter.getAmount() != null) {
-            int result = userService.recharge(ufilter);
+    public ResponseResult recharge(Dfilter dfilter) throws Exception{
+        if (dfilter.getId() != null && dfilter.getAmount() != null) {
+            int result = userService.recharge(dfilter);
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.RECHARGE_OK);
             }
@@ -463,6 +460,36 @@ public class UserController {
     }
 
     /**
+     * 搜索用户团队详情
+     *
+     * @param
+     * @return
+     */
+//    @UserLoginToken
+    @PostMapping("/home/findTeamInfo")
+    public ResponseResult findTeamInfo(Ufilter ufilter) throws Exception {
+        UserModel userModel = userService.findByUserphone(ufilter.getPhone());
+        ufilter.setId(userModel.getId());
+        if (ufilter.getId() != null) {
+            TeamEntity team = userService.getTeam(ufilter, -1, 1L);
+            //正向递归，设置团队成员总数
+//            Long total = userService.getTotal(team, 1L);
+            //获取用户团队充值,奖励总数
+            TeamAmount teamAmount = new TeamAmount();
+            teamAmount = userService.getTeamAmount(team.getIds());
+            if (teamAmount == null){
+                teamAmount = new TeamAmount();
+            }
+            team.setTotal(Long.valueOf(team.getIds().size()));
+            //更新用户团队成员
+            team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
+            team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
+            return new ResponseResult(ResponseMessage.OK, team);
+        }
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
      * 获取团队列表详情
      *
      * @param
@@ -556,8 +583,8 @@ public class UserController {
      */
 //    @UserLoginToken
     @PostMapping("/updateSystem")
-    public ResponseResult updateSystem(SystemModel systemModel) {
-        int i = userService.updateSystem(systemModel);
+    public ResponseResult updateSystem(SystemModel systemModel,HttpServletRequest request) throws Exception{
+        int i = userService.updateSystem(systemModel,request);
         if (i > 0){
             return new ResponseResult(ResponseMessage.OK );
         }

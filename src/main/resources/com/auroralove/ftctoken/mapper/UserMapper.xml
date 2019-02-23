@@ -61,23 +61,33 @@
         (
         tid,
         uid,
+        user_name,
+        univalent,
+        quantity,
         deal_amount,
         deal_date,
-        type
+        status,
+        type,
+        phone
         )
         VALUES
         (
-        #{dealId},
-        #{userId},
-        #{amount},
+        #{tid},
+        #{uid},
+        #{user_name},
+        #{univalent},
+        #{quantity},
+        #{deal_amount},
         NOW(),
-        #{type}
+        6,
+        2,
+        phone
         )
     </insert>
 
     <update id="rechargeFlag">
         UPDATE <include refid="USER" />
-        SET flag = #{flag}
+        SET regist_flag = #{flag}
         WHERE id = #{id}
     </update>
     
@@ -203,11 +213,12 @@ where uid= #{id} GROUP BY uid
         )
     </insert>
 
-
     <update id="frozenUser">
         UPDATE ftc_user
-        set
-        account_status = #{accountStatus}
+        <set>
+        account_status = #{accountStatus},
+        frozen_date = NOW()
+        </set>
         WHERE id=#{id}
     </update>
 

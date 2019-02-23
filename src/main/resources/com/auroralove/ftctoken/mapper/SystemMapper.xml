@@ -119,7 +119,7 @@
     </update>
 
     <select id="getSystemLevel" resultType="com.auroralove.ftctoken.model.SystemLevelModel">
-        select lid,level,amount from ftc_level order by level
+        select lid,level,amount from ftc_reward_level order by level
     </select>
     <resultMap type="com.auroralove.ftctoken.model.HelpModel" id="helpMap">
         <id column="hid" property="hid"/>
