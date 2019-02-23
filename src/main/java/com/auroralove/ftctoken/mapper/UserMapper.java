@@ -249,5 +249,25 @@ public interface UserMapper {
      */
     List<MessageModel> getMessages();
 
+    /**
+     * 获取团队充值总金额
+     * @param id
+     * @param payPwd
+     * @return
+     */
     TeamAmount getTeamAmount(@Param("ids")List<Long> ids);
+
+    /**
+     * 更新用户团队人数
+     * @param parentId
+     * @return
+     */
+    int updateTeamTotal(@Param("id")Long id);
+
+    /**
+     * 取用户列表总数
+     * @param parentId
+     * @return
+     */
+    List<UserModel> getUsers();
 }

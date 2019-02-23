@@ -55,7 +55,18 @@ public class RewardRecordModel {
     private Date rewardDate;
 
     /**
-     * 奖励日期
+     * 记录状态，默认6已完成
      */
     private Integer status;
+
+    public RewardRecordModel() {
+    }
+    public RewardRecordModel(UserModel user,  SystemLevelModel systemLevelModel) {
+        this.uid = user.getParentId();
+        this.childId = user.getId();
+        this.childPhone = user.getPhone();
+        this.level = systemLevelModel.getLevel();
+        this.amount = systemLevelModel.getAmount();
+        this.status = 6;
+    }
 }

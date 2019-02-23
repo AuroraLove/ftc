@@ -28,6 +28,7 @@
 (SELECT IFNULL(sum(amount),0)  from ftc_reward where status=6)as totalReward
     </select>
 
+
     <select id="getHelpInfo"  resultMap="helpMap">
     SELECT
     h.hid,
@@ -116,6 +117,10 @@
         </set>
         where  sid=1
     </update>
+
+    <select id="getSystemLevel" resultType="com.auroralove.ftctoken.model.SystemLevelModel">
+        select lid,level,amount from ftc_level order by level
+    </select>
     <resultMap type="com.auroralove.ftctoken.model.HelpModel" id="helpMap">
         <id column="hid" property="hid"/>
         <result column="pid" property="pid"/>

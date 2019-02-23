@@ -53,6 +53,21 @@ public class DealController {
     }
 
     /**
+     * 交易记录列表查询
+     * @param
+     * @return
+     */
+//    @UserLoginToken
+    @PostMapping("/home/dealRecordList")
+    public ResponseResult dealRecordList(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
+            PageInfo result = dealService.dealRecordList(dfilter,pageNum,pageSize);
+        //设置未完成订单数
+        DealResult responseResult = new DealResult(ResponseMessage.OK, result);
+        responseResult.setTotalCount(dealService.getDealTotal(dfilter));
+        return new ResponseResult(ResponseMessage.OK,responseResult);
+    }
+
+    /**
      * 分佣奖励
      * @param
      * @return
@@ -156,10 +171,12 @@ public class DealController {
         if (dfilter.getOid() != null){
             OrderEntity result = dealService.orderInfo(dfilter);
             return new ResponseResult(ResponseMessage.OK,result);
-        }else {
-            OrderListEntity orderListEntity = dealService.getOrderList(dfilter);
-            return new ResponseResult(ResponseMessage.OK,orderListEntity);
         }
+//        else {
+//            OrderListEntity orderListEntity = dealService.getOrderList(dfilter);
+//            return new ResponseResult(ResponseMessage.OK,orderListEntity);
+//        }
+        return new ResponseResult(ResponseMessage.FAIL);
     }
 
 }

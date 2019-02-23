@@ -56,6 +56,11 @@ public class UserModel {
      */
     private Long teamId;
 
+    /**
+     *  团队总人数
+     */
+    private Long teamTotal;
+
     private Integer flag;
 
     /**
@@ -67,6 +72,14 @@ public class UserModel {
      */
     private String pay_pwd;
 
+    /**
+     * 用户账户状态，0正常，1冻结
+     */
+    private Integer accountStatus;
+
+    /**
+     * 系统增加金额
+     */
     private Double systemAmount;
     /**
      * 短信验证码

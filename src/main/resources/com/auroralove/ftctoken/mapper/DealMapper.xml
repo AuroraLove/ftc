@@ -86,6 +86,11 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
            )
     </insert>
 
+    <insert id="newRewardRecord" parameterType="com.auroralove.ftctoken.model.RewardRecordModel">
+        insert into ftc_reward (uid,child_phone,child_id,level,amount,reward_date,status)
+        values (#uid,#childPhone,#childId,#level,#amount,NOW(),#status)
+    </insert>
+
     <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
     SELECT
         oid,
@@ -117,11 +122,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getRecharegeDeals" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where status =6 and type = 2
-
-    <if test="phone==null">
-    and  DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
-    </if>
+    from ftc_deal where status =6 and type = 2 and  DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
     <if test="phone!=null">
         and phone = #{phone}
     </if>
@@ -131,9 +132,32 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where uid = #{id} and type in (0,1,2,7) order by deal_date desc
     </select>
+    <select id="dealRecordList" resultMap="dealEntity">
+    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+    from ftc_deal where DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
+    <if test="status!=null">
+       and status = #{status}
+    </if>
+    <if test="type!=null">
+       and  type =#{type}
+    </if>
+    order by deal_date desc
+    </select>
+
+    <select id="getDealTotal" resultType="java.lang.Integer">
+        SELECT count(0)
+        from ftc_deal where DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
+        <if test="status!=null">
+            and status = #{status}
+        </if>
+        <if test="type!=null">
+            and  type =#{type}
+        </if>
+    </select>
+
     <select id="getAssertDealRecord" resultMap="dealEntity">
     SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1,2,7) and status=6 order by deal_date desc
+    from ftc_deal where uid = #{id} and type in (0,1,7) and status=6 order by deal_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">

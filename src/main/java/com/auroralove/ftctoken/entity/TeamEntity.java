@@ -44,6 +44,10 @@ public class TeamEntity {
      */
     private List<Long> ids ;
 
+    private Double teamRechargeAmount;
+
+    private Double teamRewardAmount;
+
     public TeamEntity(UserModel userModel) {
         this.phone = userModel.getPhone();
         this.uid = userModel.getId();

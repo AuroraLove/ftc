@@ -18,6 +18,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -104,7 +105,8 @@ public class UserService {
      * @param ufilter
      * @return
      */
-    public int recharge(Ufilter ufilter) {
+    @Transactional
+    public int recharge(Ufilter ufilter) throws Exception {
         DealModel dealModel = new DealModel(ufilter);
         dealModel.setType(DealEnum.DEALTYPE_RECHARGE.getValue());
         dealModel.setTid(idWorker.nextId());
@@ -113,6 +115,23 @@ public class UserService {
         if (reslut > 0){
             //为用户增加充值记录标识
             reslut = userMapper.rechargeFlag(ufilter.getId(),DealEnum.RECHARGE_FLAG.getValue());
+            //更新用户团队人数
+            List<SystemLevelModel> systemLevelModels = systemMapper.getSystemLevel();
+            //记录对应子id
+            Long childId = ufilter.getId();
+            for (SystemLevelModel systemLevelModel:systemLevelModels) {
+                //取邀请人id
+                UserModel user = userMapper.findUserById(childId);
+                if (user.getParentId() == null){
+                    break;
+                }
+                //增加父对象团队人数
+                reslut = userMapper.updateTeamTotal(user.getParentId());
+                if (reslut == 0){
+                    throw new Exception("更新团队人数失败");
+                }
+                childId = user.getParentId();
+            }
         }
         return reslut;
     }
@@ -473,6 +492,11 @@ public class UserService {
        return i;
     }
 
+    /**
+     * 获取用户留言列表
+     * @param ufilter
+     * @return
+     */
     public PageInfo messageListInfo(Ufilter ufilter) {
         if (ufilter.getPageNum() == null){
             ufilter.setPageNum(1);
@@ -502,8 +526,42 @@ public class UserService {
         return i;
     }
 
+    /**
+     * 获取团队总奖励金额
+     * @param ids
+     * @return
+     */
     public TeamAmount getTeamAmount(List<Long> ids) {
         TeamAmount teamAmount = userMapper.getTeamAmount(ids);
         return teamAmount;
+    }
+
+    /**
+     * 根据团队用户数获取用户列表
+     * @param ids
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    public List<TeamEntity> getUsers(Integer pageNum, Integer pageSize) {
+        List<TeamEntity> teamEntities = new ArrayList<>();
+        PageHelper.startPage(pageNum,pageSize);
+        List<UserModel> userModels = userMapper.getUsers();
+        //取用户团队详情
+        for (UserModel userModel : userModels) {
+            Ufilter ufilter = new Ufilter(userModel);
+            TeamEntity team = getTeam(ufilter, -1, 1L);
+            //获取用户团队充值,奖励总数
+            TeamAmount teamAmount = new TeamAmount();
+            teamAmount = getTeamAmount(team.getIds());
+            if (teamAmount == null) {
+                teamAmount = new TeamAmount();
+            }
+            team.setTotal(Long.valueOf(team.getIds().size()));
+            team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
+            team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
+            teamEntities.add(team);
+        }
+        return teamEntities;
     }
 }

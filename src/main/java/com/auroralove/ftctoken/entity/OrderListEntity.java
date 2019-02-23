@@ -23,9 +23,9 @@ public class OrderListEntity extends PageInfo {
 
     private PageInfo orders;
 
-    public OrderListEntity(PageInfo page, Integer totalOrders, Integer dealStatus) {
+    public OrderListEntity(PageInfo page, Integer totalOrders, Integer orderStatus) {
       this.orders = page;
       this.totalOrders = totalOrders;
-      this.status = dealStatus;
+      this.status = orderStatus;
     }
 }

@@ -11,6 +11,11 @@ public class DealResult extends ResponseResult {
      */
     private Integer unfinished;
 
+    /**
+     * 订单数
+     */
+    private Integer totalCount;
+
     public DealResult(ResponseMessage rm, PageInfo result) {
         super(rm,result);
     }

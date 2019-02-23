@@ -17,10 +17,7 @@ import com.auroralove.ftctoken.utils.SendSMSUitl;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -123,18 +120,18 @@ public class UserController {
         return new ResponseResult(ResponseMessage.OK, totalInfoModel);
     }
 
-    /**
-     * 搜索交易订单
-     *
-     * @param ufilter
-     * @return ResponseResult
-     */
-    @UserLoginToken
-    @PostMapping("/findDeal")
-    public ResponseResult findDeal(Ufilter ufilter) {
-        PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
-        return new ResponseResult(ResponseMessage.OK, recharegeDeals);
-    }
+//    /**
+//     * 搜索交易订单
+//     *
+//     * @param ufilter
+//     * @return ResponseResult
+//     */
+//    @UserLoginToken
+//    @PostMapping("/findDeal")
+//    public ResponseResult findDeal(Ufilter ufilter) {
+//        PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
+//        return new ResponseResult(ResponseMessage.OK, recharegeDeals);
+//    }
 
 
     /**
@@ -157,6 +154,7 @@ public class UserController {
             if (i == -2) {
                 return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
             }
+            ufilter.setId(userForBase.getId());
             int result = userService.updateUserInfo(ufilter);
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.OK);
@@ -238,7 +236,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/home/recharge")
-    public ResponseResult recharge(Ufilter ufilter) {
+    public ResponseResult recharge(Ufilter ufilter) throws Exception{
         if (ufilter.getId() != null && ufilter.getAmount() != null) {
             int result = userService.recharge(ufilter);
             if (result > 0) {
@@ -450,13 +448,32 @@ public class UserController {
             //正向递归，设置团队成员总数
 //            Long total = userService.getTotal(team, 1L);
             //获取用户团队充值,奖励总数
-            TeamAmount teamAmount = userService.getTeamAmount(team.getIds());
+            TeamAmount teamAmount = new TeamAmount();
+            teamAmount = userService.getTeamAmount(team.getIds());
+            if (teamAmount == null){
+                teamAmount = new TeamAmount();
+            }
             team.setTotal(Long.valueOf(team.getIds().size()));
             //更新用户团队成员
-
+            team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
+            team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
             return new ResponseResult(ResponseMessage.OK, team);
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * 获取团队列表详情
+     *
+     * @param
+     * @return
+     */
+//    @UserLoginToken
+    @PostMapping("/home/teamList")
+    public ResponseResult teamList(@RequestParam(defaultValue = "1")Integer pageNum, @RequestParam(defaultValue = "5")Integer pageSize) throws Exception {
+        //取用户分页列表
+        List<TeamEntity> teamEntities = userService.getUsers(pageNum, pageSize);
+        return new ResponseResult(ResponseMessage.OK, teamEntities);
     }
 
     /**

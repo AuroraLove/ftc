@@ -1,6 +1,7 @@
 package com.auroralove.ftctoken.filter;
 
 
+import com.auroralove.ftctoken.model.UserModel;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -112,5 +113,10 @@ public class Ufilter {
     public Ufilter(Long childId, String childPhone) {
     	this.id = childId;
     	this.phone = childPhone;
+    }
+
+    public Ufilter(UserModel userModel) {
+        this.phone = userModel.getPhone();
+        this.id = userModel.getId();
     }
 }

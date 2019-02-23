@@ -16,4 +16,8 @@ public class TeamAmount {
     @Autowired
     private Double teamRewardAmount;
 
+    public TeamAmount() {
+        this.teamRechargeAmount = 0.0;
+        this.teamRewardAmount = 0.0;
+    }
 }

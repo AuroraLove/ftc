@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -64,6 +65,15 @@ public class DealService {
         return page;
     }
 
+    public PageInfo dealRecordList(Dfilter dfilter, Integer pageNum, Integer pageSize) {
+        List<DealEntity> dealRecords = new ArrayList<>();
+        PageHelper.startPage(pageNum,pageSize);
+        //根据订单状态获取交易列表
+        dealRecords = dealMapper.dealRecordList(dfilter.getDealStatus(),dfilter.getDealType());
+        PageInfo pageInfo = new PageInfo(dealRecords);
+        return pageInfo;
+    }
+
     /**
      * 可交易资产查询
      * @param dfilter
@@ -91,6 +101,7 @@ public class DealService {
      * @param dfilter
      * @return
      */
+    @Transactional
     public int deal(Dfilter dfilter, AccountEntity accountEntity) {
         DealModel dealModel = new DealModel(dfilter);
         if (dfilter.getDealType() == DealEnum.RECHARGE_FLAG.getValue()
@@ -100,13 +111,13 @@ public class DealService {
             if (payInfo == null){
                 return -1;
             }
-            //判断账户是否冻结，1冻结，0正常
-//            if (payInfo.getAccountStatus().equals(1)){
-//                return -8;
-//            }
             dealModel.setUser_name(payInfo.getName());
             //验证用户支付密码
             UserModel user = userMapper.findUserById(dfilter.getId());
+            //判断账户是否冻结，1冻结，0正常
+//            if (user.getAccountStatus().equals(1)){
+//                return -8;
+//            }
             if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
                 return -3;
             }
@@ -193,6 +204,7 @@ public class DealService {
      * @param dfilter
      * @return
      */
+    @Transactional
     public int updateOrder(Dfilter dfilter) {
         OrderModel orderModel = new OrderModel(dfilter);
         int result =  dealMapper.updateOrder(orderModel);
@@ -211,43 +223,59 @@ public class DealService {
                 realeaseAcct.setReleaseAmount(0.0);
             }
             //增加释放记录
-            Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAcct.getReleaseAmount();;
+            Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAcct.getReleaseAmount();
+            OrderModel order = dealMapper.getOrder(dfilter.getOid());
             if (lockedAcct > 100.0){
-                OrderModel order = dealMapper.getOrder(dfilter.getOid());
                 DealModel dealModel = new DealModel(order);
                 dealModel.setTid(idWorker.nextId());
                 dealModel.setDeal_amount(100.0);
                 result = dealMapper.newDealRecord(dealModel);
             }
+            //增加奖励记录
+            List<SystemLevelModel> systemLevelModels = systemMapper.getSystemLevel();
+            //记录对应子id
+            Long childId = order.getBuyer_id();
+            for (SystemLevelModel systemLevelModel:systemLevelModels) {
+                //取买单用户父id
+                UserModel user = userMapper.findUserById(childId);
+                if (user.getParentId() == null){
+                    break;
+                }
+                //增加父对象相应奖励记录
+                RewardRecordModel rewardRecordModel = new RewardRecordModel(user,systemLevelModel);
+                result = dealMapper.newRewardRecord(rewardRecordModel);
+                childId = user.getParentId();
+            }
         }
         return result;
     }
 
-    /**
-     * 获取订单列表
-     * @param dfilter
-     * @return
-     */
-    public OrderListEntity getOrderList(Dfilter dfilter) {
-        if (dfilter.getPageNum() == null){
-            dfilter.setPageNum(1);
-        }
-        if (dfilter.getPageSize() == null){
-            dfilter.setPageSize(10);
-        }
-        PageHelper.startPage(dfilter.getPageNum(),dfilter.getPageSize());
-        List<OrderModel> orderModels = dealMapper.getOrderList(dfilter.getDealStatus(),dfilter.getDealType());
-        PageInfo page = new PageInfo(orderModels);
-        Integer total = dealMapper.getOrderCount(dfilter.getDealStatus(),dfilter.getDealType());
-        OrderListEntity orderListEntity = new OrderListEntity(page,total,dfilter.getDealStatus());
-        return orderListEntity;
-    }
+//    /**
+//     * 获取订单列表
+//     * @param dfilter
+//     * @return
+//     */
+//    public OrderListEntity getOrderList(Dfilter dfilter) {
+//        if (dfilter.getPageNum() == null){
+//            dfilter.setPageNum(1);
+//        }
+//        if (dfilter.getPageSize() == null){
+//            dfilter.setPageSize(10);
+//        }
+//        PageHelper.startPage(dfilter.getPageNum(),dfilter.getPageSize());
+//        List<OrderModel> orderModels = dealMapper.getOrderList(dfilter.getOrderStatus());
+//        PageInfo page = new PageInfo(orderModels);
+//        Integer total = dealMapper.getOrderCount(dfilter.getDealStatus(),dfilter.getDealType());
+//        OrderListEntity orderListEntity = new OrderListEntity(page,total,dfilter.getOrderStatus());
+//        return orderListEntity;
+//    }
 
     /**
      * 获取用户注册列表
      * @return
      * @param ufilter
      */
+    @Transactional
     public PageInfo getRecharegeDeals(Ufilter ufilter){
         if (ufilter.getPageNum() == null){
             ufilter.setPageNum(1);
@@ -274,6 +302,7 @@ public class DealService {
         return totalInfoModel;
     }
 
+    @Transactional
     @Scheduled(cron = "${model.Btime.cron}")
     public void matchOrder(){
         //获取买单数
@@ -332,4 +361,13 @@ public class DealService {
         System.out.println("===========匹配任务"+ System.currentTimeMillis()+"================");
     }
 
+    /**
+     * 取订单总数
+     * @param dfilter
+     * @return
+     */
+    public Integer getDealTotal(Dfilter dfilter) {
+        Integer total = dealMapper.getDealTotal(dfilter.getDealType(),dfilter.getDealStatus());
+        return total;
+    }
 }

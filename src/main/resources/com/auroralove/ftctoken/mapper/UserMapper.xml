@@ -18,11 +18,21 @@
     </select>
 
     <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
-        SELECT id,phone,password,teamid,admin_status,pay_pwd FROM ftc_user
+        SELECT id,phone,password,teamid,admin_status as amdinStatus,pay_pwd ,account_status as accountStatus,parent_id as parentId FROM ftc_user
       where
       id=#{id}
     </select>
+    <select id="getUsers" resultType="com.auroralove.ftctoken.model.UserModel">
+        SELECT id,phone FROM ftc_user order by team_total desc
+    </select>
 
+    <update id="updateTeamTotal">
+        update ftc_user
+        <set>
+            team_total = team_total+1
+        </set>
+        where id =#{id}
+    </update>
     <insert id="newUser" parameterType="com.auroralove.ftctoken.model.UserModel">
         INSERT INTO
         <include refid="USER" />

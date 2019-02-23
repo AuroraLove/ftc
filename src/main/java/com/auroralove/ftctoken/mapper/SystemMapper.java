@@ -2,6 +2,7 @@ package com.auroralove.ftctoken.mapper;
 
 import com.auroralove.ftctoken.model.DataCenterModel;
 import com.auroralove.ftctoken.model.HelpModel;
+import com.auroralove.ftctoken.model.SystemLevelModel;
 import com.auroralove.ftctoken.model.SystemModel;
 
 import java.util.List;
@@ -44,4 +45,6 @@ public interface SystemMapper {
     int deleteHelp(HelpModel helpModel);
 
     int deletePicture(HelpModel helpModel);
+
+    List<SystemLevelModel> getSystemLevel();
 }
