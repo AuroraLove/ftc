@@ -15,6 +15,15 @@ import java.util.Date;
 public class MessageModel {
 
     /**
+     * 留言id
+     */
+    private Long id;
+
+    /**
+     * 用户id
+     */
+    private Long uid;
+    /**
      * 留言信息
      */
     private String msg;

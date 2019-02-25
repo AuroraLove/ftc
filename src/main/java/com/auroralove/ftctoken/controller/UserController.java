@@ -68,7 +68,7 @@ public class UserController {
         if (ufilter.getAmdinFlag() != null && userForBase.getAmdinStatus().equals(0)) {
             return new ResponseResult(ResponseMessage.INADEQUATE_PERMISSIONS);
         }
-        String token = tokenService.getToken(userForBase);
+        String token = tokenService.getToken(userForBase, ufilter.getUserDevice());
         UserEntity userResult = userService.getUserInfo(userForBase);
         userResult.setToken(token);
         return new ResponseResult(ResponseMessage.OK, userResult);
@@ -80,7 +80,7 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/findUser")
     public ResponseResult findUser(Ufilter ufilter) {
         if (ufilter.getPhone() != null) {
@@ -97,7 +97,7 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/findRecharegeDeals")
     public ResponseResult findRecharegeDeals(Ufilter ufilter) {
         PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
@@ -110,21 +110,20 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/statistacRecharge")
     public ResponseResult statistacRecharge() {
         TotalInfoModel totalInfoModel = dealService.statistacRecharge();
         return new ResponseResult(ResponseMessage.OK, totalInfoModel);
     }
 
-//    /**
+    //    /**
 //     * 搜索交易订单
 //     *
 //     * @param ufilter
 //     * @return ResponseResult
 //     */
-//    @UserLoginToken
-//    @PostMapping("/findDeal")
+    @UserLoginToken//    @PostMapping("/findDeal")
 //    public ResponseResult findDeal(Ufilter ufilter) {
 //        PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
 //        return new ResponseResult(ResponseMessage.OK, recharegeDeals);
@@ -216,7 +215,7 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/userAccount")
     public ResponseResult userAccount(Ufilter ufilter) {
         AccountEntity userResult = userService.userAccount(ufilter.getId());
@@ -227,13 +226,33 @@ public class UserController {
     }
 
     /**
+     * 增加账户可交易金额
+     *
+     * @param dfilter
+     * @return
+     */
+    @UserLoginToken
+    @PostMapping("/addTradableAmount")
+    public ResponseResult addTradableAmount(Dfilter dfilter) throws Exception {
+        if (dfilter.getId() != null && dfilter.getAmount() != null) {
+            int result = userService.addTradableAmount(dfilter);
+            if (result > 0) {
+                return new ResponseResult(ResponseMessage.TRADEABLE_OK);
+            }
+            return new ResponseResult(ResponseMessage.TRADEABLE_FAIL);
+        }
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
      * 账户充值
      *
      * @param dfilter
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/recharge")
-    public ResponseResult recharge(Dfilter dfilter) throws Exception{
+    public ResponseResult recharge(Dfilter dfilter) throws Exception {
         if (dfilter.getId() != null && dfilter.getAmount() != null) {
             int result = userService.recharge(dfilter);
             if (result > 0) {
@@ -250,6 +269,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/changeLoginPwd")
     public ResponseResult changeLoginPwd(Ufilter ufilter) {
         if (ufilter.getPhone() != null && ufilter.getPassWord() != null) {
@@ -268,7 +288,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/changePayPwd")
     public ResponseResult changePayPwd(Ufilter ufilter) {
         if (ufilter.getId() != null && ufilter.getPayPwd() != null) {
@@ -290,10 +310,10 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/uploadMsg")
     public ResponseResult uploadMsg(Ufilter ufilter, HttpServletRequest request) {
-        if (ufilter.getId() != null && ufilter.getType() != null && ufilter.getMessage() != null) {
+        if (ufilter.getId() != null && ufilter.getPhone() != null && ufilter.getType() != null && ufilter.getMessage() != null) {
             int res = 0;
             if (ufilter.getPicture() != null) {
                 try {
@@ -335,6 +355,7 @@ public class UserController {
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/home/relayMsg")
     public ResponseResult relayMsg(MsgFilter msgFilter) {
         if (msgFilter.getMessage() != null && msgFilter.getMessage() != null) {
@@ -358,7 +379,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/messageInfo")
     public ResponseResult messageInfo(Ufilter ufilter) {
         if (ufilter.getId() != null) {
@@ -369,10 +390,9 @@ public class UserController {
                 messageEntities.add(messageEntity);
             }
             return new ResponseResult(ResponseMessage.OK, messageEntities);
-        }else {
+        } else {
             PageInfo messageInfos = userService.messageListInfo(ufilter);
-            MessageListEntity messageListEntity = new MessageListEntity(messageInfos);
-            return new ResponseResult(ResponseMessage.OK, messageListEntity);
+            return new ResponseResult(ResponseMessage.OK, messageInfos);
         }
     }
 
@@ -382,10 +402,10 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/queryUserData")
-    public ResponseResult queryUserData(PayFilter payFilter ) {
-        if(payFilter.getId() != null){
+    public ResponseResult queryUserData(PayFilter payFilter) {
+        if (payFilter.getId() != null) {
             UserPayModel payInfo = userService.getPayInfo(payFilter.getId());
             return new ResponseResult(ResponseMessage.OK, payInfo);
         }
@@ -398,7 +418,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/userData")
     public ResponseResult userData(PayFilter payFilter, HttpServletRequest request) throws Exception {
         if (payFilter.getId() != null) {
@@ -441,13 +461,13 @@ public class UserController {
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {
-            TeamEntity team = userService.getTeam(ufilter, -1, 1L);
+            TeamEntity team = userService.getTeam(ufilter, -1, 0L);
             //正向递归，设置团队成员总数
 //            Long total = userService.getTotal(team, 1L);
             //获取用户团队充值,奖励总数
             TeamAmount teamAmount = new TeamAmount();
             teamAmount = userService.getTeamAmount(team.getIds());
-            if (teamAmount == null){
+            if (teamAmount == null) {
                 teamAmount = new TeamAmount();
             }
             team.setTotal(Long.valueOf(team.getIds().size()));
@@ -477,7 +497,7 @@ public class UserController {
             //获取用户团队充值,奖励总数
             TeamAmount teamAmount = new TeamAmount();
             teamAmount = userService.getTeamAmount(team.getIds());
-            if (teamAmount == null){
+            if (teamAmount == null) {
                 teamAmount = new TeamAmount();
             }
             team.setTotal(Long.valueOf(team.getIds().size()));
@@ -495,9 +515,9 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/teamList")
-    public ResponseResult teamList(@RequestParam(defaultValue = "1")Integer pageNum, @RequestParam(defaultValue = "5")Integer pageSize) throws Exception {
+    public ResponseResult teamList(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "5") Integer pageSize) throws Exception {
         //取用户分页列表
         List<TeamEntity> teamEntities = userService.getUsers(pageNum, pageSize);
         return new ResponseResult(ResponseMessage.OK, teamEntities);
@@ -509,7 +529,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/getPublicMsg")
     public ResponseResult getPublicMsg() {
         List<PublicInfoModel> publicInfoModel = userService.getPublicMsg();
@@ -522,7 +542,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/newPublicMsg")
     public ResponseResult newPublicMsg(String information) {
         int result = userService.newPublicMsg(information);
@@ -538,7 +558,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/deletePublicMsg")
     public ResponseResult deletePublicMsg(Long pid) {
         int result = userService.deletePublicMsg(pid);
@@ -565,10 +585,10 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/newHelp")
-    public ResponseResult newHelp(HelpModel helpModel,HttpServletRequest request) throws Exception{
-        int result = userService.newHelp(helpModel,request);
+    public ResponseResult newHelp(HelpModel helpModel, HttpServletRequest request) throws Exception {
+        int result = userService.newHelp(helpModel, request);
         if (result > 0) {
             return new ResponseResult(ResponseMessage.OK);
         }
@@ -581,12 +601,12 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/updateSystem")
-    public ResponseResult updateSystem(SystemModel systemModel,HttpServletRequest request) throws Exception{
-        int i = userService.updateSystem(systemModel,request);
-        if (i > 0){
-            return new ResponseResult(ResponseMessage.OK );
+    public ResponseResult updateSystem(SystemModel systemModel, HttpServletRequest request) throws Exception {
+        int i = userService.updateSystem(systemModel, request);
+        if (i > 0) {
+            return new ResponseResult(ResponseMessage.OK);
         }
         return new ResponseResult(ResponseMessage.FAIL);
     }
@@ -597,12 +617,12 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/frozenUser")
     public ResponseResult frozenUser(Ufilter ufilter) {
         int i = userService.frozenUser(ufilter);
-        if (i > 0){
-            return new ResponseResult(ResponseMessage.OK );
+        if (i > 0) {
+            return new ResponseResult(ResponseMessage.OK);
         }
         return new ResponseResult(ResponseMessage.FAIL);
     }
@@ -613,7 +633,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/dataCenter")
     public ResponseResult userData() {
         DataCenterModel dataCenterEntity = systemService.getDataCenter();

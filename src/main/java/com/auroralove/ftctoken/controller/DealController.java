@@ -36,14 +36,15 @@ public class DealController {
 
     /**
      * 交易记录查询
+     *
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/dealRecord")
-    public ResponseResult dealRecord(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
-        if (dfilter.getId() != null){
-            PageInfo result = dealService.getDealRecord(dfilter,pageNum,pageSize);
+    public ResponseResult dealRecord(Dfilter dfilter, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
+        if (dfilter.getId() != null) {
+            PageInfo result = dealService.getDealRecord(dfilter, pageNum, pageSize);
             //设置未完成订单数
             DealResult responseResult = new DealResult(ResponseMessage.OK, result);
             responseResult.setUnfinished(dealService.getUnfinishedDeal(dfilter.getId()));
@@ -54,74 +55,77 @@ public class DealController {
 
     /**
      * 交易记录列表查询
+     *
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/dealRecordList")
-    public ResponseResult dealRecordList(Dfilter dfilter, @RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
-        PageInfo result = dealService.dealRecordList(dfilter,pageNum,pageSize);
+    public ResponseResult dealRecordList(Dfilter dfilter, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
+        PageInfo result = dealService.dealRecordList(dfilter, pageNum, pageSize);
         //设置未完成订单数
         DealResult responseResult = new DealResult(ResponseMessage.OK, result);
         responseResult.setTotalCount(dealService.getDealTotal(dfilter));
-        return new ResponseResult(ResponseMessage.OK,responseResult);
+        return new ResponseResult(ResponseMessage.OK, responseResult);
     }
 
     /**
      * 分佣奖励
+     *
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/rewardRecord")
-    public ResponseResult rewardRecord(Ufilter ufilter,@RequestParam(defaultValue = "1")Integer pageNum,@RequestParam(defaultValue = "10")Integer pageSize){
-        if (ufilter.getId() != null){
-            PageInfo dealEntities = dealService.subReward(ufilter,pageNum,pageSize);
-            return new ResponseResult(ResponseMessage.OK,dealEntities);
+    public ResponseResult rewardRecord(Ufilter ufilter, @RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
+        if (ufilter.getId() != null) {
+            PageInfo dealEntities = dealService.subReward(ufilter, pageNum, pageSize);
+            return new ResponseResult(ResponseMessage.OK, dealEntities);
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
 
     /**
      * 交易
+     *
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/transaction/deal")
-    public ResponseResult deal(Dfilter dfilter){
-        if (dfilter.getId() != null){
+    public ResponseResult deal(Dfilter dfilter) {
+        if (dfilter.getId() != null) {
             AccountEntity accountEntity = userService.userAccount(dfilter.getId());
-            int result = dealService.deal(dfilter,accountEntity);
-            if (result == -5){
+            int result = dealService.deal(dfilter, accountEntity);
+            if (result == -5) {
                 return new ResponseResult(ResponseMessage.SINGLE_SAIL_FAIL);
             }
-            if (result == -8){
+            if (result == -8) {
                 return new ResponseResult(ResponseMessage.ACCOUNT_FROZEN_FAIL);
             }
-            if (result == -6){
+            if (result == -6) {
                 return new ResponseResult(ResponseMessage.BANLANCE_FAIL);
             }
-            if (result == -7){
+            if (result == -7) {
                 return new ResponseResult(ResponseMessage.CANCLE_FAIL);
             }
-            if (result == -4){
+            if (result == -4) {
                 return new ResponseResult(ResponseMessage.UNFINISHED_ORDER_FIAL);
             }
-            if (result == -1){
+            if (result == -1) {
                 return new ResponseResult(ResponseMessage.BASE_INCOMPLETE_INFORMATION);
             }
-            if (result == -3){
+            if (result == -3) {
                 return new ResponseResult(ResponseMessage.PAYPWD_FIAL);
             }
-            if (result == -2){
-                return new ResponseResult(ResponseMessage.OK,"充值成功!");
+            if (result == -2) {
+                return new ResponseResult(ResponseMessage.OK, "充值成功!");
             }
-            if (result == -9){
+            if (result == -9) {
                 return new ResponseResult(ResponseMessage.RECHARGE_FAIL);
             }
-            if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,"订单匹配中!");
+            if (result > 0) {
+                return new ResponseResult(ResponseMessage.OK, "订单匹配中!");
             }
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
@@ -129,16 +133,17 @@ public class DealController {
 
     /**
      * 订单状态修改
+     *
      * @param
      * @return
      */
 //    @UserLoginToken
     @PostMapping("/myDeal/orderStatus")
-    public ResponseResult orderStatus(Dfilter dfilter){
-        if (dfilter.getOid() != null){
+    public ResponseResult orderStatus(Dfilter dfilter) {
+        if (dfilter.getOid() != null) {
             int result = dealService.updateOrder(dfilter);
-            if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,true);
+            if (result > 0) {
+                return new ResponseResult(ResponseMessage.OK, true);
             }
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
@@ -146,15 +151,17 @@ public class DealController {
 
     /**
      * 交易订单状态修改
+     *
      * @param
      * @return
      */
+    @UserLoginToken
     @PostMapping("/myDeal/updateDealStatus")
-    public ResponseResult updateDealStatus(Dfilter dfilter){
-        if (dfilter.getDid() != null ){
+    public ResponseResult updateDealStatus(Dfilter dfilter) {
+        if (dfilter.getDid() != null) {
             int result = dealService.updateDealStatus(dfilter);
-            if (result > 0){
-                return new ResponseResult(ResponseMessage.OK,true);
+            if (result > 0) {
+                return new ResponseResult(ResponseMessage.OK, true);
             }
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
@@ -162,15 +169,16 @@ public class DealController {
 
     /**
      * 订单详情查询
+     *
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/myDeal/orderInfo")
-    public ResponseResult orderInfo(Dfilter dfilter){
-        if (dfilter.getOid() != null){
+    public ResponseResult orderInfo(Dfilter dfilter) {
+        if (dfilter.getOid() != null) {
             OrderEntity result = dealService.orderInfo(dfilter);
-            return new ResponseResult(ResponseMessage.OK,result);
+            return new ResponseResult(ResponseMessage.OK, result);
         }
 //        else {
 //            OrderListEntity orderListEntity = dealService.getOrderList(dfilter);

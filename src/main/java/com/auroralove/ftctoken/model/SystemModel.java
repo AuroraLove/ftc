@@ -81,4 +81,6 @@ public class SystemModel {
      * 系统账户
      */
     private MultipartFile systemPicture;
+
+    private Double CNY;
 }

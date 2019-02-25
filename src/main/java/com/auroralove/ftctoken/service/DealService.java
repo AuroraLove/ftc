@@ -9,6 +9,7 @@ import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.platform.JPushInstance;
+import com.auroralove.ftctoken.utils.CanlendarUtil;
 import com.auroralove.ftctoken.utils.IdWorker;
 import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
@@ -115,18 +116,31 @@ public class DealService {
             //验证用户支付密码
             UserModel user = userMapper.findUserById(dfilter.getId());
             //判断账户是否冻结，1冻结，0正常
-//            if (user.getAccountStatus().equals(1)){
-//                return -8;
-//            }
+            if (!user.getAccountStatus().equals(0)){
+                //1,冻结一周，判断是否超过解冻期
+                if (user.getAccountStatus().equals(1)
+                        &&user.getFrozenDate().after(CanlendarUtil.getPastDate(7))){
+                    return -8;
+                }
+                //2,冻结一月，判断是否超过解冻期
+                if (user.getAccountStatus().equals(2)
+                        &&user.getFrozenDate().after(CanlendarUtil.getPastDate(30))){
+                    return -8;
+                }
+                //3,永久冻结
+                if (user.getAccountStatus().equals(3)){
+                    return -8;
+                }
+            }
             if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
                 return -3;
             }
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-//                if (dealModels.size() > 0){
-//                    return -5;
-//                }
+                if (dealModels.size() > 0){
+                    return -5;
+                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
                 if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
@@ -138,15 +152,15 @@ public class DealService {
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-//                if (cancleModel.getOid() != null){
-//                   return -7;
-//                }
+                if (cancleModel.getOid() != null){
+                   return -7;
+                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-//            if (dealModels.size()>0){
-//                return -4;
-//            }
+            if (dealModels.size()>0){
+                return -4;
+            }
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
@@ -208,23 +222,23 @@ public class DealService {
     public int updateOrder(Dfilter dfilter) {
         OrderModel orderModel = new OrderModel(dfilter);
         int result =  dealMapper.updateOrder(orderModel);
+        OrderModel order = dealMapper.getOrder(dfilter.getOid());
         //完成订单释放金额
         if (result >0 && dfilter.getOrderStatus().equals(6)){
             //取充值金额
-            AccountModel rechargeAccount = userMapper.getRegistAmount(dfilter.getId());
+            AccountModel rechargeAccount = userMapper.getRechargeAmount(order.getBuyer_id());
             if (rechargeAccount == null){
                 rechargeAccount = new AccountModel();
                 rechargeAccount.setRechargeAcct(0.0);
             }
             //取释放金额
-            AccountModel realeaseAcct = userMapper.getReleaseAmount(dfilter.getId());
+            AccountModel realeaseAcct = userMapper.getReleaseAmount(order.getBuyer_id());
             if (realeaseAcct == null){
                 realeaseAcct = new AccountModel();
                 realeaseAcct.setReleaseAmount(0.0);
             }
             //增加释放记录
             Double lockedAcct = rechargeAccount.getRechargeAcct() - realeaseAcct.getReleaseAmount();
-            OrderModel order = dealMapper.getOrder(dfilter.getOid());
             if (lockedAcct > 100.0){
                 DealModel dealModel = new DealModel(order);
                 dealModel.setTid(idWorker.nextId());
@@ -242,7 +256,9 @@ public class DealService {
                     break;
                 }
                 //增加父对象相应奖励记录
-                RewardRecordModel rewardRecordModel = new RewardRecordModel(user,systemLevelModel);
+                UserModel parent = userMapper.findUserById(user.getParentId());
+                RewardRecordModel rewardRecordModel = new RewardRecordModel(user,systemLevelModel,parent);
+                rewardRecordModel.setRid(idWorker.nextId());
                 result = dealMapper.newRewardRecord(rewardRecordModel);
                 childId = user.getParentId();
             }
@@ -323,7 +339,7 @@ public class DealService {
                 Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
                 //买房交易金额
                 Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
-                if (!purchaseDeal.equals(sellDeal.getUid())
+                if (!purchaseDeal.getUid().equals(sellDeal.getUid())
                         && sellAmount.equals(buyAmount)){
                     OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
                     orderModel.setOid(idWorker.nextId());

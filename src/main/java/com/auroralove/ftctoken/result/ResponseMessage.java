@@ -149,6 +149,10 @@ public enum ResponseMessage {
 
 	RECHARGE_FAIL(524,"充值失败"),
 
+	TRADEABLE_FAIL(524,"增加可用余额失败"),
+
+	TRADEABLE_OK(200,"增加可用余额成功"),
+
 	SINGLE_SAIL_FAIL(530,"每天仅可挂卖一次!"),
 
 	ACCOUNT_FROZEN_FAIL(530,"您的账户已被冻结，禁止交易!"),
@@ -170,6 +174,10 @@ public enum ResponseMessage {
 	REGIST_OK(200,"注册成功！"),
 
 	RECHARGE_OK(200,"充值成功"),
+
+	MISS_TOKEN(888,"缺少token信息！"),
+
+	REPEATLOGIN_EXCEPTION(666,"您的账号已在其他地方登陆，请重新登陆！"),
 
 	SMS_FAIL(522,"发送短信失败！请重试");
 

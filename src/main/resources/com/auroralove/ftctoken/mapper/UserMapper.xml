@@ -17,8 +17,17 @@
       phone=#{phone}
     </select>
 
+    <update id="updateUserDevice" parameterType="com.auroralove.ftctoken.model.UserModel">
+        update ftc_user
+        <set>
+            user_device =#{userDevice}
+        </set>
+        where phone = #{phone}
+    </update>
+
     <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
-        SELECT id,phone,password,teamid,admin_status as amdinStatus,pay_pwd ,account_status as accountStatus,parent_id as parentId FROM ftc_user
+        SELECT id,phone,password,teamid,admin_status as amdinStatus,pay_pwd ,account_status as accountStatus,parent_id as parentId,
+         frozen_date as frozenDate,user_device as userDevice FROM ftc_user
       where
       id=#{id}
     </select>
@@ -26,6 +35,13 @@
         SELECT id,phone FROM ftc_user order by team_total desc
     </select>
 
+    <update id="addTradableAmount">
+        update ftc_user
+        <set>
+            system_amount = #{amount}
+        </set>
+        where id = #{id}
+    </update>
     <update id="updateTeamTotal">
         update ftc_user
         <set>
@@ -169,7 +185,7 @@ select uid,IFNULL(sum(deal_amount),0) as buyAcct from ftc_deal  where type=0 and
     <select id="getSellAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
 select uid,IFNULL(sum(deal_amount),0) as sellAcct from ftc_deal  where type=1 and status=6 and uid= #{uid} GROUP BY uid
     </select>
-    <select id="getRegistAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
+    <select id="getRechargeAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
 select uid,IFNULL(sum(deal_amount),0) as rechargeAcct from ftc_deal  where type=2 and status=6 and uid= #{uid} GROUP BY uid
     </select>
     <select id="getSystemAmount" resultType="com.auroralove.ftctoken.model.AccountModel" >
@@ -250,7 +266,8 @@ where uid= #{id} GROUP BY uid
       uid=#{uid}
     </select>
     <select id="getMessages" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,replay_flag,phone  FROM ftc_message order by leaving_date desc
+        SELECT id,uid,IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,replay_flag,phone  FROM ftc_message
+         where replay_flag=0 order by leaving_date desc
     </select>
 
     <select id="getUserChilds" resultType="com.auroralove.ftctoken.model.UserModel">

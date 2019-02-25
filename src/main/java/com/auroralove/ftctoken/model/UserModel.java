@@ -52,6 +52,11 @@ public class UserModel {
     private Date registTime;
 
     /**
+     * 注册时间
+     */
+    private Date frozenDate;
+
+    /**
      *  我的团队id
      */
     private Long teamId;
@@ -85,6 +90,10 @@ public class UserModel {
      * 短信验证码
      */
     private Integer code;
+    /**
+     * 用户设备信息
+     */
+    private String userDevice;
 
     public UserModel() {
     }

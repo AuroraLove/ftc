@@ -87,8 +87,8 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </insert>
 
     <insert id="newRewardRecord" parameterType="com.auroralove.ftctoken.model.RewardRecordModel">
-        insert into ftc_reward (uid,child_phone,child_id,level,amount,reward_date,status)
-        values (#uid,#childPhone,#childId,#level,#amount,NOW(),#status)
+        insert into ftc_reward (uid,child_phone,child_id,level,amount,reward_date,status,parent_phone)
+        values (#{uid},#{childPhone},#{childId},#{level},#{amount},NOW(),#{status},#{parentPhone})
     </insert>
 
     <select id="getOrder" resultType="com.auroralove.ftctoken.model.OrderModel">

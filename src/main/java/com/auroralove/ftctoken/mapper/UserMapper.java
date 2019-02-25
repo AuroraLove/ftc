@@ -97,11 +97,11 @@ public interface UserMapper {
      */
     AccountModel getSellAmount(@Param("uid")Long uid);
     /**
-     * 获取用户注册金额
+     * 获取用户充值金额
      * @param uid
      * @return
      */
-    AccountModel getRegistAmount(@Param("uid")Long uid);
+    AccountModel getRechargeAmount(@Param("uid")Long uid);
 
     /**
      * 获取用户系统金额
@@ -270,4 +270,13 @@ public interface UserMapper {
      * @return
      */
     List<UserModel> getUsers();
+
+    /**
+     * 增加账户可用金额
+     * @param parentId
+     * @return
+     */
+    int addTradableAmount(@Param("id")Long id,@Param("amount") Double amount);
+
+    int updateUserDevice(UserModel userModel);
 }

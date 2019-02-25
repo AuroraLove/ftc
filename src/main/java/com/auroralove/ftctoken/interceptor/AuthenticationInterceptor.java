@@ -1,6 +1,8 @@
 package com.auroralove.ftctoken.interceptor;
 
 import com.auroralove.ftctoken.annotation.UserLoginToken;
+import com.auroralove.ftctoken.exception.MissingTokenException;
+import com.auroralove.ftctoken.exception.RepeatLoginException;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.service.UserService;
 import com.auth0.jwt.JWT;
@@ -19,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
+import java.util.List;
 
 
 /**
@@ -50,18 +53,28 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             if (userLoginToken.required()) {
                 // 执行认证
                 if (token == null) {
-                    throw new RuntimeException("无token，请重新登录");
+                    throw new MissingTokenException("缺少token！");
                 }
                 // 获取 token 中的 userEntity id
                 Long userId;
+                String userDevice;
                 try {
                     userId = Long.valueOf(JWT.decode(token).getAudience().get(0));
+                    //获取用户设备信息
+                    userDevice = JWT.decode(token).getAudience().get(1);
                 } catch (JWTDecodeException j) {
                     throw new RuntimeException("401");
                 }
                 UserModel user = userService.findUserById(userId);
                 if (user == null) {
-                    throw new RuntimeException("用户不存在，请重新登录");
+                    throw new RuntimeException("用户不存在！");
+                }
+                //踢出用户
+                if(user.getUserDevice() == null){
+                    user.setUserDevice("");
+                }
+                if (!user.getUserDevice().equals(userDevice)){
+                    throw new RepeatLoginException("账号重复登录！");
                 }
                 // 验证 token
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassWord())).build();

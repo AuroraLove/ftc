@@ -103,6 +103,11 @@ public class Ufilter {
      */
     private Integer accountStatus;
 
+    /**
+     * 用户设备信息
+     */
+    private String userDevice;
+
     private Integer pageSize;
 
     private Integer pageNum;

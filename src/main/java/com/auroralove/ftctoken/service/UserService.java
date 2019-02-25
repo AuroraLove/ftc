@@ -394,10 +394,10 @@ public class UserService {
             rewardAccount.setFTCRewardAcct(0.0);
         }
         //取充值金额
-        AccountModel registAmount = userMapper.getRegistAmount(uid);
-        if (registAmount == null){
-            registAmount = new AccountModel();
-            registAmount.setRechargeAcct(0.0);
+        AccountModel rechargeAmount = userMapper.getRechargeAmount(uid);
+        if (rechargeAmount == null){
+            rechargeAmount = new AccountModel();
+            rechargeAmount.setRechargeAcct(0.0);
         }
         //取释放金额
         AccountModel realeaseAccount = userMapper.getReleaseAmount(uid);
@@ -411,7 +411,7 @@ public class UserService {
             systemAccount = new AccountModel();
             systemAccount.setSystemAcct(0.0);
         }
-        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,registAmount,realeaseAccount,systemAccount);
+        AccountEntity accountEntity = new AccountEntity(buyAccountInfo,sellAccountInfo,rewardAccount,rechargeAmount,realeaseAccount,systemAccount);
         return  accountEntity;
     }
 
@@ -515,18 +515,19 @@ public class UserService {
         return  page;
     }
 
+    @Transactional
     public int newHelp(HelpModel helpModel,HttpServletRequest request) throws Exception {
         Long pid = idWorker.nextId();
         helpModel.setPid(pid);
         int i = systemMapper.newHelp(helpModel);
-        if (helpModel.getPictures() != null){
-            List<String> fileNames = new ArrayList<>();
-            for ( MultipartFile picture:helpModel.getPictures()){
-                String fileName = savePicture(picture,request);
-                fileNames.add(fileName);
+        if (helpModel.getPictureModels().size()>0){
+            List<PictureModel> pictureModels = new ArrayList<>();
+            for ( PictureModel picture:helpModel.getPictureModels()){
+                String fileName = savePicture(picture.getPicture(),request);
+                PictureModel pictureModel = new PictureModel(fileName,pid);
+                pictureModels.add(pictureModel);
             }
-            helpModel.setPictureUrl(fileNames);
-            i = systemMapper.newPicture(helpModel);
+            i = systemMapper.newPicture(pictureModels);
         }
         return i;
     }
@@ -568,5 +569,15 @@ public class UserService {
             teamEntities.add(team);
         }
         return teamEntities;
+    }
+
+    /**
+     * 增加账户可用金额
+     * @param dfilter
+     * @return
+     */
+    public int addTradableAmount(Dfilter dfilter) {
+        int resutl = userMapper.addTradableAmount(dfilter.getId(),dfilter.getAmount());
+        return resutl;
     }
 }

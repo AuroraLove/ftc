@@ -40,4 +40,9 @@ public class HelpModel {
      * 内容图片
      */
     private List<MultipartFile> pictures;
+
+    /**
+     * 内容图片地址
+     */
+    private List<PictureModel> pictureModels;
 }

@@ -1,9 +1,7 @@
 package com.auroralove.ftctoken.mapper;
 
-import com.auroralove.ftctoken.model.DataCenterModel;
-import com.auroralove.ftctoken.model.HelpModel;
-import com.auroralove.ftctoken.model.SystemLevelModel;
-import com.auroralove.ftctoken.model.SystemModel;
+import com.auroralove.ftctoken.model.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -38,7 +36,7 @@ public interface SystemMapper {
 
     int newHelp(HelpModel helpModel);
 
-    int newPicture(HelpModel helpModel);
+    int newPicture(@Param("pictureModels") List<PictureModel> pictureModels);
 
     int updateHelp(HelpModel helpModel);
 
@@ -47,4 +45,10 @@ public interface SystemMapper {
     int deletePicture(HelpModel helpModel);
 
     List<SystemLevelModel> getSystemLevel();
+
+    int updateSystemLevel(SystemLevelModel systemLevelModel);
+
+    int updateHelpPicture(PictureModel pictureModel);
+
+    Double getSystemAmount();
 }

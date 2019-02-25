@@ -4,11 +4,12 @@
 
     <select id="getSystemInfo" resultType="com.auroralove.ftctoken.model.SystemModel">
       SELECT EOS,FTC,FTCLocked,FTCPrice,univalent,quantity ,User_level as userLevel,version ,public_info as publicInfo,poundage,commission_scheme as commissionScheme,
-      gathering_code as gatheringCode,system_account as systemAccount
+      gathering_code as gatheringCode,system_account as systemAccount,CNY
       FROM ftc_system
       where
       sid = 1
     </select>
+
 
     <select id="getDataCenter" resultType="com.auroralove.ftctoken.model.DataCenterModel">
      select
@@ -25,7 +26,12 @@
 -- 总释放
 (SELECT IFNULL(sum(deal_amount),0)  from ftc_deal where type=7 and status=6)as totalReleaseAmount,
 -- 总奖励
-(SELECT IFNULL(sum(amount),0)  from ftc_reward where status=6)as totalReward
+(SELECT IFNULL(sum(amount),0)  from ftc_reward where status=6)as totalReward,
+-- 系统隐藏总可交易
+     (select sum(system_amount) as systemAmount  from ftc_user) as systemTotalAmount,
+-- 系统买卖完成可交易
+          ((select sum(deal_amount)  from ftc_deal where status = 6 and type = 0)-
+(select sum(deal_amount)   from ftc_deal where status = 6 and type = 1)) as totalDealAmount
     </select>
 
 
@@ -35,7 +41,8 @@
     h.pid,
     h.catalog,
     h.content,
-    p. picture_url AS pictureUrl
+    p. picture_url AS pictureUrl,
+    p.id
     FROM
     ftc_help h
     LEFT JOIN ftc_picture p ON h.pid = p.pid
@@ -45,6 +52,15 @@
          insert into ftc_help(pid,catalog,content)
          values (#{pid},#{catalog},#{content})
     </insert>
+
+
+    <update id="updateHelpPicture" parameterType="com.auroralove.ftctoken.model.PictureModel">
+      update ftc_picture
+      <set>
+          picture_url = #{pictureUrl}
+      </set>
+        where id = #{id}
+    </update>
 
     <update id="updateHelp" parameterType="com.auroralove.ftctoken.model.HelpModel">
        update ftc_help
@@ -67,12 +83,11 @@
         delete from ftc_picture where pid = #{pid}
     </delete>
 
-    <insert id="newPicture" parameterType="com.auroralove.ftctoken.model.HelpModel">
-         insert into ftc_picture(pid,picture_url)
-        <foreach item="item" index="index" collection="pictureUrl" separator=",">
-            (#{pid},#{item})
+    <insert id="newPicture" parameterType="java.util.List">
+         insert into ftc_picture(pid,picture_url) values
+        <foreach item="item" index="index" collection="pictureModels" separator=",">
+            (#{item.pid,jdbcType=INTEGER},#{item.pictureUrl})
         </foreach>
-         values (#{pid},#{catalog})
     </insert>
 
     <update id="updateSystem" parameterType="com.auroralove.ftctoken.model.SystemModel">
@@ -80,6 +95,9 @@
         <set>
             <if test="EOS!=null">
                EOS = #{EOS},
+            </if>
+            <if test="CNY!=null">
+                CNY = #{CNY},
             </if>
             <if test="FTC!=null">
                FTC = #{FTC},
@@ -118,6 +136,19 @@
         where  sid=1
     </update>
 
+    <update id="updateSystemLevel" parameterType="com.auroralove.ftctoken.model.SystemLevelModel">
+        update ftc_reward_level
+        <set>
+            <if test="level!=null">
+                level = #{level},
+            </if>
+            <if test="amount!=null">
+                amount = #{amount}
+            </if>
+        </set>
+        where lid = #{lid}
+    </update>
+
     <select id="getSystemLevel" resultType="com.auroralove.ftctoken.model.SystemLevelModel">
         select lid,level,amount from ftc_reward_level order by level
     </select>
@@ -126,7 +157,9 @@
         <result column="pid" property="pid"/>
         <result column="catalog" property="catalog"/>
         <result column="content" property="content"/>
-        <collection property="pictureUrl" ofType="java.lang.String">
+        <collection property="pictureModels" ofType="com.auroralove.ftctoken.model.PictureModel">
+            <result column="id" property="id"/>
+            <result column="pid" property="pid"/>
             <result column="pictureUrl" property="pictureUrl"/>
         </collection>
     </resultMap>

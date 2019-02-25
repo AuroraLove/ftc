@@ -98,8 +98,8 @@ public class DealModel {
 
     public DealModel(OrderModel order) {
         this.uid = order.getBuyer_id();
-        this.univalent = order.getUnivalent();
-        this.quantity = order.getQuantity();
+        this.univalent = 1.0;
+        this.quantity = 100.0;
         this.phone = order.getBuyer_phone();
         this.user_name = order.getBuyer_name();
         this.phone = order.getBuyer_phone();

@@ -56,7 +56,12 @@ public class DataCenterModel {
     private Double totalReward;
 
     /**
-     *系统总金额
+     *系统总交易可用金额
+     */
+    private Double totalDealAmount;
+
+    /**
+     *系统增加可交易金额
      */
     private Double systemTotalAmount;
 
