@@ -4,7 +4,9 @@ import com.auroralove.ftctoken.model.UserModel;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class TeamEntity {
@@ -39,6 +41,7 @@ public class TeamEntity {
      */
     private List<TeamEntity> childs;
 
+    private HashMap<Integer, Integer> teamLevelInfo;
     /**
      * 团队用户id
      */

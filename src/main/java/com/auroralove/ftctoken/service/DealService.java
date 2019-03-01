@@ -15,6 +15,7 @@ import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,13 @@ import java.util.List;
 @Component
 public class DealService {
 
-     @Autowired
+    @Value("${system.startTime}")
+    private String startTime;
+
+    @Value("${system.endTime}")
+    private String endTime;
+
+    @Autowired
      private DealMapper dealMapper;
 
      @Autowired
@@ -107,6 +114,9 @@ public class DealService {
         DealModel dealModel = new DealModel(dfilter);
         if (dfilter.getDealType() == DealEnum.RECHARGE_FLAG.getValue()
                 || dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
+            if (!CanlendarUtil.isEffectiveDate(startTime,endTime)){
+                return -11;
+            }
             //买卖交易判断用户资料是否完整
             UserPayModel payInfo = userMapper.getPayInfo(dfilter.getId());
             if (payInfo == null){
@@ -138,9 +148,9 @@ public class DealService {
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-                if (dealModels.size() > 0){
-                    return -5;
-                }
+//                if (dealModels.size() > 0){
+//                    return -5;
+//                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
                 if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
@@ -152,15 +162,15 @@ public class DealService {
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-                if (cancleModel.getOid() != null){
-                   return -7;
-                }
+//                if (cancleModel.getOid() != null){
+//                   return -7;
+//                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-            if (dealModels.size()>0){
-                return -4;
-            }
+//            if (dealModels.size()>0){
+//                return -4;
+//            }
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
@@ -199,7 +209,12 @@ public class DealService {
      * @param dfilter
      * @return
      */
+    @Transactional
     public int updateDealStatus(Dfilter dfilter) {
+        if (dfilter.getDealStatus().equals(9)){
+            //如果交易撤销，则将记录推出状态11，页面不可见状态
+            return dealMapper.updateDealStatus(dfilter.getDid(),11);
+        }
         return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus());
     }
 
@@ -385,5 +400,30 @@ public class DealService {
     public Integer getDealTotal(Dfilter dfilter) {
         Integer total = dealMapper.getDealTotal(dfilter.getDealType(),dfilter.getDealStatus());
         return total;
+    }
+
+    /**
+     * 检测超时订单
+     * @return
+     */
+    @Transactional
+    @Scheduled(cron = "${order.Btime.cron}")
+    public void orderAutomatic(){
+        List<OrderModel> orderModels = dealMapper.getTimeoutOrder();
+        if (orderModels.size() > 0){
+            for (OrderModel orderModel:orderModels){
+                Long oid = orderModel.getOid();
+                if (orderModel.getStatus().equals(4)){
+                    //设置系统撤销
+                    Dfilter dfilter = new Dfilter(oid,10);
+                    updateOrder(dfilter);
+                }
+                if (orderModel.getStatus().equals(5)){
+                    //完成订单
+                    Dfilter dfilter = new Dfilter(oid,6);
+                    updateOrder(dfilter);
+                }
+            }
+        }
     }
 }

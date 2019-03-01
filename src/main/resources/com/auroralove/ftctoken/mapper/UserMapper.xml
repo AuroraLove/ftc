@@ -11,7 +11,7 @@
     </resultMap>
     <select id="findByUserphone" resultType="com.auroralove.ftctoken.model.UserModel">
       SELECT id,phone,name,password,admin_status as amdinStatus,parent_id as parentId,regist_flag as registFlag,regist_time as registTime,teamid,
-      pay_pwd
+      pay_pwd,account_status as accountStatus
        FROM ftc_user
       where
       phone=#{phone}
@@ -97,7 +97,7 @@
         NOW(),
         6,
         2,
-        phone
+        #{phone}
         )
     </insert>
 
@@ -168,6 +168,9 @@
             </if>
             <if test=" registFlag!=null">
                 regist_flag=#{registFlag},
+            </if>
+            <if test=" teamTotal!=null">
+                team_total=#{teamTotal},
             </if>
         </set>
         where id = #{id}

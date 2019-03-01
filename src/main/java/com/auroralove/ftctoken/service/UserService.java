@@ -12,27 +12,30 @@ import com.auroralove.ftctoken.mapper.DealMapper;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
+import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.utils.IdWorker;
 
+import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author zyu
  * @date 2019-1-22 20:52
  */
 @Service("UserService")
+@Component
 public class UserService {
 
     @Autowired
@@ -109,13 +112,17 @@ public class UserService {
     @Transactional
     public int recharge(Dfilter dfilter) throws Exception {
         DealModel dealModel = new DealModel(dfilter);
+        //获取用户交易资料
+        UserPayModel payModel = userMapper.getPayInfo(dfilter.getId());
+        dealModel.setPhone(payModel.getPhone());
+        dealModel.setUser_name(payModel.getName());
         dealModel.setType(DealEnum.DEALTYPE_RECHARGE.getValue());
         dealModel.setTid(idWorker.nextId());
         //增加用户充值记录
         int reslut = userMapper.recharge(dealModel);
         if (reslut > 0){
             //为用户增加充值记录标识,1为已注册充值
-            reslut = userMapper.rechargeFlag(dfilter.getId(),1);
+            int n = userMapper.rechargeFlag(dfilter.getId(),1);
             //更新用户团队人数
             List<SystemLevelModel> systemLevelModels = systemMapper.getSystemLevel();
             //记录对应子id
@@ -123,7 +130,7 @@ public class UserService {
             for (SystemLevelModel systemLevelModel:systemLevelModels) {
                 //取邀请人id
                 UserModel user = userMapper.findUserById(childId);
-                if (user.getParentId() == null){
+                if (user == null || user.getParentId() == null){
                     break;
                 }
                 //增加父对象团队人数
@@ -277,10 +284,13 @@ public class UserService {
                 //设置子用户级别人数
                 result.setCount(count);
                 //设置团队用户列表id
-                result.getIds().add(userModel.getId());
+//                result.getIds().add(userModel.getId());
                 Ufilter filter = new Ufilter(userModel.getId(),userModel.getPhone());
                 //递归获取子用户
                 TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
+                //设置团队用户列表id
+                List<Long> ids = userChild.getIds();
+                result.getIds().addAll(ids);
                 childs.add(userChild);
             }
             result.setChilds(childs);
@@ -304,8 +314,8 @@ public class UserService {
         if (childs != null){
             total += childs.size();
             if (childs.size()>0){
-                for (TeamEntity teamEntity :childs){
-                    total = getTotal(teamEntity,total);
+                for (TeamEntity child :childs){
+                    total = getTotal(child,total);
                 }
             }
         }
@@ -480,7 +490,7 @@ public class UserService {
      * @return
      */
     public int updateSystem(SystemModel systemModel,HttpServletRequest request) throws Exception {
-        if (systemModel.getGatheringCode()!= null){
+        if (systemModel.getSystemPicture()!= null){
             String pictureName = savePicture(systemModel.getSystemPicture(),request);
             systemModel.setGatheringCode(pictureName);
         }
@@ -520,11 +530,10 @@ public class UserService {
         Long pid = idWorker.nextId();
         helpModel.setPid(pid);
         int i = systemMapper.newHelp(helpModel);
-        if (helpModel.getPictureModels().size()>0){
-            List<PictureModel> pictureModels = new ArrayList<>();
-            for ( PictureModel picture:helpModel.getPictureModels()){
-                String fileName = savePicture(picture.getPicture(),request);
-                PictureModel pictureModel = new PictureModel(fileName,pid);
+        List<PictureModel> pictureModels = new ArrayList<>();
+        if (helpModel.getPictureUrl()!=null){
+            for (String str:helpModel.getPictureUrl()){
+                PictureModel pictureModel = new PictureModel(str,pid);
                 pictureModels.add(pictureModel);
             }
             i = systemMapper.newPicture(pictureModels);
@@ -549,12 +558,14 @@ public class UserService {
      * @param pageSize
      * @return
      */
-    public List<TeamEntity> getUsers(Integer pageNum, Integer pageSize) {
+    public PageInfo getUsers(Integer pageNum, Integer pageSize) {
         List<TeamEntity> teamEntities = new ArrayList<>();
         PageHelper.startPage(pageNum,pageSize);
         List<UserModel> userModels = userMapper.getUsers();
+        PageInfo pageInfo = new PageInfo(userModels);
+        List<UserModel> list = pageInfo.getList();
         //取用户团队详情
-        for (UserModel userModel : userModels) {
+        for (UserModel userModel : list) {
             Ufilter ufilter = new Ufilter(userModel);
             TeamEntity team = getTeam(ufilter, -1, 1L);
             //获取用户团队充值,奖励总数
@@ -563,12 +574,13 @@ public class UserService {
             if (teamAmount == null) {
                 teamAmount = new TeamAmount();
             }
-            team.setTotal(Long.valueOf(team.getIds().size()));
+            team.setTotal(Long.valueOf(team.getIds().size()-1));
             team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
             team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
             teamEntities.add(team);
         }
-        return teamEntities;
+        pageInfo.setList(teamEntities);
+        return pageInfo;
     }
 
     /**
@@ -579,5 +591,54 @@ public class UserService {
     public int addTradableAmount(Dfilter dfilter) {
         int resutl = userMapper.addTradableAmount(dfilter.getId(),dfilter.getAmount());
         return resutl;
+    }
+
+    /**
+     * 更新用户团队总人数
+     * @param dfilter
+     * @return
+     */
+    @Transactional
+    @Scheduled(cron = "${team.Btime.cron}")
+    public void updateTeamInfo(){
+        List<UserModel> userModels = userMapper.getUsers();
+        //定时更新团队总人数
+        if (userModels.size() == 0){
+            return;
+        }
+        for (UserModel userModel : userModels) {
+            Ufilter ufilter = new Ufilter(userModel);
+            TeamEntity team = getTeam(ufilter, -1, 1L);
+            //获取用户总数
+            int size = team.getIds().size() - 1;
+            UserModel user = new UserModel(ufilter.getId(),size);
+            userMapper.updateUserInfo(user);
+        }
+    }
+
+    /**
+     * 统计各级人数
+     * @param team
+     * @param teamLevelInfo
+     * @return
+     */
+    public HashMap<Integer, Integer> getTeamLevelInfo(TeamEntity team, HashMap<Integer, Integer> teamLevelInfo) {
+        List<TeamEntity> childs = team.getChilds();
+        if (childs != null){
+            if (!teamLevelInfo.containsKey(team.getLevel())){
+                teamLevelInfo.put(team.getLevel(),1);
+            }
+            if (childs.size()>0){
+                for (TeamEntity child :childs){
+                    if (teamLevelInfo.containsKey(child.getLevel())){
+                        teamLevelInfo.put(child.getLevel(),teamLevelInfo.get(child.getLevel()) + 1);
+                    }else {
+                        teamLevelInfo.put(child.getLevel(),1);
+                    }
+                    teamLevelInfo = getTeamLevelInfo(child,teamLevelInfo);
+                }
+            }
+        }
+        return teamLevelInfo;
     }
 }

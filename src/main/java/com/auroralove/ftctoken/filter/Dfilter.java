@@ -83,4 +83,12 @@ public class Dfilter{
     private Integer pageSize;
 
     private Integer pageNum;
+
+    public Dfilter() {
+    }
+
+    public Dfilter(Long oid, Integer status) {
+        this.oid = oid;
+        this.orderStatus = status;
+    }
 }

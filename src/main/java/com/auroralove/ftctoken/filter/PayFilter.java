@@ -71,4 +71,9 @@ public class PayFilter {
      * 手机验证码
      */
     private Integer code;
+
+    /**
+     *  后台更改用户资料标识，0，APP端，1后台端
+     */
+    private Integer adminFlag;
 }

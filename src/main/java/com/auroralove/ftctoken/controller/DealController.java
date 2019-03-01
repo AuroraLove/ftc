@@ -13,6 +13,7 @@ import com.auroralove.ftctoken.service.DealService;
 import com.auroralove.ftctoken.service.UserService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -98,6 +99,9 @@ public class DealController {
             AccountEntity accountEntity = userService.userAccount(dfilter.getId());
             int result = dealService.deal(dfilter, accountEntity);
             if (result == -5) {
+                return new ResponseResult(ResponseMessage.SYSTEM_TIME_FAIL);
+            }
+            if (result == -5) {
                 return new ResponseResult(ResponseMessage.SINGLE_SAIL_FAIL);
             }
             if (result == -8) {
@@ -137,7 +141,7 @@ public class DealController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/myDeal/orderStatus")
     public ResponseResult orderStatus(Dfilter dfilter) {
         if (dfilter.getOid() != null) {

@@ -1,12 +1,12 @@
 package com.auroralove.ftctoken.service;
 
+import com.auroralove.ftctoken.entity.TeamEntity;
+import com.auroralove.ftctoken.filter.Ufilter;
 import com.auroralove.ftctoken.mapper.SystemMapper;
-import com.auroralove.ftctoken.model.DataCenterModel;
-import com.auroralove.ftctoken.model.HelpModel;
-import com.auroralove.ftctoken.model.PictureModel;
-import com.auroralove.ftctoken.model.SystemLevelModel;
+import com.auroralove.ftctoken.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,7 +41,10 @@ public class SystemService {
         Double trableAmount = dataCenterModel.getTotalReleaseAmount() + dataCenterModel.getTotalReward()
                 + dataCenterModel.getSystemTotalAmount() + dataCenterModel.getTotalDealAmount();
         trableAmount = trableAmount > 0 ? trableAmount:0;
+        //未释放 = 总充值 - 总释放
+        Double releaseAmount = dataCenterModel.getTotalRegistAmount() - dataCenterModel.getTotalReleaseAmount();
         dataCenterModel.setTotalTrableAmount(trableAmount);
+        dataCenterModel.setTotalUnReleaseAmount(releaseAmount);
         return dataCenterModel;
     }
 
@@ -55,14 +58,13 @@ public class SystemService {
         //更新图片
         if (helpModel.getPictureModels() != null && helpModel.getPictureModels().size() > 0){
             for (PictureModel pictureModel:helpModel.getPictureModels()) {
-                String pictureName = savePicture(pictureModel.getPicture(),request);
-                pictureModel.setPictureUrl(pictureName);
                 i = systemMapper.updateHelpPicture(pictureModel);
             }
         }
         return i;
     }
 
+    @Transactional
     public int deleteHelp(HelpModel helpModel) {
         int i = systemMapper.deleteHelp(helpModel);
         //删除帮助中心图片
@@ -98,4 +100,13 @@ public class SystemService {
         picture.transferTo(new File(pictureUrl + fileName));
         return  fileName;
     }
+
+    public String uploadPicture(PictureModel pictureModel, HttpServletRequest request) throws Exception {
+        if (pictureModel.getPicture()!=null){
+            String picture = savePicture(pictureModel.getPicture(), request);
+            return picture;
+        }
+        return "";
+    }
+
 }

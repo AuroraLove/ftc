@@ -153,15 +153,19 @@ public enum ResponseMessage {
 
 	TRADEABLE_OK(200,"增加可用余额成功"),
 
-	SINGLE_SAIL_FAIL(530,"每天仅可挂卖一次!"),
+	SINGLE_SAIL_FAIL(530,"每日仅可挂卖一次！"),
 
-	ACCOUNT_FROZEN_FAIL(530,"您的账户已被冻结，禁止交易!"),
+	SYSTEM_TIME_FAIL(539,"交易时间9：00至21：00！"),
 
-	BANLANCE_FAIL(530,"您没有足够可交易的FTC!"),
+	ACCOUNT_FROZEN_FAIL(530,"您的账户已被冻结！"),
 
-	CANCLE_FAIL(530,"您有撤销订单今日将限制交易!"),
+	ACCOUNT_FROZEN_PERMINANT_FAIL(530,"您的账户已被永久冻结!"),
 
-	UNFINISHED_FAIL(530,"您有还有未完成的订单将限制交易!"),
+	BANLANCE_FAIL(530,"您没有足够的可交易FTC!"),
+
+	CANCLE_FAIL(530,"您今日有撤销订单！"),
+
+	UNFINISHED_FAIL(530,"您还有未完成订单！"),
 
 	LEAVING_FAIL(526,"留言失败"),
 

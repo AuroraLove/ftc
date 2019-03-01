@@ -20,8 +20,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+
 
 /**
  * 用户中心REST访问接口
@@ -60,7 +62,13 @@ public class UserController {
         if (userForBase == null) {
             return new ResponseResult(ResponseMessage.PHONE_ERROR);
         }
-
+        //判断账户是否冻结，1冻结，0正常
+        if (!userForBase.getAccountStatus().equals(0)){
+            //3,永久冻结
+            if (userForBase.getAccountStatus().equals(3)){
+                return new ResponseResult(ResponseMessage.ACCOUNT_FROZEN_PERMINANT_FAIL);
+            }
+        }
         if (!userForBase.getPassWord().equals(ufilter.getPassWord())) {
             return new ResponseResult(ResponseMessage.AUTHORIZED_ERROR);
         }
@@ -80,7 +88,6 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-    @UserLoginToken
     @PostMapping("/findUser")
     public ResponseResult findUser(Ufilter ufilter) {
         if (ufilter.getPhone() != null) {
@@ -110,7 +117,6 @@ public class UserController {
      * @param ufilter
      * @return ResponseResult
      */
-    @UserLoginToken
     @PostMapping("/statistacRecharge")
     public ResponseResult statistacRecharge() {
         TotalInfoModel totalInfoModel = dealService.statistacRecharge();
@@ -123,7 +129,7 @@ public class UserController {
 //     * @param ufilter
 //     * @return ResponseResult
 //     */
-    @UserLoginToken//    @PostMapping("/findDeal")
+ //    @PostMapping("/findDeal")
 //    public ResponseResult findDeal(Ufilter ufilter) {
 //        PageInfo recharegeDeals = dealService.getRecharegeDeals(ufilter);
 //        return new ResponseResult(ResponseMessage.OK, recharegeDeals);
@@ -250,7 +256,7 @@ public class UserController {
      * @param dfilter
      * @return
      */
-    @UserLoginToken
+//    @UserLoginToken
     @PostMapping("/home/recharge")
     public ResponseResult recharge(Dfilter dfilter) throws Exception {
         if (dfilter.getId() != null && dfilter.getAmount() != null) {
@@ -269,7 +275,6 @@ public class UserController {
      * @param
      * @return
      */
-    @UserLoginToken
     @PostMapping("/home/changeLoginPwd")
     public ResponseResult changeLoginPwd(Ufilter ufilter) {
         if (ufilter.getPhone() != null && ufilter.getPassWord() != null) {
@@ -292,6 +297,8 @@ public class UserController {
     @PostMapping("/home/changePayPwd")
     public ResponseResult changePayPwd(Ufilter ufilter) {
         if (ufilter.getId() != null && ufilter.getPayPwd() != null) {
+            UserModel userModel = userService.findUserById(ufilter.getId());
+            ufilter.setPhone(userModel.getPhone());
             int result = userService.changePayPwd(ufilter);
             if (result == -1) {
                 return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
@@ -358,17 +365,13 @@ public class UserController {
     @UserLoginToken
     @PostMapping("/home/relayMsg")
     public ResponseResult relayMsg(MsgFilter msgFilter) {
-        if (msgFilter.getMessage() != null && msgFilter.getMessage() != null) {
+        if (msgFilter.getMessage() != null) {
             int res = 0;
-            //直接存数据库
-            if (msgFilter.getMType() == 12) {
                 res = userService.replayMsg(msgFilter);
-            }
             if (res > 0) {
                 return new ResponseResult(ResponseMessage.OK, true);
             }
             return new ResponseResult(ResponseMessage.LEAVING_FAIL);
-
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
@@ -422,18 +425,23 @@ public class UserController {
     @PostMapping("/home/userData")
     public ResponseResult userData(PayFilter payFilter, HttpServletRequest request) throws Exception {
         if (payFilter.getId() != null) {
-            int i = userService.veritifyCode(payFilter.getUserPhone(), payFilter.getCode());
-            if (i == -1) {
-                return new ResponseResult(ResponseMessage.FAIL_CODE);
-            }
-            if (i == -2) {
-                return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
+            if(payFilter.getAdminFlag() == null){
+                int i = userService.veritifyCode(payFilter.getUserPhone(), payFilter.getCode());
+                if (i == -1) {
+                    return new ResponseResult(ResponseMessage.FAIL_CODE);
+                }
+                if (i == -2) {
+                    return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
+                }
             }
             UserPayModel payInfo = userService.getPayInfo(payFilter.getId());
             if (payInfo != null) {
+                int n = 0;
                 //更新用户资料
                 UserPayModel userPayModel = userService.updatePayInfo(payFilter, request);
-                int n = 0;
+                if (userPayModel != null){
+                    n = 1;
+                }
                 //更新交易密码
                 if (payFilter.getPayPwd() != null) {
                     n = userService.updatePayPwd(payFilter);
@@ -457,20 +465,28 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {
             TeamEntity team = userService.getTeam(ufilter, -1, 0L);
             //正向递归，设置团队成员总数
-//            Long total = userService.getTotal(team, 1L);
+            Long total = userService.getTotal(team, 1L);
+            //获取团队各层级人数
+            HashMap<Integer, Integer> teamLevelInfo = new HashMap<Integer,Integer>();
+            teamLevelInfo = userService.getTeamLevelInfo(team, teamLevelInfo);
             //获取用户团队充值,奖励总数
             TeamAmount teamAmount = new TeamAmount();
             teamAmount = userService.getTeamAmount(team.getIds());
             if (teamAmount == null) {
                 teamAmount = new TeamAmount();
             }
-            team.setTotal(Long.valueOf(team.getIds().size()));
+            team.setTotal(Long.valueOf(team.getIds().size() -1));
+//            if (team.getTeamLevelInfo() == null){
+//                team.setTeamLevelInfo(new ArrayList<>());
+//            }
+//            team.getTeamLevelInfo().add(teamLevelInfo);
+            team.setTeamLevelInfo(teamLevelInfo);
             //更新用户团队成员
             team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
             team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
@@ -485,7 +501,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/findTeamInfo")
     public ResponseResult findTeamInfo(Ufilter ufilter) throws Exception {
         UserModel userModel = userService.findByUserphone(ufilter.getPhone());
@@ -496,11 +512,14 @@ public class UserController {
 //            Long total = userService.getTotal(team, 1L);
             //获取用户团队充值,奖励总数
             TeamAmount teamAmount = new TeamAmount();
+            //去除本人id
+            List teamIds = team.getIds();
+            teamIds.remove(0);
             teamAmount = userService.getTeamAmount(team.getIds());
             if (teamAmount == null) {
                 teamAmount = new TeamAmount();
             }
-            team.setTotal(Long.valueOf(team.getIds().size()));
+            team.setTotal(Long.valueOf(team.getIds().size()-1));
             //更新用户团队成员
             team.setTeamRechargeAmount(teamAmount.getTeamRechargeAmount());
             team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
@@ -519,7 +538,7 @@ public class UserController {
     @PostMapping("/home/teamList")
     public ResponseResult teamList(@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "5") Integer pageSize) throws Exception {
         //取用户分页列表
-        List<TeamEntity> teamEntities = userService.getUsers(pageNum, pageSize);
+        PageInfo teamEntities = userService.getUsers(pageNum, pageSize);
         return new ResponseResult(ResponseMessage.OK, teamEntities);
     }
 
@@ -635,7 +654,7 @@ public class UserController {
      */
     @UserLoginToken
     @PostMapping("/dataCenter")
-    public ResponseResult userData() {
+    public ResponseResult dataCenter() {
         DataCenterModel dataCenterEntity = systemService.getDataCenter();
         return new ResponseResult(ResponseMessage.OK, dataCenterEntity);
     }

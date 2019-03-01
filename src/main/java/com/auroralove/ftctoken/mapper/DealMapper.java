@@ -139,10 +139,11 @@ public interface DealMapper {
     /**
      * 订单交易记录列表
      * @return
-     * @param id
      * @param dealType
      */
     List<DealEntity> dealRecordList(@Param("status") Integer status,@Param("type") Integer dealType);
 
     Integer getDealTotal(@Param("type")Integer dealType, @Param("status")Integer dealStatus);
+
+    List<OrderModel> getTimeoutOrder();
 }

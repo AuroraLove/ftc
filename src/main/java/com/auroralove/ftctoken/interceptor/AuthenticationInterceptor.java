@@ -69,13 +69,15 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 if (user == null) {
                     throw new RuntimeException("用户不存在！");
                 }
+
                 //踢出用户
                 if(user.getUserDevice() == null){
                     user.setUserDevice("");
                 }
-                if (!user.getUserDevice().equals(userDevice)){
-                    throw new RepeatLoginException("账号重复登录！");
-                }
+                    if (!user.getUserDevice().equals(userDevice)){
+                        throw new RepeatLoginException("账号重复登录！");
+                    }
+
                 // 验证 token
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassWord())).build();
                 try {

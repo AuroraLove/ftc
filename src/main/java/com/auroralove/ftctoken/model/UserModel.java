@@ -64,7 +64,7 @@ public class UserModel {
     /**
      *  团队总人数
      */
-    private Long teamTotal;
+    private Integer teamTotal;
 
     private Integer flag;
 
@@ -78,7 +78,7 @@ public class UserModel {
     private String pay_pwd;
 
     /**
-     * 用户账户状态，0正常，1冻结
+     * 用户账户状态，0正常，1冻结7天，2冻结30天，3冻结永久
      */
     private Integer accountStatus;
 
@@ -106,5 +106,10 @@ public class UserModel {
         this.amdinStatus = ufilter.getAmdinstatus();
         this.parentId = ufilter.getParentId();
         this.pay_pwd = ufilter.getPayPwd();
+    }
+
+    public UserModel(Long id, int size) {
+        this.id = id;
+        this.teamTotal = size;
     }
 }

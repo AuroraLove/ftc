@@ -4,8 +4,10 @@ import com.auroralove.ftctoken.model.AccountModel;
 import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.model.UserModel;
 import com.auroralove.ftctoken.model.UserPayModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +73,14 @@ public class UserEntity {
      */
     private Double realeaseAcct;
 
+    private Integer accountStatus;
+
+    /**
+     * 注册时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date registDate;
+
     /**
      * 用户交易资料
      */
@@ -92,5 +102,7 @@ public class UserEntity {
         this.tradeableAcct = accountEntity.getTradeableAcct();
         this.FTCRewardAcct = accountEntity.getFTCRewardAcct();
         this.payInfo = payModel;
+        this.accountStatus = userModel.getAccountStatus();
+        this.registDate = userModel.getRegistTime();
     }
 }

@@ -54,7 +54,7 @@ public class DealModel {
     private Date deal_date;
 
     /**
-     * 交易状态，4未支付，5已支付未确认，6确认支付完成，8，订单冻结，9撤销
+     * 交易状态，4未支付，5已支付未确认，6确认支付完成，8，订单冻结，9撤销,10系统撤销
      */
     private Integer status;
 

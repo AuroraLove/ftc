@@ -3,12 +3,14 @@ package com.auroralove.ftctoken.controller;
 import com.auroralove.ftctoken.annotation.UserLoginToken;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.model.HelpModel;
+import com.auroralove.ftctoken.model.PictureModel;
 import com.auroralove.ftctoken.model.SystemLevelModel;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
 import com.auroralove.ftctoken.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ import java.util.List;
  * @date 2019/2/21
  */
 @RestController
+@RequestMapping("/v1/rest")
 public class SystemController {
 
     @Autowired
@@ -32,6 +35,15 @@ public class SystemController {
         int result = systemService.updateHelp(helpModel, request);
         if (result > 0) {
             return new ResponseResult(ResponseMessage.OK);
+        }
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    @PostMapping("/savePicture")
+    public ResponseResult savePicture(PictureModel pictureModel, HttpServletRequest request) throws Exception {
+        String result = systemService.uploadPicture(pictureModel, request);
+        if (!result.equals("")) {
+            return new ResponseResult(ResponseMessage.OK,result);
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
