@@ -14,6 +14,7 @@ import com.auroralove.ftctoken.utils.IdWorker;
 import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +35,12 @@ import java.util.List;
 @Service
 @Component
 public class DealService {
+
+    private static final String FIVE_MIN = "PT5M";
+
+    private static final String TWO_MIN = "PT2M";
+
+    private static final String ONE_MIN = "PT1M";
 
     @Value("${system.startTime}")
     private String startTime;
@@ -114,17 +122,21 @@ public class DealService {
         DealModel dealModel = new DealModel(dfilter);
         if (dfilter.getDealType() == DealEnum.RECHARGE_FLAG.getValue()
                 || dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
-            if (!CanlendarUtil.isEffectiveDate(startTime,endTime)){
-                return -11;
-            }
+//            if (CanlendarUtil.isEffectiveDate(startTime,endTime)){
+//                return -11;
+//            }
             //买卖交易判断用户资料是否完整
             UserPayModel payInfo = userMapper.getPayInfo(dfilter.getId());
             if (payInfo == null){
                 return -1;
             }
             dealModel.setUser_name(payInfo.getName());
-            //验证用户支付密码
+            //获取用户
             UserModel user = userMapper.findUserById(dfilter.getId());
+            //判断账户是否进行充值认购
+            if (user.getRegistFlag() == null || !user.getRegistFlag().equals(1)){
+                return -12;
+            }
             //判断账户是否冻结，1冻结，0正常
             if (!user.getAccountStatus().equals(0)){
                 //1,冻结一周，判断是否超过解冻期
@@ -142,15 +154,16 @@ public class DealService {
                     return -8;
                 }
             }
+            //验证用户交易密码
             if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
                 return -3;
             }
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-//                if (dealModels.size() > 0){
-//                    return -5;
-//                }
+                if (dealModels.size() > 0){
+                    return -5;
+                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
                 if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
@@ -162,31 +175,31 @@ public class DealService {
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-//                if (cancleModel.getOid() != null){
-//                   return -7;
-//                }
+                if (cancleModel.getOid() != null){
+                   return -7;
+                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-//            if (dealModels.size()>0){
-//                return -4;
-//            }
+            if (dealModels.size()>0){
+                return -4;
+            }
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
         dealModel.setTid(idWorker.nextId());
         int result = dealMapper.newDealRecord(dealModel);
-        //充值
-        if (result > 0 && DealEnum.DEALTYPE_RECHARGE.getValue().equals(dfilter.getDealType())){
-            UserModel userModel = new UserModel();
-            userModel.setId(dfilter.getId());
-            userModel.setRegistFlag(1);
-            result = userMapper.updateUserInfo(userModel);
-            if (result > 0){
-                return -2;
-            }
-            return -9;
-        }
+//        //充值
+//        if (result > 0 && DealEnum.DEALTYPE_RECHARGE.getValue().equals(dfilter.getDealType())){
+//            UserModel userModel = new UserModel();
+//            userModel.setId(dfilter.getId());
+//            userModel.setRegistFlag(1);
+//            result = userMapper.updateUserInfo(userModel);
+//            if (result > 0){
+//                return -2;
+//            }
+//            return -9;
+//        }
         return result;
     }
 
@@ -211,10 +224,10 @@ public class DealService {
      */
     @Transactional
     public int updateDealStatus(Dfilter dfilter) {
-        if (dfilter.getDealStatus().equals(9)){
-            //如果交易撤销，则将记录推出状态11，页面不可见状态
-            return dealMapper.updateDealStatus(dfilter.getDid(),11);
-        }
+//        if (dfilter.getDealStatus().equals(9)){
+//            //如果交易撤销，则将记录推出状态10，即系统撤销，页面不可见状态
+//            return dealMapper.updateDealStatus(dfilter.getDid(),10);
+//        }
         return dealMapper.updateDealStatus(dfilter.getDid(),dfilter.getDealStatus());
     }
 
@@ -238,6 +251,30 @@ public class DealService {
         OrderModel orderModel = new OrderModel(dfilter);
         int result =  dealMapper.updateOrder(orderModel);
         OrderModel order = dealMapper.getOrder(dfilter.getOid());
+        //更新匹配订单订单状态
+        if (!dfilter.getOrderStatus().equals(10)
+                &&!dfilter.getOrderStatus().equals(9)){
+            result = flushOrderDealStatus(dfilter.getOrderStatus(),dfilter.getOid());
+        }
+        //执行单向撤销
+        if (dfilter.getOrderStatus().equals(9)){
+            Dfilter buyFilter = new Dfilter();
+            buyFilter.setDid(order.getDeal_buy_id());
+            //卖单继续匹配
+            Dfilter sellFilter = new Dfilter();
+            sellFilter.setDid(order.getDeal_sell_id());
+            //买单单向撤销
+            if (dfilter.getDealType().equals(0)){
+                buyFilter.setDealStatus(9);
+                sellFilter.setDealStatus(3);
+            }else {
+                //卖单单向撤销
+                buyFilter.setDealStatus(3);
+                sellFilter.setDealStatus(9);
+            }
+            updateDealStatus(sellFilter);
+            updateDealStatus(buyFilter);
+        }
         //完成订单释放金额
         if (result >0 && dfilter.getOrderStatus().equals(6)){
             //取充值金额
@@ -264,6 +301,7 @@ public class DealService {
             List<SystemLevelModel> systemLevelModels = systemMapper.getSystemLevel();
             //记录对应子id
             Long childId = order.getBuyer_id();
+            UserModel rootUser = userMapper.findUserById(childId);
             for (SystemLevelModel systemLevelModel:systemLevelModels) {
                 //取买单用户父id
                 UserModel user = userMapper.findUserById(childId);
@@ -272,13 +310,24 @@ public class DealService {
                 }
                 //增加父对象相应奖励记录
                 UserModel parent = userMapper.findUserById(user.getParentId());
-                RewardRecordModel rewardRecordModel = new RewardRecordModel(user,systemLevelModel,parent);
+                RewardRecordModel rewardRecordModel = new RewardRecordModel(rootUser,systemLevelModel,parent);
                 rewardRecordModel.setRid(idWorker.nextId());
                 result = dealMapper.newRewardRecord(rewardRecordModel);
                 childId = user.getParentId();
             }
         }
         return result;
+    }
+
+    /**
+     * 随订单状态更新匹配订单状态
+     * @param orderStatus
+     * @param oid
+     * @return
+     */
+    private int flushOrderDealStatus(Integer orderStatus, Long oid) {
+        int n = dealMapper.flushOrderDealStatus(orderStatus,oid);
+        return n;
     }
 
 //    /**
@@ -333,8 +382,10 @@ public class DealService {
         return totalInfoModel;
     }
 
+
     @Transactional
     @Scheduled(cron = "${model.Btime.cron}")
+    @SchedulerLock(name = "matchOrder",lockAtLeastForString = TWO_MIN,lockAtMostForString = FIVE_MIN)
     public void matchOrder(){
         //获取买单数
         List<DealModel> purchaseDeals =  dealMapper.getPurchaseDeals();
@@ -344,17 +395,17 @@ public class DealService {
 
         //遍历订单进行匹配
         Iterator purchaseIterator = purchaseDeals.iterator();
-        //遍历卖方
-        Iterator sellIterator = sellDeals.iterator();
         while (purchaseIterator.hasNext()){
             DealModel purchaseDeal = (DealModel) purchaseIterator.next();
+            //遍历卖方
+            Iterator sellIterator = sellDeals.iterator();
             while (sellIterator.hasNext()){
                 DealModel sellDeal = (DealModel) sellIterator.next();
                 //卖方交易金额
                 Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
                 //买房交易金额
                 Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
-                if (!purchaseDeal.getUid().equals(sellDeal.getUid())
+                if (!(purchaseDeal.getUid()).equals(sellDeal.getUid())
                         && sellAmount.equals(buyAmount)){
                     OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
                     orderModel.setOid(idWorker.nextId());
@@ -363,25 +414,15 @@ public class DealService {
                         //移除以匹配订单
                         sellIterator.remove();
                         orders.add(orderModel);
+                        //更新买单卖单状态，并新增oid在匹配订单中
+                        n = updateOrderDealStatus(purchaseDeal.getTid(),sellDeal.getTid(),orderModel.getOid());
                         //跳出当前循环
                         break;
                     }
                 }
             }
         }
-//        int min = purchaseDeals.size() < sellDeals.size() ? purchaseDeals.size() : sellDeals.size();
-//        for (int i = 0;i < min;i++){
-//            //匹配生成订单
-//            if (!purchaseDeals.get(i).getUid().equals(sellDeals.get(i).getUid())
-//                    && purchaseDeals.get(i).getDeal_amount().equals(sellDeals.get(i).getDeal_amount())){
-//                OrderModel orderModel = new OrderModel(purchaseDeals.get(i), sellDeals.get(i));
-//                orderModel.setOid(idWorker.nextId());
-//                int n = dealMapper.newOrder(orderModel);
-//                if (n > 0){
-//                    orders.add(orderModel);
-//                }
-//            }
-//        }
+
         if (orders.size() > 0){
             for (OrderModel orderModel:orders) {
                 //调用极光推送消息
@@ -390,6 +431,18 @@ public class DealService {
             }
         }
         System.out.println("===========匹配任务"+ System.currentTimeMillis()+"================");
+    }
+
+    /**
+     * 新增订单时，更新匹配订单状态和赋值oid
+     * @param purchaseDealTid
+     * @param sellDealTid
+     * @param oid
+     * @return
+     */
+    private int updateOrderDealStatus(Long purchaseDealTid, Long sellDealTid, Long oid) {
+        int n = dealMapper.updateOrderDealStatus(purchaseDealTid,sellDealTid,oid);
+        return n;
     }
 
     /**
@@ -408,8 +461,9 @@ public class DealService {
      */
     @Transactional
     @Scheduled(cron = "${order.Btime.cron}")
+    @SchedulerLock(name = "orderAutomatic",lockAtLeastForString = ONE_MIN,lockAtMostForString = FIVE_MIN)
     public void orderAutomatic(){
-        List<OrderModel> orderModels = dealMapper.getTimeoutOrder();
+         List<OrderModel> orderModels = dealMapper.getTimeoutOrder();
         if (orderModels.size() > 0){
             for (OrderModel orderModel:orderModels){
                 Long oid = orderModel.getOid();
@@ -417,10 +471,21 @@ public class DealService {
                     //设置系统撤销
                     Dfilter dfilter = new Dfilter(oid,10);
                     updateOrder(dfilter);
+                    //将买单撤销
+                    OrderEntity orderEntity = orderInfo(dfilter);
+                    Dfilter buyFilter = new Dfilter();
+                    buyFilter.setDid(orderEntity.getDealBuyId());
+                    buyFilter.setDealStatus(9);
+                    updateDealStatus(buyFilter);
+                    //卖单继续匹配
+                    Dfilter sellFilter = new Dfilter();
+                    sellFilter.setDid(orderEntity.getDealSellId());
+                    sellFilter.setDealStatus(3);
+                    updateDealStatus(sellFilter);
                 }
                 if (orderModel.getStatus().equals(5)){
-                    //完成订单
-                    Dfilter dfilter = new Dfilter(oid,6);
+                    //冻结订单,设置订单超时冻结
+                    Dfilter dfilter = new Dfilter(oid,12);
                     updateOrder(dfilter);
                 }
             }

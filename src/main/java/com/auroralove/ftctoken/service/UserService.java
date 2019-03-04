@@ -12,10 +12,8 @@ import com.auroralove.ftctoken.mapper.DealMapper;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
-import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.utils.IdWorker;
 
-import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,8 +191,17 @@ public class UserService {
      * @param ufilter
      * @return
      */
-    public int uploadMsg(Ufilter ufilter,String url) {
-    	int reslut = userMapper.uploadMsg(idWorker.nextId(),ufilter.getPhone(),ufilter.getId(),ufilter.getMessage(),url);
+    public int uploadMsg(Ufilter ufilter, String url) {
+        int reslut;
+        if (ufilter.getTid() == null) {
+            //首次上传留言记录日期
+            ufilter.setTid(idWorker.nextId());
+            reslut = userMapper.newUploadMsg(idWorker.nextId(), ufilter.getTid(), ufilter.getPhone(), ufilter.getId(), ufilter.getMessage(), url);
+        }else {
+            //获取首次上传日期
+            Date newMessageDate = userMapper.getNewMessageDate(ufilter.getTid());
+            reslut = userMapper.uploadMsg(idWorker.nextId(), ufilter.getTid(), ufilter.getPhone(), ufilter.getId(), ufilter.getMessage(), url,newMessageDate);
+        }
         return reslut;
     }
 
@@ -286,12 +293,14 @@ public class UserService {
                 //设置团队用户列表id
 //                result.getIds().add(userModel.getId());
                 Ufilter filter = new Ufilter(userModel.getId(),userModel.getPhone());
-                //递归获取子用户
-                TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
-                //设置团队用户列表id
-                List<Long> ids = userChild.getIds();
-                result.getIds().addAll(ids);
-                childs.add(userChild);
+                if(level < 6){
+                    //递归获取子用户
+                    TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
+                    //设置团队用户列表id
+                    List<Long> ids = userChild.getIds();
+                    result.getIds().addAll(ids);
+                    childs.add(userChild);
+                }
             }
             result.setChilds(childs);
         }else {
@@ -347,6 +356,7 @@ public class UserService {
      * @param payFilter
      * @return
      */
+    @Transactional
     public int updatePayPwd(PayFilter payFilter) {
         return userMapper.updatePayPwd(payFilter.getId(),payFilter.getPayPwd());
     }
@@ -641,4 +651,5 @@ public class UserService {
         }
         return teamLevelInfo;
     }
+
 }

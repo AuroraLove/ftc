@@ -33,17 +33,22 @@ public class MessageEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date replayDate;
 
+    private String leavingPictureUrl;
+
     public MessageEntity() {
 
     }
 
+
     public MessageEntity(MessageModel messageModel) {
-        this.leavingMsg = messageModel.getMsg() == null ? "":messageModel.getMsg();
-        this.leavingDate = messageModel.getLeaving_date();
-        this.replayDate = messageModel.getReplay_date();
-        this.replayMsg = messageModel.getR_msg() == null ? "":messageModel.getR_msg();
+        this.leavingMsg = messageModel.getLeavingMsg() == null ? "":messageModel.getLeavingMsg();
+        this.leavingDate = messageModel.getLeavingDate();
+        this.replayDate = messageModel.getReplayDate();
+        this.replayMsg = messageModel.getReplayMsg() == null ? "":messageModel.getReplayMsg();
+        this.leavingPictureUrl = messageModel.getLeavingPictureUrl();
+
     }
 
 
-    
+
 }

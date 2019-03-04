@@ -19,9 +19,9 @@ public class TokenService {
     private UserMapper userMapper;
 
     @Transactional
-    public String getToken(UserModel userModel,String userDevice) {
+    public String getToken(UserModel userModel, String userDevice, Integer amdinFlag) {
         // 将 userEntity id 保存到 token 里面,以 password 作为 token 的密钥
-        String token= JWT.create().withAudience(userModel.getId().toString(),userDevice)
+        String token= JWT.create().withAudience(userModel.getId().toString(),userDevice,amdinFlag.toString())
                 .sign(Algorithm.HMAC256(userModel.getPassWord()));
         //将用户设备保存的用户数据库中实现单一用户登录
         userModel.setUserDevice(userDevice);

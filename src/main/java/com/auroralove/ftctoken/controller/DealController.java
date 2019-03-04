@@ -98,6 +98,9 @@ public class DealController {
         if (dfilter.getId() != null) {
             AccountEntity accountEntity = userService.userAccount(dfilter.getId());
             int result = dealService.deal(dfilter, accountEntity);
+            if (result == -12) {
+                return new ResponseResult(ResponseMessage.UNRECHARGE_ERROR);
+            }
             if (result == -5) {
                 return new ResponseResult(ResponseMessage.SYSTEM_TIME_FAIL);
             }

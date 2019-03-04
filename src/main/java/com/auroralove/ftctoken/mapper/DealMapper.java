@@ -101,6 +101,12 @@ public interface DealMapper {
     int updateDealStatus(@Param("did") Long did,@Param("dealStatus") Integer dealStatus);
 
     /**
+     * 修改交易订单状态
+     * @return
+     */
+    int updateOrderDealStatus(@Param("purchaseDealTid") Long purchaseDealTid, @Param("sellDealTid") Long sellDealTid,@Param("oid") Long oid);
+
+    /**
      * 获取未完成交易订单数
      * @return
      */
@@ -146,4 +152,6 @@ public interface DealMapper {
     Integer getDealTotal(@Param("type")Integer dealType, @Param("status")Integer dealStatus);
 
     List<OrderModel> getTimeoutOrder();
+
+    int flushOrderDealStatus(@Param("orderStatus")Integer orderStatus,@Param("oid") Long oid);
 }

@@ -64,9 +64,9 @@ public class CanlendarUtil {
 //                || nowTime.getTime() == endTime.getTime()) {
 //            return true;
 //        }
-        if (startDate.compareTo(nowTime)<0||endDate.compareTo(nowTime)>0){
-            return true;
+        if (startDate.compareTo(nowTime)<0 && endDate.compareTo(nowTime)>0){
+            return false;
         }
-        return false;
+        return true;
     }
 }

@@ -56,7 +56,7 @@ public class Dfilter{
     private String userName;
 
     /**
-     * 订单状态，4待支付，5已支付未确认收款，6确认收款，订单完成，8订单冻结，9撤销
+     * 订单状态，3，匹配中，4待支付，5已支付未确认收款，6确认收款，订单完成，8订单冻结，9，撤销,10，系统撤销，12，订单超时冻结
      */
     private Integer orderStatus;
 

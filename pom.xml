@@ -49,7 +49,16 @@
             <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
             <!--<scope>provided</scope>&lt;!&ndash; 打成war的时候打开注释，本地开发用内嵌tomcat时加上注释 &ndash;&gt;-->
         <!--</dependency>-->
-
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>2.2.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>

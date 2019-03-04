@@ -58,10 +58,13 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 // 获取 token 中的 userEntity id
                 Long userId;
                 String userDevice;
+                Integer amdinFlag;
                 try {
                     userId = Long.valueOf(JWT.decode(token).getAudience().get(0));
                     //获取用户设备信息
                     userDevice = JWT.decode(token).getAudience().get(1);
+                    //获取管理台标识，0，APP，1，后台服务
+                    amdinFlag = Integer.valueOf(JWT.decode(token).getAudience().get(2));
                 } catch (JWTDecodeException j) {
                     throw new RuntimeException("401");
                 }
@@ -69,14 +72,17 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 if (user == null) {
                     throw new RuntimeException("用户不存在！");
                 }
-
-                //踢出用户
-                if(user.getUserDevice() == null){
-                    user.setUserDevice("");
-                }
-                    if (!user.getUserDevice().equals(userDevice)){
+                //不为后台管理时，执行踢人操作
+                if (!amdinFlag.equals(1)){
+                    //踢出用户
+                    if (user.getUserDevice() == null) {
+                        user.setUserDevice("");
+                    }
+                    if (!user.getUserDevice().equals(userDevice)) {
                         throw new RepeatLoginException("账号重复登录！");
                     }
+
+                }
 
                 // 验证 token
                 JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassWord())).build();

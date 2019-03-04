@@ -17,6 +17,11 @@ public class MsgFilter {
     private Long mid;
 
     /**
+     * 留言类别id
+     */
+    private Long tid;
+
+    /**
      * 回复留言信息
      */
     private String message;

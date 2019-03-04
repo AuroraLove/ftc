@@ -27,7 +27,7 @@
 
     <select id="findUserById" resultType="com.auroralove.ftctoken.model.UserModel">
         SELECT id,phone,password,teamid,admin_status as amdinStatus,pay_pwd ,account_status as accountStatus,parent_id as parentId,
-         frozen_date as frozenDate,user_device as userDevice FROM ftc_user
+         frozen_date as frozenDate,user_device as userDevice,regist_flag as registFlag FROM ftc_user
       where
       id=#{id}
     </select>
@@ -217,21 +217,42 @@ where uid= #{id} GROUP BY uid
         delete from ftc_publicinfo where pid = #{pid}
     </delete>
 
-    <insert id="uploadMsg" >
+    <insert id="newUploadMsg" >
         INSERT INTO
         <include refid="MESSAGE" />
-        (id,uid,phone,leaving_date,  msg, pic_url)
+        (id,tid,uid,phone,leaving_date,msg, pic_url,new_date)
         VALUES
         (
         #{id},
+        #{tid},
         #{uid},
         #{phone},
         NOW(),
         #{message},
-        #{url}
+        #{url},
+        NOW()
         )
     </insert>
 
+    <select id="getNewMessageDate" parameterType="java.lang.Long" resultType="java.util.Date">
+        select DISTINCT new_date as newMessageDate from ftc_message where tid = #{tid} AND new_date is not null
+    </select>
+    <insert id="uploadMsg" >
+        INSERT INTO
+        <include refid="MESSAGE" />
+        (id,tid,uid,phone,leaving_date,msg, pic_url,new_date)
+        VALUES
+        (
+        #{id},
+        #{tid},
+        #{uid},
+        #{phone},
+        NOW(),
+        #{message},
+        #{url},
+        #{newDate}
+        )
+    </insert>
     <update id="frozenUser">
         UPDATE ftc_user
         <set>
@@ -263,21 +284,24 @@ where uid= #{id} GROUP BY uid
         </foreach> ) as teamRewardAmount
     </select>
 
-    <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,phone FROM ftc_message
+    <select id="messageInfo" resultType="com.auroralove.ftctoken.model.MessageModel" >
+        SELECT id,tid,uid,IFNULL(msg,'') as leavingMsg,IFNULL(r_msg,'') as replayMsg,leaving_date as leavingDate,
+        replay_date as replayDate,replay_flag as replayFlag,phone,pic_url as leavingPictureUrl FROM ftc_message
       where
-      uid=#{uid}
+      uid=#{uid} and  DATE_ADD(leaving_date,INTERVAL 30 DAY) <![CDATA[>= ]]> NOW() order by leaving_date,replay_date
     </select>
+
     <select id="getMessages" resultType="com.auroralove.ftctoken.model.MessageModel">
-        SELECT id,uid,IFNULL(msg,'') as msg,IFNULL(r_msg,'') as r_msg,leaving_date,replay_date,replay_flag,phone  FROM ftc_message
-         where replay_flag=0 order by leaving_date desc
+       SELECT id,tid,uid,IFNULL(msg,'') as leavingMsg,IFNULL(r_msg,'') as replayMsg,max(leaving_date) as leavingDate,
+        replay_date as replayDate,replay_flag as replayFlag,phone,pic_url as leavingPictureUrl  FROM ftc_message
+         where replay_flag=0 GROUP BY uid
     </select>
 
     <select id="getUserChilds" resultType="com.auroralove.ftctoken.model.UserModel">
         SELECT id,phone,name,regist_flag
          FROM ftc_user
       where
-      parent_id=#{uid} and regist_flag=1
+      parent_id=#{uid}
     </select>
 
     <insert id="savePayInfo">
@@ -328,5 +352,18 @@ where uid= #{id} GROUP BY uid
         insert into ftc_veritify (phone,code,new_time,loss_time)
         values (#{phone},#{code},NOW(),ADDDATE(NOW(),interval 60 second))
     </insert>
+    <resultMap id="messageInfoList" type="com.auroralove.ftctoken.model.MessageModelList">
+        <result property="tid" column="tid"/>
+        <collection property="messageModels" ofType="com.auroralove.ftctoken.model.MessageModel">
+            <result property="id" column="id"/>
+            <result property="uid" column="uid"/>
+            <result property="leavingMsg" column="leavingMsg"/>
+            <result property="replayMsg" column="replayMsg"/>
+            <result property="leavingDate" column="leavingDate"/>
+            <result property="replayDate" column="replayDate"/>
+            <result property="phone" column="phone"/>
+            <result property="leavingPictureUrl" column="leavingPictureUrl"/>
+        </collection>
+    </resultMap>
 
 </mapper>

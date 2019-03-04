@@ -14,6 +14,7 @@ import com.auroralove.ftctoken.utils.SendSMSUitl;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,7 +77,11 @@ public class UserController {
         if (ufilter.getAmdinFlag() != null && userForBase.getAmdinStatus().equals(0)) {
             return new ResponseResult(ResponseMessage.INADEQUATE_PERMISSIONS);
         }
-        String token = tokenService.getToken(userForBase, ufilter.getUserDevice());
+        //APP端设置访问权限，执行踢人操作
+        if (ufilter.getAmdinFlag() == null){
+            ufilter.setAmdinFlag(0);
+        }
+        String token = tokenService.getToken(userForBase, ufilter.getUserDevice(),ufilter.getAmdinFlag());
         UserEntity userResult = userService.getUserInfo(userForBase);
         userResult.setToken(token);
         return new ResponseResult(ResponseMessage.OK, userResult);
@@ -256,7 +261,7 @@ public class UserController {
      * @param dfilter
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/recharge")
     public ResponseResult recharge(Dfilter dfilter) throws Exception {
         if (dfilter.getId() != null && dfilter.getAmount() != null) {
@@ -392,7 +397,7 @@ public class UserController {
                 MessageEntity messageEntity = new MessageEntity(messageModel);
                 messageEntities.add(messageEntity);
             }
-            return new ResponseResult(ResponseMessage.OK, messageEntities);
+            return new ResponseResult(ResponseMessage.OK, messageInfos);
         } else {
             PageInfo messageInfos = userService.messageListInfo(ufilter);
             return new ResponseResult(ResponseMessage.OK, messageInfos);
@@ -423,6 +428,7 @@ public class UserController {
      */
     @UserLoginToken
     @PostMapping("/home/userData")
+    @Transactional
     public ResponseResult userData(PayFilter payFilter, HttpServletRequest request) throws Exception {
         if (payFilter.getId() != null) {
             if(payFilter.getAdminFlag() == null){
@@ -442,16 +448,16 @@ public class UserController {
                 if (userPayModel != null){
                     n = 1;
                 }
-                //更新交易密码
-                if (payFilter.getPayPwd() != null) {
-                    n = userService.updatePayPwd(payFilter);
-                }
                 if (userPayModel != null && n > 0) {
                     return new ResponseResult(ResponseMessage.USERDATA_UPDATE_SUCCESS, userPayModel);
                 }
                 return new ResponseResult(ResponseMessage.USERDATA_FAIL);
             }
             UserPayModel userPayModel = userService.saveUserData(payFilter, request);
+            //更新交易密码
+            if (payFilter.getPayPwd() != null) {
+                int n = userService.updatePayPwd(payFilter);
+            }
             if (userPayModel != null) {
                 return new ResponseResult(ResponseMessage.OK, userPayModel);
             }
@@ -465,7 +471,7 @@ public class UserController {
      * @param
      * @return
      */
-    @UserLoginToken
+//    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {

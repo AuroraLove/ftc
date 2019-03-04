@@ -51,7 +51,7 @@ public class OrderModel {
     private Long buyer_id;
 
     /**
-     * 订单状态
+     * 订单状态，12超时冻结订单
      */
     private Integer status;
 

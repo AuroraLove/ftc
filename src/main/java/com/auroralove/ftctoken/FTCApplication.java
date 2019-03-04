@@ -1,5 +1,6 @@
 package com.auroralove.ftctoken;
 
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -33,6 +34,7 @@ import java.util.List;
 @EnableSwagger2
 @EnableScheduling//启动定时任务
 @EnableTransactionManagement
+@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 @MapperScan("com.auroralove.ftctoken.mapper")
 @ComponentScan(basePackages = {"com.auroralove.ftctoken.*"})
 public class FTCApplication extends SpringBootServletInitializer {

@@ -157,6 +157,8 @@ public enum ResponseMessage {
 
 	SYSTEM_TIME_FAIL(539,"交易时间9：00至21：00！"),
 
+	UNRECHARGE_ERROR(539,"您还尚未认购FTC！"),
+
 	ACCOUNT_FROZEN_FAIL(530,"您的账户已被冻结！"),
 
 	ACCOUNT_FROZEN_PERMINANT_FAIL(530,"您的账户已被永久冻结!"),

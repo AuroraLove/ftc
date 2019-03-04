@@ -20,32 +20,43 @@ public class MessageModel {
     private Long id;
 
     /**
+     * 留言记录id
+     */
+    private Long tid;
+
+    /**
      * 用户id
      */
     private Long uid;
     /**
      * 留言信息
      */
-    private String msg;
+    private String leavingMsg;
+
+    /**
+     * 留言凭证地址
+     */
+    private String leavingPictureUrl;
+
     /**
      * 回复留言
      */
-    private String r_msg;
+    private String replayMsg;
     /**
      * 留言时间
      */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date leaving_date;
+    private Date leavingDate;
     /**
      * 回复时间
      */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date replay_date;
+    private Date replayDate;
 
     /**
      * 回复标识，0未回复，1回复
      */
-	private Integer replay_flag;
+	private Integer replayFlag;
 
 	private String phone;
 

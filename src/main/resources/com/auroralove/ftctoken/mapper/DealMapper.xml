@@ -120,21 +120,31 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     select (SELECT IFNULL(count(0),0) from ftc_user )as  regitTotal ,(select IFNULL(count(0),0)  from ftc_user where regist_flag=1)as rechargeTotal
     </select>
 
+    <update id="updateOrderDealStatus">
+        update ftc_deal set status = 4 where tid in (#{purchaseDealTid},#{sellDealTid});
+        update ftc_deal set  oid = #{oid} where tid in (#{purchaseDealTid},#{sellDealTid});
+    </update>
+
+    <update id="flushOrderDealStatus">
+       update ftc_deal set status = #{orderStatus} where oid = #{oid};
+    </update>
+
     <select id="getRecharegeDeals" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where status =6 and type = 2 and  DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
+    from ftc_deal where status =6 and type = 2 and  DATE_ADD(deal_date,INTERVAL 30 DAY) <![CDATA[>= ]]> NOW()
     <if test="phone!=null">
         and phone = #{phone}
     </if>
      order by deal_date desc
     </select>
+
     <select id="getDealRecord" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1) order by deal_date desc
+    from ftc_deal where uid = #{id} and type in (0,1) and status in (3,4,5,6,8,9,12) order by deal_date desc
     </select>
     <select id="dealRecordList" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where DATE_SUB(CURDATE(), INTERVAL 30 DAY)  <![CDATA[<= ]]> date(deal_date)
+    from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW()
     <if test="status!=null">
        and status = #{status}
     </if>
@@ -146,7 +156,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getDealTotal" resultType="java.lang.Integer">
         SELECT count(0)
-        from ftc_deal where DATE_SUB(CURDATE(), INTERVAL 30 DAY )  <![CDATA[<= ]]> date(deal_date)
+        from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW()
         <if test="status!=null">
             and status = #{status}
         </if>
@@ -162,7 +172,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getDealStatus" resultMap="dealEntity">
     SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8)
+    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8,12)
     </select>
 
     <select id="getCancleAction" resultMap="dealEntity">
@@ -176,12 +186,24 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="getTimeoutOrder" resultType="com.auroralove.ftctoken.model.OrderModel">
-    SELECT oid,status
-    from ftc_order where status = 4  and DATE_SUB(CURDATE(), INTERVAL 1 HOUR  )  <![CDATA[>= ]]> date(order_date) union all
-    SELECT oid,status
-    from ftc_order where status = 5 and DATE_SUB(CURDATE(), INTERVAL 2 HOUR  )  <![CDATA[>= ]]> date(affirm_date)
+        SELECT
+        oid,
+        STATUS
+        FROM
+        ftc_order
+        WHERE
+        STATUS = 4
+        AND DATE_ADD(order_date, INTERVAL 30 MINUTE) <![CDATA[<= ]]> NOW()
+        UNION ALL
+        SELECT
+        oid,
+        STATUS
+        FROM
+        ftc_order
+        WHERE
+        STATUS = 5
+        AND DATE_ADD(affirm_date, INTERVAL 2 HOUR) <![CDATA[<= ]]> NOW()
     </select>
-
 
     <select id="getUnfinishedDeal" resultType="java.lang.Integer">
     SELECT IFNULL(count(1),0)

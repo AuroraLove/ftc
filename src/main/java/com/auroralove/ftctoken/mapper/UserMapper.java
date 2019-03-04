@@ -4,6 +4,7 @@ import com.auroralove.ftctoken.model.*;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -130,7 +131,17 @@ public interface UserMapper {
      * @param message
      * @return Result<int>
      */
-    int uploadMsg(@Param("id") Long id, @Param("phone")String phone, @Param("uid") Long uid, @Param("message") String message, @Param("url") String url);
+    int newUploadMsg(@Param("id") Long id, @Param("tid") Long tid, @Param("phone")String phone, @Param("uid") Long uid, @Param("message") String message, @Param("url") String url);
+
+    /**
+     * 上传留言
+     *
+     * @param id
+     * @param phone
+     * @param message
+     * @return Result<int>
+     */
+    int uploadMsg(@Param("id") Long id, @Param("tid") Long tid, @Param("phone")String phone, @Param("uid") Long uid, @Param("message") String message, @Param("url") String url,@Param("newDate") Date newDate);
     /**
      * 回复留言
      *
@@ -143,7 +154,7 @@ public interface UserMapper {
      * 查询留言
      *
      * @param uid
-     * @return Result<UserModel>
+     * @return Result<MessageModelList>
      */
     List<MessageModel> messageInfo(Long uid);
 
@@ -279,4 +290,6 @@ public interface UserMapper {
     int addTradableAmount(@Param("id")Long id,@Param("amount") Double amount);
 
     int updateUserDevice(UserModel userModel);
+
+    Date getNewMessageDate(@Param("tid")Long tid);
 }

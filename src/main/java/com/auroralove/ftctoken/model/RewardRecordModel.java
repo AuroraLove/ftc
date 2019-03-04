@@ -63,7 +63,7 @@ public class RewardRecordModel {
     }
 
     public RewardRecordModel(UserModel user, SystemLevelModel systemLevelModel, UserModel parent) {
-        this.uid = user.getParentId();
+        this.uid = parent.getId();
         this.parentPhone = parent.getPhone();
         this.childId = user.getId();
         this.childPhone = user.getPhone();

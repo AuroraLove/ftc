@@ -20,6 +20,11 @@ public class Ufilter {
     private Long id;
 
     /**
+     *  留言簿类别id
+     */
+    private Long tid;
+
+    /**
      * 用户手机号
      */
     private String phone;
@@ -66,8 +71,8 @@ public class Ufilter {
     /**
      * 留言信息
      */
-    private String message;	
-    
+    private String message;
+
     /**
      * 留言凭证
      */
