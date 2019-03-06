@@ -49,24 +49,25 @@ public class CanlendarUtil {
      */
     public static boolean isEffectiveDate(String startDate, String endDate) {
         String format = "HH:mm:ss";
-        String nowTime = null;
+        String nowTimeStr = null;
         Date startTime = null;
         Date endTime = null;
+        Date nowTime = null;
         try {
-            nowTime =new SimpleDateFormat(format).format(new Date());
-//            startTime = new SimpleDateFormat(format).parse(startDate);
-//            endTime = new SimpleDateFormat(format).parse(endDate);
-
+            nowTimeStr =new SimpleDateFormat(format).format(new Date());
+            nowTime = new SimpleDateFormat(format).parse(nowTimeStr);
+            startTime = new SimpleDateFormat(format).parse(startDate);
+            endTime = new SimpleDateFormat(format).parse(endDate);
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        if (nowTime.getTime() == startTime.getTime()
-//                || nowTime.getTime() == endTime.getTime()) {
-//            return true;
-//        }
-        if (startDate.compareTo(nowTime)<0 && endDate.compareTo(nowTime)>0){
-            return false;
+        if (nowTime.getTime() == startTime.getTime()
+                || nowTime.getTime() == endTime.getTime()) {
+            return true;
         }
-        return true;
+        if (nowTime.after(startTime) && nowTime.before(endTime)){
+            return true;
+        }
+        return false;
     }
 }

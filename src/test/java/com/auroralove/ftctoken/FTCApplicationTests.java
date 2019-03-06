@@ -1,10 +1,13 @@
 package com.auroralove.ftctoken;
 
+import com.auroralove.ftctoken.mapper.DealMapper;
+import com.auroralove.ftctoken.service.DealService;
 import com.auroralove.ftctoken.utils.CanlendarUtil;
 import com.auroralove.ftctoken.utils.SendSMSUitl;
 import net.javacrumbs.shedlock.core.SchedulerLock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +23,9 @@ public class FTCApplicationTests {
 
     private static final String SIXTY_MIN = "PT60M";
     private static final String THREE_MIN = "PT3M";
+
+    @Autowired
+    private DealService dealService;
 
     @Value("${system.startTime}")
     private String startTime;
@@ -48,6 +54,11 @@ public class FTCApplicationTests {
             System.out.println("11111");
         }
         System.out.println(effectiveDate);
+    }
+
+    @Test
+    public void bulkTest(){
+        dealService.bulkOrder();
     }
 
     @Test

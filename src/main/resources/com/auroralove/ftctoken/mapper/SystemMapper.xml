@@ -28,10 +28,10 @@
 -- 总奖励
 (SELECT IFNULL(sum(amount),0)  from ftc_reward where status=6)as totalReward,
 -- 系统隐藏总可交易
-     (select sum(system_amount) as systemAmount  from ftc_user) as systemTotalAmount,
+     (select IFNULL(sum(system_amount),0) as systemAmount  from ftc_user) as systemTotalAmount,
 -- 系统买卖完成可交易
-          ((select sum(deal_amount)  from ftc_deal where status = 6 and type = 0)-
-(select sum(deal_amount)   from ftc_deal where status = 6 and type = 1)) as totalDealAmount
+          ((select IFNULL(sum(deal_amount),0)  from ftc_deal where status = 6 and type = 0)-
+(select IFNULL(sum(deal_amount),0)   from ftc_deal where status = 6 and type = 1)) as totalDealAmount
     </select>
 
 

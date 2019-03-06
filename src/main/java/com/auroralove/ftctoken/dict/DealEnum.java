@@ -91,6 +91,21 @@ public enum DealEnum {
      * 冻结账户：3，永久
      */
     FROZEN_USER_PERMANENT(3),
+
+    /**
+     * 交易状态STATUS,10,系统撤销
+     */
+    SYSTEM_CANLCE_STATUS(10),
+
+    /**
+     * 交易状态STATUS,12,超时冻结
+     */
+    TIMEOUT_STATUS(12),
+
+    /**
+     * 交易状态STATUS,13,处理匹配中
+     */
+    MATCHING_D_STATUS(13)
     ;
 
     private Integer value;

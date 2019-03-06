@@ -9,12 +9,14 @@ import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
 import com.auroralove.ftctoken.platform.JPushInstance;
+import com.auroralove.ftctoken.store.TaskQueueManager;
 import com.auroralove.ftctoken.utils.CanlendarUtil;
 import com.auroralove.ftctoken.utils.IdWorker;
 import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import net.javacrumbs.shedlock.core.SchedulerLock;
+import org.apache.tomcat.jni.Thread;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,10 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 交易大厅
@@ -41,6 +40,8 @@ public class DealService {
     private static final String TWO_MIN = "PT2M";
 
     private static final String ONE_MIN = "PT1M";
+
+    private TaskQueueManager taskQueueManager;
 
     @Value("${system.startTime}")
     private String startTime;
@@ -122,17 +123,18 @@ public class DealService {
         DealModel dealModel = new DealModel(dfilter);
         if (dfilter.getDealType() == DealEnum.RECHARGE_FLAG.getValue()
                 || dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
-//            if (CanlendarUtil.isEffectiveDate(startTime,endTime)){
-//                return -11;
-//            }
+            //验证用户交易密码
+            //获取用户
+            UserModel user = userMapper.findUserById(dfilter.getId());
+            if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
+                return -3;
+            }
             //买卖交易判断用户资料是否完整
             UserPayModel payInfo = userMapper.getPayInfo(dfilter.getId());
             if (payInfo == null){
                 return -1;
             }
             dealModel.setUser_name(payInfo.getName());
-            //获取用户
-            UserModel user = userMapper.findUserById(dfilter.getId());
             //判断账户是否进行充值认购
             if (user.getRegistFlag() == null || !user.getRegistFlag().equals(1)){
                 return -12;
@@ -154,16 +156,17 @@ public class DealService {
                     return -8;
                 }
             }
-            //验证用户交易密码
-            if (!dfilter.getPayPwd().equals(user.getPay_pwd())){
-                return -3;
+            //判断是否在可交易时间内
+            if (!CanlendarUtil.isEffectiveDate(startTime,endTime)){
+                return -11;
             }
+
             if (dfilter.getDealType() == DealEnum.SELL_FLAG.getValue()){
                 //判断是否当天只挂卖一次
                 List<DealEntity> dealModels = dealMapper.getSingleSell(dfilter.getId());
-                if (dealModels.size() > 0){
-                    return -5;
-                }
+//                if (dealModels.size() > 0){
+//                    return -5;
+//                }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
                 if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()){
@@ -175,31 +178,20 @@ public class DealService {
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
             for (DealEntity cancleModel:cancleModels) {
                 //判断是否为订单撤销操作
-                if (cancleModel.getOid() != null){
-                   return -7;
-                }
+//                if (cancleModel.getOid() != null){
+//                   return -7;
+//                }
             }
             //判断用户是否有未完成订单
             List<DealEntity> dealModels = dealMapper.getDealStatus(dfilter.getId());
-            if (dealModels.size()>0){
-                return -4;
-            }
+//            if (dealModels.size()>0){
+//                return -4;
+//            }
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
         dealModel.setTid(idWorker.nextId());
         int result = dealMapper.newDealRecord(dealModel);
-//        //充值
-//        if (result > 0 && DealEnum.DEALTYPE_RECHARGE.getValue().equals(dfilter.getDealType())){
-//            UserModel userModel = new UserModel();
-//            userModel.setId(dfilter.getId());
-//            userModel.setRegistFlag(1);
-//            result = userMapper.updateUserInfo(userModel);
-//            if (result > 0){
-//                return -2;
-//            }
-//            return -9;
-//        }
         return result;
     }
 
@@ -272,8 +264,8 @@ public class DealService {
                 buyFilter.setDealStatus(3);
                 sellFilter.setDealStatus(9);
             }
-            updateDealStatus(sellFilter);
-            updateDealStatus(buyFilter);
+            result = updateDealStatus(sellFilter);
+            result = updateDealStatus(buyFilter);
         }
         //完成订单释放金额
         if (result >0 && dfilter.getOrderStatus().equals(6)){
@@ -382,23 +374,51 @@ public class DealService {
         return totalInfoModel;
     }
 
-
     @Transactional
     @Scheduled(cron = "${model.Btime.cron}")
     @SchedulerLock(name = "matchOrder",lockAtLeastForString = TWO_MIN,lockAtMostForString = FIVE_MIN)
     public void matchOrder(){
+        System.out.println("===========开始匹配任务"+ new Date()+"================");
         //获取买单数
         List<DealModel> purchaseDeals =  dealMapper.getPurchaseDeals();
         //获取卖单数
         List<DealModel> sellDeals =  dealMapper.getSellDeals();
         List<OrderModel> orders = new ArrayList<>();
+        //记录已匹配订单
+//        HashMap<Long,OrderModel> matchedOrders = new HashMap<Long,OrderModel>();
+//
+//        for (DealModel purchaseDeal:purchaseDeals){
+//            for (DealModel sellDeal:sellDeals){
+//                //卖方交易金额
+//                Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
+//                //买方交易金额
+//                Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
+//                //以买方匹配订单号作为key,判断是否为已匹配订单，是否交易金额相等，是否用户id相等
+//                if (!matchedOrders.containsKey(sellDeal.getTid())
+//                        && !(purchaseDeal.getUid()).equals(sellDeal.getUid())
+//                        && sellAmount.equals(buyAmount)
+//                        && !matchedOrders.containsKey(purchaseDeal.getTid())){
+//                    OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
+//                    orderModel.setOid(idWorker.nextId());
+//                    int n = dealMapper.newOrder(orderModel);
+//                    if (n > 0){
+//                        orders.add(orderModel);
+//                        //更新买单卖单状态，并新增oid在匹配订单中
+//                        n = updateOrderDealStatus(purchaseDeal.getTid(),sellDeal.getTid(),orderModel.getOid());
+//                        //将已匹配订单放入HashMap
+//                        matchedOrders.put(sellDeal.getTid(),orderModel);
+//                        matchedOrders.put(purchaseDeal.getTid(),orderModel);
+//                    }
+//                }
+//            }
+//        }
 
         //遍历订单进行匹配
         Iterator purchaseIterator = purchaseDeals.iterator();
+        //遍历卖方
+        Iterator sellIterator = sellDeals.iterator();
         while (purchaseIterator.hasNext()){
             DealModel purchaseDeal = (DealModel) purchaseIterator.next();
-            //遍历卖方
-            Iterator sellIterator = sellDeals.iterator();
             while (sellIterator.hasNext()){
                 DealModel sellDeal = (DealModel) sellIterator.next();
                 //卖方交易金额
@@ -411,12 +431,12 @@ public class DealService {
                     orderModel.setOid(idWorker.nextId());
                     int n = dealMapper.newOrder(orderModel);
                     if (n > 0){
-                        //移除以匹配订单
-                        sellIterator.remove();
                         orders.add(orderModel);
                         //更新买单卖单状态，并新增oid在匹配订单中
                         n = updateOrderDealStatus(purchaseDeal.getTid(),sellDeal.getTid(),orderModel.getOid());
-                        //跳出当前循环
+                        //移除以匹配订单
+                        purchaseIterator.remove();
+                        sellIterator.remove();
                         break;
                     }
                 }
@@ -430,7 +450,8 @@ public class DealService {
                 ,orderModel.getSeller_id());
             }
         }
-        System.out.println("===========匹配任务"+ System.currentTimeMillis()+"================");
+
+        System.out.println("===========结束匹配任务"+ new Date()+"================");
     }
 
     /**
@@ -489,6 +510,39 @@ public class DealService {
                     updateOrder(dfilter);
                 }
             }
+        }
+    }
+
+
+    public void bulkOrder() {
+        for (int i = 0;i<500;i++){
+            DealModel p = new DealModel();
+            p.setTid(idWorker.nextId());
+            p.setType(0);
+            p.setStatus(3);
+            p.setUid(111l);
+            p.setUnivalent(1.0);
+            p.setQuantity(500.0);
+            p.setDeal_amount(500.0);
+            p.setPhone("123123");
+            p.setUser_name("xiaowang");
+            int n = dealMapper.newDealRecord(p);
+            System.out.println("====="+i+"========"+n);
+        }
+        for (int i = 500;i<1000;i++){
+            DealModel s = new DealModel();
+            s.setTid(idWorker.nextId());
+            s.setType(1);
+            s.setUid(111l);
+            s.setStatus(3);
+            s.setUnivalent(1.0);
+            s.setQuantity(500.0);
+            s.setDeal_amount(500.0);
+            s.setPhone("123123");
+            s.setUser_name("li");
+            int n = dealMapper.newDealRecord(s);
+            System.out.println("====="+i+"========"+n);
+
         }
     }
 }

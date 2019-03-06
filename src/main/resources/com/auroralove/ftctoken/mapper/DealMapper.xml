@@ -261,6 +261,10 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
             <if test="status==10">
                 status = #{status}
             </if>
+            <if test="status==12">
+                status = #{status},
+                freeze_date = NOW()
+            </if>
         </set>
         where oid =#{oid}
     </update>
