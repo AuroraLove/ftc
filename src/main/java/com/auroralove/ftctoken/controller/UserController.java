@@ -104,6 +104,19 @@ public class UserController {
     }
 
     /**
+     * 搜索注册用户
+     *
+     * @param ufilter
+     * @return ResponseResult
+     */
+    @UserLoginToken
+    @PostMapping("/findUserList")
+    public ResponseResult findUserList(Ufilter ufilter,@RequestParam(defaultValue = "1") Integer pageNum, @RequestParam(defaultValue = "10") Integer pageSize) {
+        PageInfo userModel = userService.findUserList(ufilter,pageNum,pageSize);
+        return new ResponseResult(ResponseMessage.OK, userModel);
+    }
+
+    /**
      * 充值列表
      *
      * @param ufilter
@@ -471,7 +484,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {

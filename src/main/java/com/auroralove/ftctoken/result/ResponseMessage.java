@@ -177,6 +177,8 @@ public enum ResponseMessage {
 
 	USERPASSWORD_FAIL(525,"修改密码失败"),
 
+	REPEATE_ACTION_ORDER(528,"订单状态已更新，请刷新订单后重试"),
+
 	REGIST_OK(200,"注册成功"),
 
 	RECHARGE_OK(200,"充值成功"),

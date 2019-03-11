@@ -31,6 +31,16 @@
       where
       id=#{id}
     </select>
+
+    <select id="findUserList"  parameterType="com.auroralove.ftctoken.model.UserModel" resultType="com.auroralove.ftctoken.model.UserModel">
+        SELECT id,phone,password,teamid,admin_status as amdinStatus,pay_pwd ,account_status as accountStatus,parent_id as parentId,
+         frozen_date as frozenDate,user_device as userDevice,regist_flag as registFlag,recharge_date as rechargeTime FROM ftc_user
+      where 1=1
+          <if test="registFlag!=null">
+             and  regist_flag = #{registFlag}
+          </if>
+    </select>
+
     <select id="getUsers" resultType="com.auroralove.ftctoken.model.UserModel">
         SELECT id,phone FROM ftc_user order by team_total desc
     </select>
@@ -104,7 +114,8 @@
     <update id="rechargeFlag">
         UPDATE <include refid="USER" />
         SET regist_flag = #{flag}
-        WHERE id = #{id}
+        WHERE id = #{id};
+        update ftc_user set recharge_date = NOW() WHERE id = #{id};
     </update>
     
      <update id="changeLoginPwd">
@@ -267,9 +278,12 @@ where uid= #{id} GROUP BY uid
         <include refid="MESSAGE"/>
         set
         replay_date = NOW(),
-        r_msg = #{message},
+        r_msg = #{message}
+        WHERE id=#{mesId};
+
+        update ftc_message set
         replay_flag = 1
-        WHERE id=#{mesId}
+        where uid  = (select uid from (select uid from ftc_message where id= #{mesId})as a);
     </update>
 
     <select id="getTeamAmount" resultType="com.auroralove.ftctoken.model.TeamAmount">
@@ -294,7 +308,7 @@ where uid= #{id} GROUP BY uid
     <select id="getMessages" resultType="com.auroralove.ftctoken.model.MessageModel">
        SELECT id,tid,uid,IFNULL(msg,'') as leavingMsg,IFNULL(r_msg,'') as replayMsg,max(leaving_date) as leavingDate,
         replay_date as replayDate,replay_flag as replayFlag,phone,pic_url as leavingPictureUrl  FROM ftc_message
-         where replay_flag=0 GROUP BY uid
+         where replay_flag=0 and  DATE_ADD(leaving_date,INTERVAL 30 DAY) <![CDATA[>= ]]> NOW() GROUP BY uid
     </select>
 
     <select id="getUserChilds" resultType="com.auroralove.ftctoken.model.UserModel">

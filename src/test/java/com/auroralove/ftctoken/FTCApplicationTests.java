@@ -50,8 +50,9 @@ public class FTCApplicationTests {
     @Test
     public void dateTest(){
         boolean effectiveDate = CanlendarUtil.isEffectiveDate(startTime, endTime);
-        if (CanlendarUtil.isEffectiveDate(startTime,endTime)){
-            System.out.println("11111");
+//判断是否在可交易时间内
+        if (!CanlendarUtil.isEffectiveDate(startTime, endTime)) {
+            System.out.println("不在可交易时间");
         }
         System.out.println(effectiveDate);
     }

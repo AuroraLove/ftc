@@ -34,7 +34,7 @@ import java.util.List;
 @EnableSwagger2
 @EnableScheduling//启动定时任务
 @EnableTransactionManagement
-@EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
+@EnableSchedulerLock(defaultLockAtMostFor = "PT10S")
 @MapperScan("com.auroralove.ftctoken.mapper")
 @ComponentScan(basePackages = {"com.auroralove.ftctoken.*"})
 public class FTCApplication extends SpringBootServletInitializer {

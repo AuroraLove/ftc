@@ -1,6 +1,9 @@
 package com.auroralove.ftctoken.filter;
 
 import lombok.Data;
+
+import java.util.List;
+
 /**
  * 交易过滤器
  *
@@ -64,6 +67,11 @@ public class Dfilter{
      * 订单状态，9撤销
      */
     private Integer dealStatus;
+
+    /**
+     * 订单状态，9撤销
+     */
+    private List<Integer> dealListStatus;
 
     /**
      * 交易方式，20银行卡，21支付宝，22微信支付

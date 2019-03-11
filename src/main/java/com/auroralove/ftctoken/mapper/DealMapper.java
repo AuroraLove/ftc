@@ -147,11 +147,23 @@ public interface DealMapper {
      * @return
      * @param dealType
      */
-    List<DealEntity> dealRecordList(@Param("status") Integer status,@Param("type") Integer dealType);
+    List<DealEntity> dealRecordList(@Param("status") List<Integer> status,@Param("type") Integer dealType);
 
     Integer getDealTotal(@Param("type")Integer dealType, @Param("status")Integer dealStatus);
 
     List<OrderModel> getTimeoutOrder();
 
     int flushOrderDealStatus(@Param("orderStatus")Integer orderStatus,@Param("oid") Long oid);
+
+    int updateUnpayTimeoutOrder(@Param("oid")Long oid);
+
+    int updateTimeoutFrozenOrder(@Param("oid")Long oid);
+
+    List<DealModel> getDealOrderInfo(@Param("oid")Long oid);
+
+    int deleteErrorOrder(@Param("oid")Long oid);
+
+    int initDealMatchingOrder();
+
+    DealModel getDealRecordInfo(@Param("did")Long did);
 }

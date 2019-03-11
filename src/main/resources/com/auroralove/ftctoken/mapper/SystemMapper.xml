@@ -49,8 +49,18 @@
   </select>
 
     <insert id="newHelp" parameterType="com.auroralove.ftctoken.model.HelpModel">
-         insert into ftc_help(pid,catalog,content)
-         values (#{pid},#{catalog},#{content})
+         insert into ftc_help
+        <choose>
+            <when test="pid !=null and pid != ''">
+                (pid,catalog,content)
+                values (#{pid},#{catalog},#{content})
+            </when>
+            <otherwise>
+                (catalog,content)
+                values (#{catalog},#{content})
+            </otherwise>
+        </choose>
+
     </insert>
 
 

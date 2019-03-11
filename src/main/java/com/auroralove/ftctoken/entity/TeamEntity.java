@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class TeamEntity {
+public class TeamEntity implements Comparable<TeamEntity> {
 
     /**
      * 用户id
@@ -60,4 +60,8 @@ public class TeamEntity {
         this.ids = new ArrayList<>();
     }
 
+    @Override
+    public int compareTo(TeamEntity teamEntity) {
+        return teamEntity.getTeamRechargeAmount().compareTo(this.teamRechargeAmount);
+    }
 }

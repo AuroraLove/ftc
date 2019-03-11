@@ -52,6 +52,12 @@ public class UserModel {
     private Date registTime;
 
     /**
+     * 充值时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date rechargeTime;
+
+    /**
      * 注册时间
      */
     private Date frozenDate;
@@ -106,6 +112,7 @@ public class UserModel {
         this.amdinStatus = ufilter.getAmdinstatus();
         this.parentId = ufilter.getParentId();
         this.pay_pwd = ufilter.getPayPwd();
+        this.registFlag = ufilter.getRechargeFlag();
     }
 
     public UserModel(Long id, int size) {

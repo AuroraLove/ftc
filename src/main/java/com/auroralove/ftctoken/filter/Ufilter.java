@@ -55,6 +55,11 @@ public class Ufilter {
     private Long teamId;
 
     /**
+     *  充值用户标识。0，未充值，1充值
+     */
+    private Integer rechargeFlag;
+
+    /**
      *  邀请人id
      */
     private Long parentId;

@@ -53,7 +53,7 @@ public enum DealEnum {
     FINISHING(6),
 
     /**
-     * 交易状态STATUS,订单冻结
+     * 交易状态STATUS,订单客诉冻结
      */
     FROZEN(8),
 
@@ -105,7 +105,7 @@ public enum DealEnum {
     /**
      * 交易状态STATUS,13,处理匹配中
      */
-    MATCHING_D_STATUS(13)
+    MATCHING_DEAL_STATUS(13)
     ;
 
     private Integer value;

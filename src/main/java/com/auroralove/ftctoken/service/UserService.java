@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -541,7 +542,7 @@ public class UserService {
         helpModel.setPid(pid);
         int i = systemMapper.newHelp(helpModel);
         List<PictureModel> pictureModels = new ArrayList<>();
-        if (helpModel.getPictureUrl()!=null){
+        if (helpModel.getPictureUrl().size()!=0 && helpModel.getPictureUrl()!=null){
             for (String str:helpModel.getPictureUrl()){
                 PictureModel pictureModel = new PictureModel(str,pid);
                 pictureModels.add(pictureModel);
@@ -589,6 +590,7 @@ public class UserService {
             team.setTeamRewardAmount(teamAmount.getTeamRewardAmount());
             teamEntities.add(team);
         }
+        Collections.sort(teamEntities);
         pageInfo.setList(teamEntities);
         return pageInfo;
     }
@@ -652,4 +654,15 @@ public class UserService {
         return teamLevelInfo;
     }
 
+    /**
+     * 查看用户注册充值列表
+     * @param ufilter
+     * @return
+     */
+    public PageInfo findUserList(Ufilter ufilter,Integer pageNum,Integer pageSize) {
+        UserModel userModel = new UserModel(ufilter);
+        PageHelper.startPage(pageNum,pageSize);
+        List<UserModel> userModels = userMapper.findUserList(userModel);
+        return new PageInfo(userModels);
+    }
 }

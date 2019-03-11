@@ -292,4 +292,7 @@ public interface UserMapper {
     int updateUserDevice(UserModel userModel);
 
     Date getNewMessageDate(@Param("tid")Long tid);
+
+    List<UserModel> findUserList(UserModel userModel);
+
 }

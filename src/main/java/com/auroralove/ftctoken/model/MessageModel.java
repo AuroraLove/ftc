@@ -12,7 +12,7 @@ import java.util.Date;
  * @date 2019/1/22
  */
 @Data
-public class MessageModel {
+public class MessageModel implements Comparable<MessageModel>{
 
     /**
      * 留言id
@@ -60,4 +60,8 @@ public class MessageModel {
 
 	private String phone;
 
+    @Override
+    public int compareTo(MessageModel o) {
+        return o.getLeavingDate().compareTo(this.leavingDate);
+    }
 }

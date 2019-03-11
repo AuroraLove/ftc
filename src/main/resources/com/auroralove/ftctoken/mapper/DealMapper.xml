@@ -46,7 +46,8 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="getSellDeals" resultType="com.auroralove.ftctoken.model.DealModel">
-    SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal where type = 1 and status = 3 ORDER BY deal_date
+    SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal
+    where type = 1 and status = 3 ORDER BY deal_date
     </select>
 
     <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.OrderModel" >
@@ -124,6 +125,33 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         update ftc_deal set status = 4 where tid in (#{purchaseDealTid},#{sellDealTid});
         update ftc_deal set  oid = #{oid} where tid in (#{purchaseDealTid},#{sellDealTid});
     </update>
+    <update id="initDealMatchingOrder">
+        update ftc_deal set status = 3 where status=13;
+    </update>
+
+    <select id="getDealRecordInfo" resultType="com.auroralove.ftctoken.model.DealModel">
+        select uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        from ftc_deal where tid = #{did}
+    </select>
+
+    <select id="getDealOrderInfo" parameterType="java.lang.Long" resultType="com.auroralove.ftctoken.model.DealModel">
+        select tid from ftc_deal where oid = #{oid}
+    </select>
+    <delete id="deleteErrorOrder">
+        delete from ftc_order where oid =#{oid}
+    </delete>
+    <update id="updateUnpayTimeoutOrder">
+        update ftc_order set status = 10 where oid=#{oid};
+        -- 买方设置状态为撤销------
+        update ftc_deal set status = 9 where oid = #{oid} and type = 0;
+        -- 卖方设置状态为匹配------
+        update ftc_deal set status = 3 where oid = #{oid} and type = 1;
+    </update>
+    <update id="updateTimeoutFrozenOrder">
+        update ftc_order set status = 8 where oid=#{oid};
+        -- 卖买方设置状态为冻结------
+        update ftc_deal set status = 8 where oid = #{oid};
+    </update>
 
     <update id="flushOrderDealStatus">
        update ftc_deal set status = #{orderStatus} where oid = #{oid};
@@ -140,13 +168,17 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getDealRecord" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1) and status in (3,4,5,6,8,9,12) order by deal_date desc
+    from ftc_deal where uid = #{id} and type in (0,1) and status in (3,4,5,6,8,9,12,13) order by deal_date desc
     </select>
+
     <select id="dealRecordList" resultMap="dealEntity">
     SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
     from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW()
     <if test="status!=null">
-       and status = #{status}
+        and status in
+        <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
+            #{status[${index}]}
+        </foreach>
     </if>
     <if test="type!=null">
        and  type =#{type}
@@ -202,7 +234,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         ftc_order
         WHERE
         STATUS = 5
-        AND DATE_ADD(affirm_date, INTERVAL 2 HOUR) <![CDATA[<= ]]> NOW()
+        AND DATE_ADD(pay_date, INTERVAL 2 HOUR) <![CDATA[<= ]]> NOW()
     </select>
 
     <select id="getUnfinishedDeal" resultType="java.lang.Integer">

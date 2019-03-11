@@ -6,6 +6,7 @@ import com.auroralove.ftctoken.entity.OrderEntity;
 import com.auroralove.ftctoken.entity.OrderListEntity;
 import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.filter.Ufilter;
+import com.auroralove.ftctoken.model.DealModel;
 import com.auroralove.ftctoken.result.DealResult;
 import com.auroralove.ftctoken.result.ResponseMessage;
 import com.auroralove.ftctoken.result.ResponseResult;
@@ -101,7 +102,7 @@ public class DealController {
             if (result == -12) {
                 return new ResponseResult(ResponseMessage.UNRECHARGE_ERROR);
             }
-            if (result == -5) {
+            if (result == -11) {
                 return new ResponseResult(ResponseMessage.SYSTEM_TIME_FAIL);
             }
             if (result == -5) {
@@ -132,7 +133,7 @@ public class DealController {
                 return new ResponseResult(ResponseMessage.RECHARGE_FAIL);
             }
             if (result > 0) {
-                return new ResponseResult(ResponseMessage.OK, "订单匹配中!");
+                return new ResponseResult(ResponseMessage.OK, "订单委托成功");
             }
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
@@ -152,6 +153,27 @@ public class DealController {
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.OK, true);
             }
+            if (result == -1){
+                //已经更新订单操作，不能重复提交操作
+                return new ResponseResult(ResponseMessage.REPEATE_ACTION_ORDER);
+            }
+        }
+        return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * 订单状态修改
+     *
+     * @param
+     * @return
+     */
+    @UserLoginToken
+    @PostMapping("/myDeal/dealInfo")
+    public ResponseResult dealInfo(Dfilter dfilter) {
+        if (dfilter.getDid() != null) {
+            DealModel result = dealService.getDealRecordInfo(dfilter);
+                return new ResponseResult(ResponseMessage.OK, result);
+
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
     }
