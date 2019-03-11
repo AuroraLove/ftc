@@ -63,6 +63,10 @@
 
     </insert>
 
+    <update id="systemCancleDeal">
+       update ftc_deal set status = 9 where status = 3 and type in (0,1)
+    </update>
+
 
     <update id="updateHelpPicture" parameterType="com.auroralove.ftctoken.model.PictureModel">
       update ftc_picture

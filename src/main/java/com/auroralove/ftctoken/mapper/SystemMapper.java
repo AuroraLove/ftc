@@ -51,4 +51,6 @@ public interface SystemMapper {
     int updateHelpPicture(PictureModel pictureModel);
 
     Double getSystemAmount();
+
+    int systemCancleDeal();
 }

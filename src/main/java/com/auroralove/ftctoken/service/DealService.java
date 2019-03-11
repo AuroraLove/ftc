@@ -257,28 +257,32 @@ public class DealService {
         }
         int result = dealMapper.updateOrder(orderModel);
         //更新匹配订单订单状态
-        if (!dfilter.getOrderStatus().equals(10)
-                && !dfilter.getOrderStatus().equals(9)) {
+        if (!dfilter.getOrderStatus().equals(9)) {
             result = flushOrderDealStatus(dfilter.getOrderStatus(), dfilter.getOid());
         }
         //执行单向撤销
         if (dfilter.getOrderStatus().equals(9)) {
-            Dfilter buyFilter = new Dfilter();
-            buyFilter.setDid(order.getDeal_buy_id());
-            //卖单继续匹配
-            Dfilter sellFilter = new Dfilter();
-            sellFilter.setDid(order.getDeal_sell_id());
-            //买单单向撤销
-            if (dfilter.getDealType().equals(0)) {
-                buyFilter.setDealStatus(9);
-                sellFilter.setDealStatus(3);
-            } else {
-                //卖单单向撤销
-                buyFilter.setDealStatus(3);
-                sellFilter.setDealStatus(9);
+            if (dfilter.getAdminFlag() != null){
+                //后台执行双向撤销
+                result = flushOrderDealStatus(dfilter.getOrderStatus(), dfilter.getOid());
+            }else {
+                Dfilter buyFilter = new Dfilter();
+                buyFilter.setDid(order.getDeal_buy_id());
+                //卖单继续匹配
+                Dfilter sellFilter = new Dfilter();
+                sellFilter.setDid(order.getDeal_sell_id());
+                //买单单向撤销
+                if (dfilter.getDealType().equals(0)) {
+                    buyFilter.setDealStatus(9);
+                    sellFilter.setDealStatus(3);
+                } else {
+                    //卖单单向撤销
+                    buyFilter.setDealStatus(3);
+                    sellFilter.setDealStatus(9);
+                }
+                result = updateDealStatus(sellFilter);
+                result = updateDealStatus(buyFilter);
             }
-            result = updateDealStatus(sellFilter);
-            result = updateDealStatus(buyFilter);
         }
         //完成订单释放金额
         if (result > 0 && dfilter.getOrderStatus().equals(6)) {
@@ -532,18 +536,6 @@ public class DealService {
                         if (n == 0) {
                             throw new Exception();
                         }
-//                    updateOrder(dfilter);
-//                    //将买单撤销
-//                    OrderEntity orderEntity = orderInfo(dfilter);
-//                    Dfilter buyFilter = new Dfilter();
-//                    buyFilter.setDid(orderEntity.getDealBuyId());
-//                    buyFilter.setDealStatus(9);
-//                    updateDealStatus(buyFilter);
-//                    //卖单继续匹配
-//                    Dfilter sellFilter = new Dfilter();
-//                    sellFilter.setDid(orderEntity.getDealSellId());
-//                    sellFilter.setDealStatus(3);
-//                    updateDealStatus(sellFilter);
                     }
                     if (orderModel.getStatus().equals(5)) {
                         //冻结订单,设置订单超时冻结

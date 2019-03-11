@@ -484,7 +484,7 @@ public class UserController {
      * @param
      * @return
      */
-    @UserLoginToken
+//    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {

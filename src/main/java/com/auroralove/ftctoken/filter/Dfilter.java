@@ -39,6 +39,11 @@ public class Dfilter{
     private Integer dealType;
 
     /**
+     * 管理员操作标识，0为普通用户，1为管理员
+     */
+    private Integer adminFlag;
+
+    /**
      * 订单id
      */
     private Long oid;

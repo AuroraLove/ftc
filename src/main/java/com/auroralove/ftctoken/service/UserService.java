@@ -294,7 +294,7 @@ public class UserService {
                 //设置团队用户列表id
 //                result.getIds().add(userModel.getId());
                 Ufilter filter = new Ufilter(userModel.getId(),userModel.getPhone());
-                if(level < 6){
+                if(level < 5){
                     //递归获取子用户
                     TeamEntity userChild = getTeam(filter,level,Long.valueOf(userChilds.size()));
                     //设置团队用户列表id
@@ -504,6 +504,13 @@ public class UserService {
         if (systemModel.getSystemPicture()!= null){
             String pictureName = savePicture(systemModel.getSystemPicture(),request);
             systemModel.setGatheringCode(pictureName);
+        }
+        //更新价格后，撤销所有订单
+        if (systemModel.getCNY() != null){
+            SystemModel systemInfo = systemMapper.getSystemInfo();
+            if (!systemInfo.getCNY().equals(systemModel.getCNY())){
+                int i = systemMapper.systemCancleDeal();
+            }
         }
         int i = systemMapper.updateSystem(systemModel);
         return i;

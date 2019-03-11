@@ -148,9 +148,9 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         update ftc_deal set status = 3 where oid = #{oid} and type = 1;
     </update>
     <update id="updateTimeoutFrozenOrder">
-        update ftc_order set status = 8 where oid=#{oid};
+        update ftc_order set status = 12 where oid=#{oid};
         -- 卖买方设置状态为冻结------
-        update ftc_deal set status = 8 where oid = #{oid};
+        update ftc_deal set status = 12 where oid = #{oid};
     </update>
 
     <update id="flushOrderDealStatus">
@@ -172,18 +172,31 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="dealRecordList" resultMap="dealEntity">
-    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW()
-    <if test="status!=null">
-        and status in
-        <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
-            #{status[${index}]}
-        </foreach>
-    </if>
-    <if test="type!=null">
-       and  type =#{type}
-    </if>
-    order by deal_date desc
+    SELECT  oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW() and tid in ( SELECT max(tid)
+        from ftc_deal where oid is not null group by oid )
+        <if test="status!=null">
+            and status in
+            <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
+                #{status[${index}]}
+            </foreach>
+        </if>
+        <if test="type!=null">
+            and  type =#{type}
+        </if>
+        union all
+        SELECT  oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW() and oid is null
+        <if test="status!=null">
+            and status in
+            <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
+                #{status[${index}]}
+            </foreach>
+        </if>
+        <if test="type!=null">
+            and  type =#{type}
+        </if>
+        order by deal_date desc
     </select>
 
     <select id="getDealTotal" resultType="java.lang.Integer">
@@ -204,7 +217,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getDealStatus" resultMap="dealEntity">
     SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8,12)
+    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8,12,13)
     </select>
 
     <select id="getCancleAction" resultMap="dealEntity">
@@ -244,7 +257,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RewardRecordModel" >
     SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
-    from ftc_reward where uid = #{uid}
+    from ftc_reward where uid = #{uid} order by reward_date desc
     </select>
 
     <select id="getOrderList" resultMap="dealEntity">
