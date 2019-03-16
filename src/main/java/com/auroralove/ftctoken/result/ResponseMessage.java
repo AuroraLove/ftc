@@ -155,9 +155,13 @@ public enum ResponseMessage {
 
 	SINGLE_SAIL_FAIL(530,"每日仅可挂卖一次"),
 
+	ADMIN_CANCLE_FAIL(541,"匹配订单状态已更新，请刷新后重试"),
+
 	SYSTEM_TIME_FAIL(539," 交易时间 9：00-21：00"),
 
 	UNRECHARGE_ERROR(539," 请先认购再交易"),
+
+	NETWORK_ERROR(511," 网络异常，订单交易价格与系统不一致，请刷新后重试"),
 
 	ACCOUNT_FROZEN_FAIL(530,"已被冻结七日警告"),
 

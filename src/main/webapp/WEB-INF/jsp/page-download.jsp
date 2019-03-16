@@ -22,10 +22,8 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
     <style type="text/css">
         *{margin:0; padding:0;}
-        a{text-decoration: none;}
         img{max-width: 100%; height: auto;}
-        .weixin-tip{display: none; position: fixed; left:0; top:0; bottom:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80);  height: 100%; width: 100%; z-index: 100;}
-        .weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;}
+        .test{height: 600px; max-width: 600px; font-size: 40px;}
     </style>
 </head>
 
@@ -36,11 +34,6 @@
 <script src="assets/js/main.js"></script>
 
 <body class="bg-white">
-<div class="weixin-tip">
-    <p>
-        <img src="live_weixin.png" alt="微信打开"/>
-    </p>
-</div>
 <div class="sufee-login d-flex align-content-center flex-wrap">
 
     <div align="center" style="width: 100%">
@@ -53,10 +46,10 @@
         <div class="login-content">
             <div style="width: 100%;padding-bottom:10px;border-bottom: 25px;display:inline"align="center">
                     <div style="width: 40%;float: left;margin-bottom: 5%;margin-left: 10%;">
-                    <input type="image" style="width: 80%" src="images/anroid.png" onclick="doAnroid()" ></input>
+                    <input type="image" style="width: 90%" src="images/anroid.png" onclick="doAnroid()" ></input>
                     </div>
                 <div style="width:40%;float: right;margin-right:10%;">
-                <input type="image" style="width: 80%" src="images/ios.png" onclick="doIOS()" ></input>
+                <input type="image" style="width: 90%" src="images/ios.png" onclick="doIOS()" ></input>
                 </div>
 
             </div>
@@ -72,29 +65,58 @@
 
 </body>
 <script type="text/javascript">
-    $(window).on("load",function(){
-        var winHeight = $(window).height();
-        function is_weixin() {
-            var ua = navigator.userAgent.toLowerCase();
-            if (ua.match(/MicroMessenger/i) == "micromessenger") {
-                return true;
-            } else {
-                return false;
-            }
+    function is_weixin() {
+        var ua = navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == "micromessenger") {
+            return true;
+        } else {
+            return false;
         }
-        var isWeixin = is_weixin();
-        if(isWeixin){
-            $(".weixin-tip").css("height",winHeight);
-            $(".weixin-tip").show();
+    }
+    var isWeixin = is_weixin();
+    var winHeight = typeof window.innerHeight != 'undefined' ? window.innerHeight : document.documentElement.clientHeight;
+    function loadHtml(){
+        var div = document.createElement('div');
+        div.id = 'weixin-tip';
+        div.innerHTML = '<p><img src="live_weixin.png" alt="微信打开"/></p>';
+        document.body.appendChild(div);
+    }
+
+    function loadStyleText(cssText) {
+        var style = document.createElement('style');
+        style.rel = 'stylesheet';
+        style.type = 'text/css';
+        try {
+            style.appendChild(document.createTextNode(cssText));
+        } catch (e) {
+            style.styleSheet.cssText = cssText; //ie9以下
         }
-    })
+        var head=document.getElementsByTagName("head")[0]; //head标签之间加上style样式
+        head.appendChild(style);
+    }
+    var cssText = "#weixin-tip{position: fixed; left:0; top:0; background: rgba(0,0,0,0.8); filter:alpha(opacity=80); width: 100%; height:100%; z-index: 100;} #weixin-tip p{text-align: center; margin-top: 10%; padding:0 5%;}";
+
 </script>
 <script>
     function doAnroid(){
-        window.location.href = '/ftctoken/app-debug.apk';
+        if(isWeixin){
+            loadHtml();
+            loadStyleText(cssText);
+        }else {
+            window.location.href = '/ftctoken/ftctoken.apk';
+
+        }
     }
     function doIOS(){
-        // window.location.href = '/download';
+        // window.location.href = "itms-services://?action=download-manifest&url=https://ssl.v07.cn/jyJZ.plist";
+            // window.location.href = '/ftctoken/ftctoken.ipa';
+        if(isWeixin){
+            loadHtml();
+            loadStyleText(cssText);
+        }else {
+            window.location.href = 'itms-services://?action=download-manifest&url=https://www.futurecoin01.com/ftctoken/ipa.plist';
+        }
+
     }
 
 </script>

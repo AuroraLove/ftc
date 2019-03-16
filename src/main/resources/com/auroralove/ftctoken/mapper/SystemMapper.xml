@@ -64,7 +64,7 @@
     </insert>
 
     <update id="systemCancleDeal">
-       update ftc_deal set status = 9 where status = 3 and type in (0,1)
+       update ftc_deal set status = 9 where status in(3,13)  and type in (0,1)
     </update>
 
 

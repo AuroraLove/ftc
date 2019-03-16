@@ -16,7 +16,8 @@
         type,
         status,
         phone,
-        user_name
+        user_name,
+        finish_date
         )
         VALUES
         (
@@ -29,7 +30,15 @@
         #{type},
         #{status},
         #{phone},
-        #{user_name}
+        #{user_name},
+        <choose>
+            <when test="type == 7">
+                DATE_ADD(NOW(),INTERVAL 1 second)
+            </when>
+            <otherwise>
+                NOW()
+            </otherwise>
+        </choose>
         )
     </insert>
 
@@ -42,15 +51,15 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getPurchaseDeals" resultType="com.auroralove.ftctoken.model.DealModel">
      SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal
-     where type = 0 and status = 3
+     where type = 0 and status = 3 order by deal_date asc
     </select>
 
     <select id="getSellDeals" resultType="com.auroralove.ftctoken.model.DealModel">
     SELECT tid,uid,user_name,phone,univalent,quantity,deal_amount,deal_date,status,type from ftc_deal
-    where type = 1 and status = 3 ORDER BY deal_date
+    where type = 1 and status = 3 ORDER BY deal_date asc
     </select>
 
-    <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.OrderModel" >
+    <insert id="newOrder" parameterType="com.auroralove.ftctoken.model.OrderModel">
         INSERT INTO ftc_order
         (
         oid,
@@ -154,16 +163,23 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </update>
 
     <update id="flushOrderDealStatus">
-       update ftc_deal set status = #{orderStatus} where oid = #{oid};
+        update ftc_deal
+        <set>
+            <if test="orderStatus==6">
+                finish_date = NOW(),
+            </if>
+            status = #{orderStatus}
+        </set>
+        where oid = #{oid};
     </update>
 
     <select id="getRecharegeDeals" resultMap="dealEntity">
-    SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where status =6 and type = 2 and  DATE_ADD(deal_date,INTERVAL 30 DAY) <![CDATA[>= ]]> NOW()
-    <if test="phone!=null">
-        and phone = #{phone}
-    </if>
-     order by deal_date desc
+        SELECT uid ,tid,oid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        from ftc_deal where status =6 and type = 2 and DATE_ADD(deal_date,INTERVAL 30 DAY) <![CDATA[>= ]]> NOW()
+        <if test="phone!=null">
+            and phone = #{phone}
+        </if>
+        order by deal_date desc
     </select>
 
     <select id="getDealRecord" resultMap="dealEntity">
@@ -172,29 +188,29 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     </select>
 
     <select id="dealRecordList" resultMap="dealEntity">
-    SELECT  oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        SELECT oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
         from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW() and tid in ( SELECT max(tid)
         from ftc_deal where oid is not null group by oid )
         <if test="status!=null">
             and status in
-            <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
+            <foreach collection="status" item="status" index="index" separator="," open="(" close=")">
                 #{status[${index}]}
             </foreach>
         </if>
         <if test="type!=null">
-            and  type =#{type}
+            and type =#{type}
         </if>
         union all
-        SELECT  oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
+        SELECT oid,uid ,tid,univalent*quantity as deal_amount,deal_date ,status,type,univalent,quantity,phone
         from ftc_deal where DATE_ADD(deal_date, INTERVAL 30 DAY )  <![CDATA[>= ]]> NOW() and oid is null
         <if test="status!=null">
             and status in
-            <foreach collection="status" item="status" index="index" separator=","  open="(" close=")">
+            <foreach collection="status" item="status" index="index" separator="," open="(" close=")">
                 #{status[${index}]}
             </foreach>
         </if>
         <if test="type!=null">
-            and  type =#{type}
+            and type =#{type}
         </if>
         order by deal_date desc
     </select>
@@ -206,18 +222,18 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
             and status = #{status}
         </if>
         <if test="type!=null">
-            and  type =#{type}
+            and type =#{type}
         </if>
     </select>
 
     <select id="getAssertDealRecord" resultMap="dealEntity">
-    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1,7) and status=6 order by deal_date desc
+    SELECT uid ,tid,oid, deal_amount,finish_date as deal_date ,status,type,univalent,quantity,phone
+    from ftc_deal where uid = #{id} and type in (0,1,7) and status=6 order by finish_date desc
     </select>
 
     <select id="getDealStatus" resultMap="dealEntity">
     SELECT uid ,tid,oid,deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8,12,13)
+    from ftc_deal where uid = #{id} and type in (0,1) and status in(3,4,5,8,12,13) order by deal_date desc
     </select>
 
     <select id="getCancleAction" resultMap="dealEntity">
@@ -252,29 +268,29 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
 
     <select id="getUnfinishedDeal" resultType="java.lang.Integer">
     SELECT IFNULL(count(1),0)
-    from ftc_deal where uid = #{uid} and status in (3,4,5,8)
+    from ftc_deal where uid = #{uid} and status in (3,4,5,8,13)
     </select>
 
-    <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RewardRecordModel" >
+    <select id="getRewardRecord" resultType="com.auroralove.ftctoken.model.RewardRecordModel">
     SELECT rid,uid,child_id as childId,child_phone as childPhone,level,amount,reward_date as rewardDate
     from ftc_reward where uid = #{uid} order by reward_date desc
     </select>
 
     <select id="getOrderList" resultMap="dealEntity">
-    SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
-    from ftc_deal where 1=1
+        SELECT uid ,tid,oid, deal_amount,deal_date ,status,type,univalent,quantity,phone
+        from ftc_deal where 1=1
         <if test="status!=null">and status=#{status}</if>
         <if test="type!=null">and type=#{type}</if>
-     order by deal_date desc
+        order by deal_date desc
     </select>
     <select id="getOrderCount" resultType="java.lang.Integer">
-    SELECT IFNULL(count(0),0)
-    from ftc_deal where 1=1
+        SELECT IFNULL(count(0),0)
+        from ftc_deal where 1=1
         <if test="status!=null">and status=#{status}</if>
         <if test="type!=null">and type=#{type}</if>
     </select>
 
-    <update id="updateDealStatus" >
+    <update id="updateDealStatus">
         update ftc_deal
         <set>
             status = #{dealStatus}
@@ -285,11 +301,11 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
     <update id="updateOrder" parameterType="com.auroralove.ftctoken.model.OrderModel">
         update ftc_order
         <set>
-          <if test="status==5">
-              status = #{status},
-              pay_way = #{pay_way},
-              pay_date = NOW(),
-          </if>
+            <if test="status==5">
+                status = #{status},
+                pay_way = #{pay_way},
+                pay_date = NOW(),
+            </if>
             <if test="status==6">
                 status = #{status},
                 affirm_date = NOW(),
@@ -319,6 +335,7 @@ select t1.uid,(IFNULL(t1.buy_release_amount,0)- IFNULL(t2.sell_amount,0)) as  tr
         <result column="oid" property="oid"/>
         <result column="deal_amount" property="tradingAmount"/>
         <result column="deal_date" property="tadingDate"/>
+        <result column="finish_date" property="finishDate"/>
         <result column="status" property="tradingStatus"/>
         <result column="type" property="type"/>
         <result column="univalent" property="univalent"/>

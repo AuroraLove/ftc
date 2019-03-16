@@ -110,11 +110,17 @@ public class UserService {
      */
     @Transactional
     public int recharge(Dfilter dfilter) throws Exception {
+        dfilter.setDealType(2);
         DealModel dealModel = new DealModel(dfilter);
         //获取用户交易资料
-        UserPayModel payModel = userMapper.getPayInfo(dfilter.getId());
-        dealModel.setPhone(payModel.getPhone());
-        dealModel.setUser_name(payModel.getName());
+//        UserPayModel payModel = userMapper.getPayInfo(dfilter.getId());
+//        if (payModel == null){
+//            //先确认用户资料
+//            return -8;
+//        }
+        UserModel userModel = userMapper.findUserById(dfilter.getId());
+        dealModel.setPhone(userModel.getPhone());
+//        dealModel.setUser_name(payModel.getName());
         dealModel.setType(DealEnum.DEALTYPE_RECHARGE.getValue());
         dealModel.setTid(idWorker.nextId());
         //增加用户充值记录
@@ -151,7 +157,7 @@ public class UserService {
         //短信验证码是否正确
         int n = veritifyCode(ufilter.getPhone(),ufilter.getCode());
         if (n != 0){
-            return -1;
+            return n;
         }
     	int reslut = userMapper.changeLoginPwd(ufilter.getPhone(),ufilter.getPassWord());
         return reslut;
@@ -166,7 +172,7 @@ public class UserService {
         //短信验证码是否正确
         int n = veritifyCode(ufilter.getPhone(),ufilter.getCode());
         if (n != 0){
-            return -1;
+            return n;
         }
     	int reslut = userMapper.changePayPwd(ufilter.getId(),ufilter.getPayPwd());
         return reslut;
@@ -505,7 +511,7 @@ public class UserService {
             String pictureName = savePicture(systemModel.getSystemPicture(),request);
             systemModel.setGatheringCode(pictureName);
         }
-        //更新价格后，撤销所有订单
+        //更新价格后，撤销所有匹配中订单
         if (systemModel.getCNY() != null){
             SystemModel systemInfo = systemMapper.getSystemInfo();
             if (!systemInfo.getCNY().equals(systemModel.getCNY())){

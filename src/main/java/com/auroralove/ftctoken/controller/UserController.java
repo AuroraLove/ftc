@@ -77,6 +77,18 @@ public class UserController {
         if (ufilter.getAmdinFlag() != null && userForBase.getAmdinStatus().equals(0)) {
             return new ResponseResult(ResponseMessage.INADEQUATE_PERMISSIONS);
         }
+
+        if (ufilter.getAmdinFlag() != null && userForBase.getAmdinStatus().equals(1)) {
+            //后台手机号验证
+            //验证手机验证码是否正确
+            int i = userService.veritifyCode(ufilter.getPhone(), ufilter.getCode());
+            if (i == -1) {
+                return new ResponseResult(ResponseMessage.FAIL_CODE);
+            }
+            if (i == -2) {
+                return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
+            }
+        }
         //APP端设置访问权限，执行踢人操作
         if (ufilter.getAmdinFlag() == null){
             ufilter.setAmdinFlag(0);
@@ -282,6 +294,9 @@ public class UserController {
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.RECHARGE_OK);
             }
+            if (result > 0) {
+                return new ResponseResult(ResponseMessage.RECHARGE_OK);
+            }
             return new ResponseResult(ResponseMessage.RECHARGE_FAIL);
         }
         return new ResponseResult(ResponseMessage.INTERNAL_SERVER_ERROR);
@@ -299,6 +314,12 @@ public class UserController {
             int result = userService.changeLoginPwd(ufilter);
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.OK);
+            }
+            if (result == -1){
+                return new ResponseResult(ResponseMessage.SMS_UNUSED);
+            }
+            if (result == -2){
+                return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
             }
             return new ResponseResult(ResponseMessage.UPDATE_FAIL);
         }
@@ -318,7 +339,10 @@ public class UserController {
             UserModel userModel = userService.findUserById(ufilter.getId());
             ufilter.setPhone(userModel.getPhone());
             int result = userService.changePayPwd(ufilter);
-            if (result == -1) {
+            if (result == -1){
+                return new ResponseResult(ResponseMessage.SMS_UNUSED);
+            }
+            if (result == -2){
                 return new ResponseResult(ResponseMessage.SMS_CODE_FAIL);
             }
             if (result > 0) {
@@ -484,7 +508,7 @@ public class UserController {
      * @param
      * @return
      */
-//    @UserLoginToken
+    @UserLoginToken
     @PostMapping("/home/teamInfo")
     public ResponseResult teamInfo(Ufilter ufilter) throws Exception {
         if (ufilter.getId() != null) {

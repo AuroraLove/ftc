@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.auroralove.ftctoken.dict.DealEnum;
+import com.auroralove.ftctoken.filter.Dfilter;
 import com.auroralove.ftctoken.model.OrderModel;
 import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.utils.IdWorker;
@@ -35,9 +37,9 @@ public class GetOrderThread {
     @Autowired
     private DealMapper dealMapper;
 
-    @Transactional(rollbackFor = Exception.class)
-    @Scheduled(cron = "${matching.Btime.cron}")
-    @SchedulerLock(name = "orderAutomatic", lockAtLeastForString = "PT10S", lockAtMostForString = "PT2M")
+
+//    @Scheduled(cron = "${matching.Btime.cron}")
+//    @SchedulerLock(name = "orderAutomatic", lockAtLeastForString = "PT5S", lockAtMostForString = "PT30S")
     public void matchingOrder() {
         System.out.println("===========开始匹配任务" + new Date() + "================");
         //获取买卖方链表第一个订单
@@ -58,6 +60,21 @@ public class GetOrderThread {
                 Thread.sleep(1000);
                 return;
             }
+            //判断订单状态是否已经撤销
+            DealModel purchaseModel = dealService.getDealRecordInfo(new Dfilter(purchaseDeal.getTid()));
+            if (!purchaseModel.getStatus().equals(DealEnum.MATCHING_STATUS.getValue())
+                    && !purchaseModel.getStatus().equals(DealEnum.MATCHING_DEAL_STATUS.getValue())){
+                //买单撤销，清除缓存，放还卖单
+                SysCache.blockS.offer(sellDeal);
+                return;
+            }
+            DealModel sellDealModel = dealService.getDealRecordInfo(new Dfilter(sellDeal.getTid()));
+            if (!sellDealModel.getStatus().equals(DealEnum.MATCHING_STATUS.getValue())
+                    &&!sellDealModel.getStatus().equals(DealEnum.MATCHING_DEAL_STATUS.getValue())){
+                SysCache.blockP.offer(purchaseDeal);
+                return;
+            }
+
             //若买卖为同一个用户则调整队列顺序
             while (true) {
                 if (!(purchaseDeal.getUid()).equals(sellDeal.getUid())) {

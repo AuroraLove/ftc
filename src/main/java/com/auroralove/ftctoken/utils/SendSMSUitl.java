@@ -68,7 +68,7 @@ public class SendSMSUitl {
 		//新建一个StringBuffer链接
 		StringBuffer buffer = new StringBuffer();
 
-		String contentResult = content + code + ",有效时间1分钟";
+		String contentResult = content + code + ",有效时间10分钟";
 		try {
 			String contentUrlEncode = URLEncoder.encode(contentResult,encode);  //对短信内容做Urlencode编码操作。注意：如
 

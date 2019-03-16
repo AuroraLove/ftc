@@ -104,4 +104,8 @@ public class Dfilter{
         this.oid = oid;
         this.orderStatus = status;
     }
+
+    public Dfilter(Long tid) {
+        this.did = tid;
+    }
 }

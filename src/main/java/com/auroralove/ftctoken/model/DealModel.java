@@ -91,7 +91,18 @@ public class DealModel {
         this.type = dfilter.getDealType();
         this.univalent = dfilter.getUnivalent();
         this.quantity = dfilter.getQuantity();
-        this.deal_amount = dfilter.getAmount();
+        if (dfilter.getDealType().equals(2)) {
+            //充值不扣除手续费
+            this.deal_amount = dfilter.getAmount();
+        }
+        if (dfilter.getDealType().equals(0)){
+            //买扣除手续费，为币的数量
+            this.deal_amount = dfilter.getQuantity() * (1 - 0.002);
+        }
+        if (dfilter.getDealType().equals(1)){
+            //买扣除手续费，为币的数量
+            this.deal_amount = dfilter.getQuantity() * (1 + 0.002);
+        }
         this.phone = dfilter.getPhone();
         this.user_name = dfilter.getUserName();
     }

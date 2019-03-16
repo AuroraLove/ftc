@@ -99,12 +99,14 @@ public class DealController {
         if (dfilter.getId() != null) {
             AccountEntity accountEntity = userService.userAccount(dfilter.getId());
             int result = dealService.deal(dfilter, accountEntity);
+            if (result == -13) {
+                return new ResponseResult(ResponseMessage.NETWORK_ERROR);
+            }
             if (result == -12) {
                 return new ResponseResult(ResponseMessage.UNRECHARGE_ERROR);
             }
             if (result == -11) {
-                return new ResponseResult(ResponseMessage.SYSTEM_TIME_FAIL);
-            }
+                return new ResponseResult(ResponseMessage.SYSTEM_TIME_FAIL);            }
             if (result == -5) {
                 return new ResponseResult(ResponseMessage.SINGLE_SAIL_FAIL);
             }
@@ -189,6 +191,10 @@ public class DealController {
     public ResponseResult updateDealStatus(Dfilter dfilter) {
         if (dfilter.getDid() != null) {
             int result = dealService.updateDealStatus(dfilter);
+            //正在执行匹配任务，禁止撤销
+            if (result == -1) {
+                return new ResponseResult(ResponseMessage.ADMIN_CANCLE_FAIL);
+            }
             if (result > 0) {
                 return new ResponseResult(ResponseMessage.OK, true);
             }
@@ -202,7 +208,7 @@ public class DealController {
      * @param
      * @return
      */
-    @UserLoginToken
+//    @UserLoginToken
     @PostMapping("/myDeal/orderInfo")
     public ResponseResult orderInfo(Dfilter dfilter) {
         if (dfilter.getOid() != null) {

@@ -94,7 +94,8 @@
         deal_date,
         status,
         type,
-        phone
+        phone,
+        finish_date
         )
         VALUES
         (
@@ -107,7 +108,8 @@
         NOW(),
         6,
         2,
-        #{phone}
+        #{phone},
+        NOW()
         )
     </insert>
 
@@ -357,14 +359,14 @@ where uid= #{id} GROUP BY uid
         <set>
             code = #{code},
             new_time = NOW(),
-            loss_time = ADDDATE(NOW(),interval 60 second)
+            loss_time = ADDDATE(NOW(),interval 10 MINUTE )
         </set>
         where phone = #{phone}
     </update>
 
     <insert id="newVeritifyInfo" >
         insert into ftc_veritify (phone,code,new_time,loss_time)
-        values (#{phone},#{code},NOW(),ADDDATE(NOW(),interval 60 second))
+        values (#{phone},#{code},NOW(),ADDDATE(NOW(),interval 10 MINUTE))
     </insert>
     <resultMap id="messageInfoList" type="com.auroralove.ftctoken.model.MessageModelList">
         <result property="tid" column="tid"/>

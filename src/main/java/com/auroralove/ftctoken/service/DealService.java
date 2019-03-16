@@ -8,15 +8,17 @@ import com.auroralove.ftctoken.mapper.DealMapper;
 import com.auroralove.ftctoken.mapper.SystemMapper;
 import com.auroralove.ftctoken.mapper.UserMapper;
 import com.auroralove.ftctoken.model.*;
+import com.auroralove.ftctoken.platform.JPushInstance;
 import com.auroralove.ftctoken.store.TaskQueueManager;
 import com.auroralove.ftctoken.utils.CanlendarUtil;
 import com.auroralove.ftctoken.utils.IdWorker;
-import com.auroralove.ftctoken.utils.SysCache;
+import com.auroralove.ftctoken.utils.JsonUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
 import net.javacrumbs.shedlock.core.SchedulerLock;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * 交易大厅
@@ -127,8 +130,13 @@ public class DealService {
     @Transactional(rollbackFor = Exception.class)
     public int deal(Dfilter dfilter, AccountEntity accountEntity) {
         DealModel dealModel = new DealModel(dfilter);
+        SystemModel systemInfo = systemMapper.getSystemInfo();
         if (dfilter.getDealType().equals(DealEnum.RECHARGE_FLAG.getValue())
                 || dfilter.getDealType().equals(DealEnum.SELL_FLAG.getValue())) {
+            if (!systemInfo.getCNY().equals(dealModel.getUnivalent())){
+                //网络异常，订单交易价格和系统价格不一致
+                return -13;
+            }
             //验证用户交易密码
             //获取用户
             UserModel user = userMapper.findUserById(dfilter.getId());
@@ -179,19 +187,15 @@ public class DealService {
                 }
                 //判断可交易金额是否大于订单提交金额
                 Double tradeableAcct = accountEntity.getTradeableAcct();
-                if (tradeableAcct == null || tradeableAcct < dfilter.getAmount()) {
+                if (tradeableAcct == null || tradeableAcct < dealModel.getDeal_amount()) {
                     return -6;
                 }
             }
             //判断用户是否当日有撤销操作
             List<DealEntity> cancleModels = dealMapper.getCancleAction(dfilter.getId());
-            for (DealEntity cancleModel : cancleModels) {
-                //判断是否为订单撤销操作
-                if (cancleModel.getOid() != null) {
-                    return -7;
-                }
+            if (cancleModels.size() > 0) {
+                return -7;
             }
-
             //默认状态匹配中
             dealModel.setStatus(DealEnum.MATCHING_STATUS.getValue());
         }
@@ -223,10 +227,13 @@ public class DealService {
      */
     @Transactional(rollbackFor = Exception.class)
     public int updateDealStatus(Dfilter dfilter) {
-//        if (dfilter.getDealStatus().equals(9)){
-//            //如果交易撤销，则将记录推出状态10，即系统撤销，页面不可见状态
-//            return dealMapper.updateDealStatus(dfilter.getDid(),10);
-//        }
+        if (dfilter.getDealStatus().equals(DealEnum.SYSTEM_CANLCE_STATUS.getValue())){
+            DealModel dealRecordInfo = dealMapper.getDealRecordInfo(dfilter.getDid());
+            if (dealRecordInfo.getStatus().equals(DealEnum.UNPAID.getValue())){
+                //正在执行匹配任务，禁止撤销
+                return -1;
+            }
+        }
         return dealMapper.updateDealStatus(dfilter.getDid(), dfilter.getDealStatus());
     }
 
@@ -251,7 +258,7 @@ public class DealService {
     public int updateOrder(Dfilter dfilter) {
         OrderModel orderModel = new OrderModel(dfilter);
         OrderModel order = dealMapper.getOrder(dfilter.getOid());
-        if (order.getStatus().equals(dfilter.getOrderStatus())){
+        if (order.getStatus().equals(dfilter.getOrderStatus())) {
             //不能执行两次相同操作
             return -1;
         }
@@ -262,10 +269,10 @@ public class DealService {
         }
         //执行单向撤销
         if (dfilter.getOrderStatus().equals(9)) {
-            if (dfilter.getAdminFlag() != null){
+            if (dfilter.getAdminFlag() != null) {
                 //后台执行双向撤销
                 result = flushOrderDealStatus(dfilter.getOrderStatus(), dfilter.getOid());
-            }else {
+            } else {
                 Dfilter buyFilter = new Dfilter();
                 buyFilter.setDid(order.getDeal_buy_id());
                 //卖单继续匹配
@@ -394,64 +401,116 @@ public class DealService {
         return totalInfoModel;
     }
 
-
-    @Scheduled(cron = "${model.Btime.cron}")
-    @SchedulerLock(name = "matchOrder", lockAtLeastForString = "PT10S", lockAtMostForString = "PT1M")
+    /**
+     * 取匹配订单
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class)
-    public void matchOrder() {
-        System.out.println("================数据库拉取匹配订单开始==================");
+    public synchronized Map<String, List<DealModel>> getMatchingList() throws Exception {
+        Map<String,List<DealModel>> dealList = new HashMap<>(16);
         // 获取买单数
         List<DealModel> purchaseDeals = dealMapper.getPurchaseDeals();
         // 获取卖单数
         List<DealModel> sellDeals = dealMapper.getSellDeals();
+//        for (DealModel purchaseDeal : purchaseDeals) {
+//            dealMapper.updateDealStatus(purchaseDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//        }
+//        for (DealModel sellDeal : sellDeals) {
+//            dealMapper.updateDealStatus(sellDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//        }
+        dealList.put("sellDeals",sellDeals);
+        dealList.put("purchaseDeals",purchaseDeals);
+        return dealList;
+    }
 
-        for (DealModel purchaseDeal : purchaseDeals) {
-            int n = dealMapper.updateDealStatus(purchaseDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
-            if (n > 0) {
-                SysCache.blockP.add(purchaseDeal);
-            }
-        }
-        for (DealModel sellDeal : sellDeals) {
-            int n = dealMapper.updateDealStatus(sellDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
-            if (n > 0) {
-                SysCache.blockS.add(sellDeal);
-            }
-        }
+    @Scheduled(cron = "${model.Btime.cron}")
+    @SchedulerLock(name = "matchOrder", lockAtLeastForString = "PT15S", lockAtMostForString = "PT1M")
+    @Transactional(rollbackFor = Exception.class)
+    public void matchOrder() throws Exception {
+        System.out.println("================数据库拉取匹配订单开始==================");
+        // 获取买单数
+//        List<DealModel> purchaseDeals = dealMapper.getPurchaseDeals();
+//        // 获取卖单数
+//        List<DealModel> sellDeals = dealMapper.getSellDeals();
+
+//        for (DealModel purchaseDeal : purchaseDeals) {
+//            int n = dealMapper.updateDealStatus(purchaseDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//            if (n > 0) {
+//                SysCache.blockP.add(purchaseDeal);
+//            }
+//        }
+//        for (DealModel sellDeal : sellDeals) {
+//            int n = dealMapper.updateDealStatus(sellDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//            if (n > 0) {
+//                SysCache.blockS.add(sellDeal);
+//            }
+//        }
 
 //        //获取买单数
 //        List<DealModel> purchaseDeals =  dealMapper.getPurchaseDeals();
 //        //获取卖单数
 //        List<DealModel> sellDeals =  dealMapper.getSellDeals();
-//        List<OrderModel> orders = new ArrayList<>();
-        //记录已匹配订单
-//        HashMap<Long,OrderModel> matchedOrders = new HashMap<Long,OrderModel>();
-//
-//        for (DealModel purchaseDeal:purchaseDeals){
-//            for (DealModel sellDeal:sellDeals){
-//                //卖方交易金额
-//                Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
-//                //买方交易金额
-//                Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
-//                //以买方匹配订单号作为key,判断是否为已匹配订单，是否交易金额相等，是否用户id相等
-//                if (!matchedOrders.containsKey(sellDeal.getTid())
-//                        && !(purchaseDeal.getUid()).equals(sellDeal.getUid())
-//                        && sellAmount.equals(buyAmount)
-//                        && !matchedOrders.containsKey(purchaseDeal.getTid())){
-//                    OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
-//                    orderModel.setOid(idWorker.nextId());
-//                    int n = dealMapper.newOrder(orderModel);
-//                    if (n > 0){
-//                        orders.add(orderModel);
-//                        //更新买单卖单状态，并新增oid在匹配订单中
-//                        n = updateOrderDealStatus(purchaseDeal.getTid(),sellDeal.getTid(),orderModel.getOid());
-//                        //将已匹配订单放入HashMap
-//                        matchedOrders.put(sellDeal.getTid(),orderModel);
-//                        matchedOrders.put(purchaseDeal.getTid(),orderModel);
-//                    }
-//                }
+
+//        for (DealModel purchaseDeal : purchaseDeals) {
+//            int n = dealMapper.updateDealStatus(purchaseDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//            if (n == 0) {
+//                throw new Exception();
+//            }
+//        }
+//        for (DealModel sellDeal : sellDeals) {
+//            int n = dealMapper.updateDealStatus(sellDeal.getTid(), DealEnum.MATCHING_DEAL_STATUS.getValue());
+//            if (n == 0) {
+//                throw new Exception();
 //            }
 //        }
 
+        Map<String, List<DealModel>> matchingList = getMatchingList();
+        //获取买单数
+        List<DealModel> purchaseDeals = matchingList.get("purchaseDeals");
+        //获取卖单数
+        List<DealModel> sellDeals = matchingList.get("sellDeals");
+        List<OrderModel> orders = new ArrayList<>();
+//        记录已匹配订单
+        HashMap<Long, OrderModel> matchedOrders = new HashMap<>(16);
+
+        for (DealModel purchaseDeal : purchaseDeals) {
+            for (DealModel sellDeal : sellDeals) {
+                //卖方交易金额
+                Double sellAmount = purchaseDeal.getQuantity() * purchaseDeal.getUnivalent();
+                //买方交易金额
+                Double buyAmount = sellDeal.getQuantity() * sellDeal.getUnivalent();
+                //以买方匹配订单号作为key,判断是否为已匹配订单，是否交易金额相等，是否用户id相等
+                if (!matchedOrders.containsKey(sellDeal.getTid())
+                        && !(purchaseDeal.getUid()).equals(sellDeal.getUid())
+                        && sellAmount.equals(buyAmount)
+                        && !matchedOrders.containsKey(purchaseDeal.getTid())) {
+                    LoggerFactory.getLogger(DealService.class).info("purchaseDeal.getUid()"+purchaseDeal.getUid()+"======="+"sellDeal.getUid()"+sellDeal.getUid());
+                    OrderModel orderModel = new OrderModel(purchaseDeal, sellDeal);
+                    orderModel.setOid(idWorker.nextId());
+                    int n = dealMapper.newOrder(orderModel);
+                    if (n == 0) {
+                        throw new Exception();
+                    }
+                    orders.add(orderModel);
+                    //更新买单卖单状态，并新增oid在匹配订单中
+                    n = updateOrderDealStatus(purchaseDeal.getTid(), sellDeal.getTid(), orderModel.getOid());
+                    if (n == 0) {
+                        throw new Exception();
+                    }
+                    //将已匹配订单放入HashMap
+                    matchedOrders.put(sellDeal.getTid(), orderModel);
+                    matchedOrders.put(purchaseDeal.getTid(), orderModel);
+                }
+            }
+        }
+        if (orders.size() > 0) {
+            for (OrderModel orderModel : orders) {
+                //调用极光推送消息
+                JPushInstance.SendPush(JsonUtils.objectToJson(orderModel), orderModel.getBuyer_id()
+                        , orderModel.getSeller_id());
+            }
+        }
 //        //遍历订单进行匹配
 //        Iterator purchaseIterator = purchaseDeals.iterator();
 //        //遍历卖方
@@ -585,6 +644,7 @@ public class DealService {
 
     /**
      * 初始化匹配中订单
+     *
      * @return
      */
     public int initDealMatchingOrder() {
